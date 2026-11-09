@@ -1,0 +1,114 @@
+{
+ "version": 0.6,
+ "generator": "Overpass API 0.7.62.4",
+ "osm3s": {
+  "timestamp_osm_base": "2026-11-08T21:14:03Z",
+  "timestamp_areas_base": "2026-11-08T12:00:00Z",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+ },
+ "elements": [
+  {
+   "type": "area",
+   "id": 3600191645
+  },
+  {
+   "type": "node",
+   "id": 9100000001,
+   "lat": 51.0504,
+   "lon": 13.7373,
+   "tags": {
+    "name": "Elbtal Cloud Systems GmbH",
+    "office": "it",
+    "website": "https://www.elbtal-cloud.de/?utm_source=osm",
+    "addr:street": "Musterstraße",
+    "addr:housenumber": "12",
+    "addr:postcode": "01067",
+    "addr:city": "Dresden",
+    "phone": "+49 351 000000",
+    "email": "info@elbtal-cloud.de"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9100000002,
+   "lat": 51.06,
+   "lon": 13.74,
+   "tags": {
+    "name": "Neustadt Software UG (haftungsbeschränkt)",
+    "office": "software",
+    "contact:website": "neustadt-software.de"
+   }
+  },
+  {
+   "type": "way",
+   "id": 9200000001,
+   "center": {
+    "lat": 51.12,
+    "lon": 13.78
+   },
+   "tags": {
+    "name": "Halbleiterwerk Klotzsche",
+    "man_made": "works",
+    "industrial": "semiconductor",
+    "website": "https://karriere.halbleiterwerk-beispiel.de/de/"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9100000003,
+   "lat": 51.03,
+   "lon": 13.72,
+   "tags": {
+    "name": "Ingenieurbüro Weißeritz",
+    "office": "engineer",
+    "website": "https://www.facebook.com/ib.weisseritz"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9100000004,
+   "lat": 51.04,
+   "lon": 13.73,
+   "tags": {
+    "name": "Elbtal Cloud Systems – Standort Süd",
+    "office": "it",
+    "website": "https://elbtal-cloud.de/kontakt"
+   }
+  },
+  {
+   "type": "relation",
+   "id": 9300000001,
+   "center": {
+    "lat": 51.02,
+    "lon": 13.71
+   },
+   "tags": {
+    "name": "Institut für Beispielforschung",
+    "amenity": "research_institute",
+    "website": "http://institut-beispiel.de;https://www.institut-beispiel.de/en"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9100000005,
+   "lat": 51.05,
+   "lon": 13.7,
+   "tags": {
+    "office": "it",
+    "website": "https://ohne-namen.de"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9100000006,
+   "lat": 51.05,
+   "lon": 13.7,
+   "tags": {
+    "name": "Müller Präzisionstechnik",
+    "office": "company",
+    "industry": "Maschinenbau manufacturing",
+    "website": "müller-präzision.de"
+   }
+  }
+ ]
+}

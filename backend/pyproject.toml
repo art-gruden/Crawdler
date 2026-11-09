@@ -1,0 +1,28 @@
+[project]
+name = "germany-career-crawler"
+version = "0.1.0"
+description = "Company discovery and career-page crawling for German employers"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+
+[tool.setuptools.packages.find]
+include = ["gcc_core*", "company_discovery*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+asyncio_mode = "auto"
+filterwarnings = ["ignore::DeprecationWarning:alembic.*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]

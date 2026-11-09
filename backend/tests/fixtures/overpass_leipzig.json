@@ -1,0 +1,36 @@
+{
+ "version": 0.6,
+ "osm3s": {
+  "timestamp_osm_base": "2026-11-08T21:15:00Z"
+ },
+ "elements": [
+  {
+   "type": "area",
+   "id": 3600062649
+  },
+  {
+   "type": "node",
+   "id": 9100000101,
+   "lat": 51.34,
+   "lon": 12.37,
+   "tags": {
+    "name": "Pleiße Data Center AG",
+    "office": "it",
+    "website": "https://pleisse-dc.de",
+    "addr:city": "Leipzig",
+    "addr:postcode": "04109"
+   }
+  },
+  {
+   "type": "node",
+   "id": 9100000102,
+   "lat": 51.33,
+   "lon": 12.38,
+   "tags": {
+    "name": "Elbtal Cloud Systems Niederlassung Leipzig",
+    "office": "it",
+    "website": "https://www.elbtal-cloud.de"
+   }
+  }
+ ]
+}

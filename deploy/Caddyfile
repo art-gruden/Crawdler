@@ -1,0 +1,43 @@
+# SITE_ADDRESS: your domain (automatic Let's Encrypt certificate) or "localhost"
+# (Caddy's internal CA, for testing). Port 80 redirects to HTTPS.
+{
+	email {$ACME_EMAIL:}
+}
+
+{$SITE_ADDRESS:localhost} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		-Server
+	}
+
+	# Strict CSP for the dashboard; the Swagger UI under /api/docs loads its assets from jsDelivr.
+	@docs path /api/docs
+	@app not path /api/docs
+	header @app Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+	header @docs Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://fastapi.tiangolo.com; frame-ancestors 'none'"
+
+	# CSV uploads: the API itself limits files to IMPORT_MAX_MB.
+	request_body /api/companies/import {
+		max_size 25MB
+	}
+
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

@@ -1,0 +1,5 @@
+Firmen-ID,Firmenname,Internet,Straße,PLZ,Ort,Landkreis,Technologiefelder,WZ 2008,Mitarbeiter
+SN-1001,Elbtal Cloud Systems GmbH,https://elbtal-cloud.de,Musterstraße 12,01067,Dresden,Dresden,MICRO!,62.01,50-99
+SN-1002,Vogtland Sensorik GmbH,vogtland-sensorik.de,Industriestraße 3,08523,Plauen,Vogtlandkreis,"MASCHINE!, MICRO!",26.51,100-249
+SN-1003,Saxonia BioLab GmbH,https://www.saxonia-biolab.de,Am Labor 7,04103,Leipzig,Leipzig,LIFE SCIENCES!,72.11,10-49
+SN-1004,Chemnitzer Werkzeugbau GmbH,http://werkzeugbau-chemnitz.de,Werkstraße 1,09111,Chemnitz,Chemnitz,MASCHINE!,28.41,250-499

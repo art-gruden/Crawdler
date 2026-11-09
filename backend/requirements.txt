@@ -1,0 +1,16 @@
+# Runtime dependencies (versions tested together).
+fastapi==0.162.2
+uvicorn[standard]==0.54.0
+SQLAlchemy==2.1.8
+alembic==1.20.1
+psycopg[binary]==3.3.8
+celery[redis]==5.7.0
+redis==8.1.0
+httpx==0.28.1
+pydantic==2.13.5
+pydantic-settings==2.16.2
+python-multipart==0.0.32
+PyJWT==2.15.0
+tldextract==5.4.0
+Protego==0.7.0
+structlog==26.1.0

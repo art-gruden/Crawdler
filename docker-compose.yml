@@ -1,0 +1,125 @@
+# Germany Career Crawler – company discovery stack.
+#   cp .env.example .env   # fill in passwords and SITE_ADDRESS
+#   docker compose up -d --build
+name: gcc
+
+x-backend: &backend
+  build: ./backend
+  image: gcc-backend:0.1.0
+  env_file: .env
+  environment:
+    DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-gcc}:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-gcc}
+    REDIS_URL: redis://redis:6379/0
+    DATA_DIR: /data
+  volumes:
+    - appdata:/data
+  restart: unless-stopped
+  networks: [internal, egress]
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-gcc}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-gcc}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks: [internal]
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "100"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks: [internal]
+
+  api:
+    <<: *backend
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=5).status == 200 else 1)"]
+      interval: 15s
+      timeout: 6s
+      start_period: 30s
+      retries: 5
+
+  # One Overpass request at a time: the discovery queue runs with concurrency 1.
+  worker-discovery:
+    <<: *backend
+    command: ["celery", "-A", "gcc_core.celery_app", "worker", "-Q", "discovery", "-c", "1", "-n", "discovery@%h", "--loglevel=INFO"]
+    depends_on:
+      api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A gcc_core.celery_app inspect ping -d discovery@$$HOSTNAME --timeout 10 | grep -q pong"]
+      interval: 60s
+      timeout: 20s
+      retries: 3
+
+  worker-verify:
+    <<: *backend
+    command: ["celery", "-A", "gcc_core.celery_app", "worker", "-Q", "verify,default", "-c", "2", "-n", "verify@%h", "--loglevel=INFO"]
+    depends_on:
+      api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A gcc_core.celery_app inspect ping -d verify@$$HOSTNAME --timeout 10 | grep -q pong"]
+      interval: 60s
+      timeout: 20s
+      retries: 3
+
+  beat:
+    <<: *backend
+    command: ["celery", "-A", "gcc_core.celery_app", "beat", "--loglevel=INFO", "-s", "/data/celerybeat-schedule"]
+    depends_on:
+      api: { condition: service_healthy }
+
+  web:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile.web
+    image: gcc-web:0.1.0
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - caddydata:/data
+      - caddyconfig:/config
+    depends_on:
+      api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "--no-check-certificate", "http://127.0.0.1:2019/config/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks: [internal, egress]
+
+volumes:
+  pgdata:
+  redisdata:
+  appdata:
+  caddydata:
+  caddyconfig:
+
+networks:
+  internal:
+    internal: true   # db and redis have no internet access
+  egress: {}
