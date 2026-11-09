@@ -65,7 +65,8 @@ def clean_db(migrated_db):
         conn.execute(
             text(
                 "TRUNCATE companies, company_sources, scan_requests, external_api_usage, "
-                "discovery_jobs, discovery_job_items RESTART IDENTITY CASCADE"
+                "discovery_jobs, discovery_job_items, career_sources, jobs, job_skills, crawl_runs, crawl_pages, "
+                "crawl_metrics, site_fingerprints, extraction_errors RESTART IDENTITY CASCADE"
             )
         )
     import shutil

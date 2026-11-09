@@ -119,3 +119,155 @@ export interface Usage {
   last_request_at: string | null;
   min_interval_s: number;
 }
+
+// --- career crawler ---------------------------------------------------------------
+
+export interface Vacancy {
+  id: number;
+  company_id: number;
+  company_name: string;
+  company_domain: string | null;
+  title: string;
+  city: string | null;
+  postcode: string | null;
+  country: string | null;
+  location_raw: string | null;
+  remote_type: string;
+  employment_types: string[];
+  date_posted: string | null;
+  discovered_at: string;
+  last_seen_at: string;
+  status: string;
+  source_url: string;
+  application_url: string | null;
+  extraction_method: string;
+  confidence: number;
+  salary_min: number | null;
+  salary_max: number | null;
+  salary_currency: string | null;
+  salary_period: string | null;
+  skills: string[];
+}
+
+export interface VacancyDetail extends Vacancy {
+  career_page_url: string | null;
+  canonical_url: string | null;
+  description: string | null;
+  requirements: string[];
+  responsibilities: string[];
+  languages: { language: string; level: string | null; required: boolean; raw?: string }[];
+  salary_raw: string | null;
+  valid_through: string | null;
+  closed_at: string | null;
+  miss_count: number;
+  ats_type: string | null;
+  ats_job_id: string | null;
+  source_values: Record<string, unknown>;
+}
+
+export interface MethodCounts {
+  ok: number;
+  fail: number;
+  jobs: number;
+}
+
+export interface WorkerSample {
+  worker: string;
+  at: string;
+  cpu_pct: number | null;
+  mem_available_mb: number | null;
+  container_mem_mb: number | null;
+  http_limit: number | null;
+  http_active: number | null;
+  browser_active: number | null;
+  browser_paused: boolean | null;
+}
+
+export interface CrawlerStats {
+  window_hours: number;
+  active_scans: number;
+  completed_scans: number;
+  outcomes: Record<string, number>;
+  companies_per_hour: number;
+  pages_per_second: number;
+  pages: number;
+  requests: number;
+  mb_downloaded: number;
+  avg_latency_ms: number | null;
+  rate_429_503: number;
+  fetch_errors: number;
+  jobs_open: number;
+  jobs_total: number;
+  jobs_new: number;
+  browser_pages: number;
+  extraction_by_method: Record<string, MethodCounts>;
+  open_jobs_by_method: Record<string, number>;
+  queues: { scan_pending: number; scan_claimed: number; browser_pending: number; llm_pending: number };
+  workers: WorkerSample[];
+}
+
+export interface TimePoint {
+  t: string;
+  pages: number | null;
+  jobs_new: number | null;
+  errors: number | null;
+  rate_limited: number | null;
+  companies: number | null;
+  cpu_pct: number | null;
+  mem_available_mb: number | null;
+  browser_pages: number | null;
+  http_limit: number | null;
+}
+
+export interface CrawlRunRow {
+  id: number;
+  company_id: number;
+  company: string;
+  domain: string | null;
+  status: string;
+  outcome: string | null;
+  strategy: string | null;
+  started_at: string;
+  finished_at: string | null;
+  pages_fetched: number;
+  jobs_found: number;
+  jobs_new: number;
+  jobs_closed: number;
+  complete: boolean;
+  browser_pending: boolean;
+}
+
+export interface ProblemDomain {
+  company_id: number;
+  company: string;
+  domain: string;
+  error_streak: number;
+  avg_latency_ms: number | null;
+  rate_limited_until: string | null;
+  last_error: { kind: string; message: string | null } | null;
+  next_scan_at: string | null;
+}
+
+export interface CompanyCrawl {
+  company: { id: number; name: string; domain: string | null; website_url: string | null; verification_status: string; scan_status: string; last_scan_at: string | null };
+  diagnosis: { code: string; text: string };
+  fingerprint: null | {
+    best_strategy: string | null;
+    strategy_stats: Record<string, { attempts: number; ok: number; jobs: number; rate?: number }>;
+    ats_type: string | null;
+    ats_account: string | null;
+    career_urls: string[];
+    needs_browser: boolean;
+    technologies: string[];
+    avg_latency_ms: number | null;
+    interval_h: number | null;
+    next_scan_at: string | null;
+    last_success_at: string | null;
+    open_jobs: number;
+  };
+  sources: { id: number; url: string; kind: string; ats_type: string | null; last_success_at: string | null; last_error: string | null; last_job_count: number | null; evidence: Record<string, unknown> }[];
+  runs: { id: number; status: string; outcome: string | null; strategy: string | null; started_at: string; pages_fetched: number; jobs_found: number; jobs_new: number; complete: boolean; browser_pending: boolean }[];
+  errors: { at: string; stage: string; kind: string; url: string | null; message: string | null; http_status: number | null }[];
+  career_pages: { url: string; page_type: string; http_status: number | null; jobs_found: number; strategy: string | null; fetched_at: string }[];
+  jobs: Record<string, number>;
+}

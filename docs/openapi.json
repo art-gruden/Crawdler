@@ -1,2064 +1,3308 @@
 {
- "openapi": "3.1.0",
- "info": {
-  "title": "Germany Career Crawler API",
-  "description": "Company discovery and career crawling for German employers. Company data from OpenStreetMap is © OpenStreetMap contributors, ODbL 1.0.",
-  "version": "0.1.0"
- },
- "paths": {
-  "/api/auth/login": {
-   "post": {
-    "tags": [
-     "auth"
-    ],
-    "summary": "Login",
-    "operationId": "login_api_auth_login_post",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/LoginIn"
-       }
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Germany Career Crawler API",
+    "description": "Company discovery and career crawling for German employers. Company data from OpenStreetMap is \u00a9 OpenStreetMap contributors, ODbL 1.0.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login",
+        "operationId": "login_api_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
-     },
-     "required": true
     },
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      }
-     },
-     "422": {
-      "description": "Validation Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Logout",
+        "operationId": "logout_api_auth_logout_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
         }
-       }
       }
-     }
-    }
-   }
-  },
-  "/api/auth/logout": {
-   "post": {
-    "tags": [
-     "auth"
-    ],
-    "summary": "Logout",
-    "operationId": "logout_api_auth_logout_post",
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/auth/me": {
-   "get": {
-    "tags": [
-     "auth"
-    ],
-    "summary": "Me",
-    "operationId": "me_api_auth_me_get",
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/discovery/regions": {
-   "get": {
-    "tags": [
-     "discovery"
-    ],
-    "summary": "Regions",
-    "operationId": "regions_api_discovery_regions_get",
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/discovery/industries": {
-   "get": {
-    "tags": [
-     "discovery"
-    ],
-    "summary": "Industries",
-    "operationId": "industries_api_discovery_industries_get",
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/discovery/import-profiles": {
-   "get": {
-    "tags": [
-     "discovery"
-    ],
-    "summary": "Import Profiles",
-    "operationId": "import_profiles_api_discovery_import_profiles_get",
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/discovery/overpass/usage": {
-   "get": {
-    "tags": [
-     "discovery"
-    ],
-    "summary": "Overpass Usage",
-    "operationId": "overpass_usage_api_discovery_overpass_usage_get",
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/discovery/osm": {
-   "post": {
-    "tags": [
-     "discovery"
-    ],
-    "summary": "Start Osm",
-    "description": "Discover companies with a website in the given regions from OpenStreetMap (Overpass API).\n\nState codes (``DE-SN``) expand to their Kreise; each Kreis is one Overpass request.",
-    "operationId": "start_osm_api_discovery_osm_post",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/OsmJobIn"
-       }
-      }
-     },
-     "required": true
     },
-    "responses": {
-     "202": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/JobOut"
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Me",
+        "operationId": "me_api_auth_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
         }
-       }
       }
-     },
-     "422": {
-      "description": "Validation Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/companies/import": {
-   "post": {
-    "tags": [
-     "discovery",
-     "companies"
-    ],
-    "summary": "Import Companies",
-    "operationId": "import_companies_api_companies_import_post",
-    "requestBody": {
-     "content": {
-      "multipart/form-data": {
-       "schema": {
-        "$ref": "#/components/schemas/Body_import_companies_api_companies_import_post"
-       }
-      }
-     },
-     "required": true
     },
-    "responses": {
-     "202": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/JobOut"
+    "/api/discovery/regions": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Regions",
+        "operationId": "regions_api_discovery_regions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
         }
-       }
       }
-     },
-     "422": {
-      "description": "Validation Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/discovery/jobs": {
-   "get": {
-    "tags": [
-     "discovery"
-    ],
-    "summary": "List Jobs",
-    "operationId": "list_jobs_api_discovery_jobs_get",
-    "parameters": [
-     {
-      "name": "limit",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "type": "integer",
-       "maximum": 200,
-       "minimum": 1,
-       "default": 50,
-       "title": "Limit"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {
-         "type": "array",
-         "items": {
-          "$ref": "#/components/schemas/JobOut"
-         },
-         "title": "Response List Jobs Api Discovery Jobs Get"
-        }
-       }
-      }
-     },
-     "422": {
-      "description": "Validation Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/discovery/jobs/{job_id}": {
-   "get": {
-    "tags": [
-     "discovery"
-    ],
-    "summary": "Get Job",
-    "operationId": "get_job_api_discovery_jobs__job_id__get",
-    "parameters": [
-     {
-      "name": "job_id",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "type": "integer",
-       "title": "Job Id"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/JobOut"
-        }
-       }
-      }
-     },
-     "422": {
-      "description": "Validation Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/discovery/jobs/{job_id}/cancel": {
-   "post": {
-    "tags": [
-     "discovery"
-    ],
-    "summary": "Cancel Job",
-    "operationId": "cancel_job_api_discovery_jobs__job_id__cancel_post",
-    "parameters": [
-     {
-      "name": "job_id",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "type": "integer",
-       "title": "Job Id"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/JobOut"
-        }
-       }
-      }
-     },
-     "422": {
-      "description": "Validation Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/discovery/jobs/{job_id}/items": {
-   "get": {
-    "tags": [
-     "discovery"
-    ],
-    "summary": "Job Items",
-    "operationId": "job_items_api_discovery_jobs__job_id__items_get",
-    "parameters": [
-     {
-      "name": "job_id",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "type": "integer",
-       "title": "Job Id"
-      }
-     },
-     {
-      "name": "outcome",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "description": "new, duplicate (both kinds), invalid (invalid_url+no_website) or an exact outcome",
-       "title": "Outcome"
-      },
-      "description": "new, duplicate (both kinds), invalid (invalid_url+no_website) or an exact outcome"
-     },
-     {
-      "name": "page",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "type": "integer",
-       "minimum": 1,
-       "default": 1,
-       "title": "Page"
-      }
-     },
-     {
-      "name": "page_size",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "type": "integer",
-       "maximum": 500,
-       "minimum": 1,
-       "default": 100,
-       "title": "Page Size"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      }
-     },
-     "422": {
-      "description": "Validation Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/companies": {
-   "get": {
-    "tags": [
-     "companies"
-    ],
-    "summary": "List Companies",
-    "operationId": "list_companies_api_companies_get",
-    "parameters": [
-     {
-      "name": "sort",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "type": "string",
-       "pattern": "^(name|domain|first_seen|last_seen|city|verification)$",
-       "default": "first_seen",
-       "title": "Sort"
-      }
-     },
-     {
-      "name": "order",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "type": "string",
-       "pattern": "^(asc|desc)$",
-       "default": "desc",
-       "title": "Order"
-      }
-     },
-     {
-      "name": "page",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "type": "integer",
-       "minimum": 1,
-       "default": 1,
-       "title": "Page"
-      }
-     },
-     {
-      "name": "page_size",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "type": "integer",
-       "maximum": 500,
-       "minimum": 1,
-       "default": 50,
-       "title": "Page Size"
-      }
-     },
-     {
-      "name": "q",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "string",
-         "maxLength": 200
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "description": "Search in name, domain, city",
-       "title": "Q"
-      },
-      "description": "Search in name, domain, city"
-     },
-     {
-      "name": "region",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "description": "Kreisschlüssel (e.g. 14612) or ISO 3166-2 state code",
-       "title": "Region"
-      },
-      "description": "Kreisschlüssel (e.g. 14612) or ISO 3166-2 state code"
-     },
-     {
-      "name": "industry",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "title": "Industry"
-      }
-     },
-     {
-      "name": "verification",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "description": "Comma-separated verification statuses",
-       "title": "Verification"
-      },
-      "description": "Comma-separated verification statuses"
-     },
-     {
-      "name": "scan_status",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "title": "Scan Status"
-      }
-     },
-     {
-      "name": "source",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "description": "osm, csv:standort_sachsen, …; prefix match",
-       "title": "Source"
-      },
-      "description": "osm, csv:standort_sachsen, …; prefix match"
-     },
-     {
-      "name": "job_id",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "integer"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "description": "Only companies touched by this discovery job",
-       "title": "Job Id"
-      },
-      "description": "Only companies touched by this discovery job"
-     },
-     {
-      "name": "new_in_job",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "type": "boolean",
-       "description": "With job_id: only companies created by that job",
-       "default": false,
-       "title": "New In Job"
-      },
-      "description": "With job_id: only companies created by that job"
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/Page"
-        }
-       }
-      }
-     },
-     "422": {
-      "description": "Validation Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/companies/export.csv": {
-   "get": {
-    "tags": [
-     "companies"
-    ],
-    "summary": "Export Csv",
-    "description": "CSV export of the filtered list. Every row carries its sources, licences and attribution.",
-    "operationId": "export_csv_api_companies_export_csv_get",
-    "parameters": [
-     {
-      "name": "q",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "string",
-         "maxLength": 200
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "description": "Search in name, domain, city",
-       "title": "Q"
-      },
-      "description": "Search in name, domain, city"
-     },
-     {
-      "name": "region",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "description": "Kreisschlüssel (e.g. 14612) or ISO 3166-2 state code",
-       "title": "Region"
-      },
-      "description": "Kreisschlüssel (e.g. 14612) or ISO 3166-2 state code"
-     },
-     {
-      "name": "industry",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "title": "Industry"
-      }
-     },
-     {
-      "name": "verification",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "description": "Comma-separated verification statuses",
-       "title": "Verification"
-      },
-      "description": "Comma-separated verification statuses"
-     },
-     {
-      "name": "scan_status",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "title": "Scan Status"
-      }
-     },
-     {
-      "name": "source",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "string"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "description": "osm, csv:standort_sachsen, …; prefix match",
-       "title": "Source"
-      },
-      "description": "osm, csv:standort_sachsen, …; prefix match"
-     },
-     {
-      "name": "job_id",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "anyOf": [
-        {
-         "type": "integer"
-        },
-        {
-         "type": "null"
-        }
-       ],
-       "description": "Only companies touched by this discovery job",
-       "title": "Job Id"
-      },
-      "description": "Only companies touched by this discovery job"
-     },
-     {
-      "name": "new_in_job",
-      "in": "query",
-      "required": false,
-      "schema": {
-       "type": "boolean",
-       "description": "With job_id: only companies created by that job",
-       "default": false,
-       "title": "New In Job"
-      },
-      "description": "With job_id: only companies created by that job"
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      }
-     },
-     "422": {
-      "description": "Validation Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/companies/{company_id}": {
-   "get": {
-    "tags": [
-     "companies"
-    ],
-    "summary": "Get Company",
-    "operationId": "get_company_api_companies__company_id__get",
-    "parameters": [
-     {
-      "name": "company_id",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "type": "integer",
-       "title": "Company Id"
-      }
-     }
-    ],
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/CompanyDetail"
-        }
-       }
-      }
-     },
-     "422": {
-      "description": "Validation Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/companies/{company_id}/scan": {
-   "post": {
-    "tags": [
-     "companies"
-    ],
-    "summary": "Scan Company",
-    "description": "Queue one company for career-page scanning (verified websites only).\n\nUnverified websites are verified first; the company is queued automatically if\nverification succeeds.",
-    "operationId": "scan_company_api_companies__company_id__scan_post",
-    "parameters": [
-     {
-      "name": "company_id",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "type": "integer",
-       "title": "Company Id"
-      }
-     }
-    ],
-    "responses": {
-     "202": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      }
-     },
-     "422": {
-      "description": "Validation Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
-        }
-       }
-      }
-     }
-    }
-   }
-  },
-  "/api/companies/scan": {
-   "post": {
-    "tags": [
-     "companies"
-    ],
-    "summary": "Scan Companies",
-    "description": "Queue several companies (dashboard: 'Queue selected for vacancy scanning').",
-    "operationId": "scan_companies_api_companies_scan_post",
-    "requestBody": {
-     "content": {
-      "application/json": {
-       "schema": {
-        "$ref": "#/components/schemas/ScanBulkIn"
-       }
-      }
-     },
-     "required": true
     },
-    "responses": {
-     "202": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      }
-     },
-     "422": {
-      "description": "Validation Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
+    "/api/discovery/industries": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Industries",
+        "operationId": "industries_api_discovery_industries_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
         }
-       }
       }
-     }
-    }
-   }
-  },
-  "/api/companies/{company_id}/verify": {
-   "post": {
-    "tags": [
-     "companies"
-    ],
-    "summary": "Verify Company",
-    "operationId": "verify_company_api_companies__company_id__verify_post",
-    "parameters": [
-     {
-      "name": "company_id",
-      "in": "path",
-      "required": true,
-      "schema": {
-       "type": "integer",
-       "title": "Company Id"
-      }
-     }
-    ],
-    "responses": {
-     "202": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
-      }
-     },
-     "422": {
-      "description": "Validation Error",
-      "content": {
-       "application/json": {
-        "schema": {
-         "$ref": "#/components/schemas/HTTPValidationError"
+    },
+    "/api/discovery/import-profiles": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Import Profiles",
+        "operationId": "import_profiles_api_discovery_import_profiles_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
         }
-       }
       }
-     }
+    },
+    "/api/discovery/overpass/usage": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Overpass Usage",
+        "operationId": "overpass_usage_api_discovery_overpass_usage_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/discovery/osm": {
+      "post": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Start Osm",
+        "description": "Discover companies with a website in the given regions from OpenStreetMap (Overpass API).\n\nState codes (``DE-SN``) expand to their Kreise; each Kreis is one Overpass request.",
+        "operationId": "start_osm_api_discovery_osm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OsmJobIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/company_discovery__api__JobOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/companies/import": {
+      "post": {
+        "tags": [
+          "discovery",
+          "companies"
+        ],
+        "summary": "Import Companies",
+        "operationId": "import_companies_api_companies_import_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_import_companies_api_companies_import_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/company_discovery__api__JobOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/discovery/jobs": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "List Jobs",
+        "operationId": "list_jobs_api_discovery_jobs_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/company_discovery__api__JobOut"
+                  },
+                  "title": "Response List Jobs Api Discovery Jobs Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/discovery/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Get Job",
+        "operationId": "get_job_api_discovery_jobs__job_id__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/company_discovery__api__JobOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/discovery/jobs/{job_id}/cancel": {
+      "post": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Cancel Job",
+        "operationId": "cancel_job_api_discovery_jobs__job_id__cancel_post",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/company_discovery__api__JobOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/discovery/jobs/{job_id}/items": {
+      "get": {
+        "tags": [
+          "discovery"
+        ],
+        "summary": "Job Items",
+        "operationId": "job_items_api_discovery_jobs__job_id__items_get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Job Id"
+            }
+          },
+          {
+            "name": "outcome",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "new, duplicate (both kinds), invalid (invalid_url+no_website) or an exact outcome",
+              "title": "Outcome"
+            },
+            "description": "new, duplicate (both kinds), invalid (invalid_url+no_website) or an exact outcome"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Page Size"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/companies": {
+      "get": {
+        "tags": [
+          "companies"
+        ],
+        "summary": "List Companies",
+        "operationId": "list_companies_api_companies_get",
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(name|domain|first_seen|last_seen|city|verification)$",
+              "default": "first_seen",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(asc|desc)$",
+              "default": "desc",
+              "title": "Order"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Page Size"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Search in name, domain, city",
+              "title": "Q"
+            },
+            "description": "Search in name, domain, city"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Kreisschl\u00fcssel (e.g. 14612) or ISO 3166-2 state code",
+              "title": "Region"
+            },
+            "description": "Kreisschl\u00fcssel (e.g. 14612) or ISO 3166-2 state code"
+          },
+          {
+            "name": "industry",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Industry"
+            }
+          },
+          {
+            "name": "verification",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Comma-separated verification statuses",
+              "title": "Verification"
+            },
+            "description": "Comma-separated verification statuses"
+          },
+          {
+            "name": "scan_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Scan Status"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "osm, csv:standort_sachsen, \u2026; prefix match",
+              "title": "Source"
+            },
+            "description": "osm, csv:standort_sachsen, \u2026; prefix match"
+          },
+          {
+            "name": "job_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only companies touched by this discovery job",
+              "title": "Job Id"
+            },
+            "description": "Only companies touched by this discovery job"
+          },
+          {
+            "name": "new_in_job",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "With job_id: only companies created by that job",
+              "default": false,
+              "title": "New In Job"
+            },
+            "description": "With job_id: only companies created by that job"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/companies/export.csv": {
+      "get": {
+        "tags": [
+          "companies"
+        ],
+        "summary": "Export Csv",
+        "description": "CSV export of the filtered list. Every row carries its sources, licences and attribution.",
+        "operationId": "export_csv_api_companies_export_csv_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Search in name, domain, city",
+              "title": "Q"
+            },
+            "description": "Search in name, domain, city"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Kreisschl\u00fcssel (e.g. 14612) or ISO 3166-2 state code",
+              "title": "Region"
+            },
+            "description": "Kreisschl\u00fcssel (e.g. 14612) or ISO 3166-2 state code"
+          },
+          {
+            "name": "industry",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Industry"
+            }
+          },
+          {
+            "name": "verification",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Comma-separated verification statuses",
+              "title": "Verification"
+            },
+            "description": "Comma-separated verification statuses"
+          },
+          {
+            "name": "scan_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Scan Status"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "osm, csv:standort_sachsen, \u2026; prefix match",
+              "title": "Source"
+            },
+            "description": "osm, csv:standort_sachsen, \u2026; prefix match"
+          },
+          {
+            "name": "job_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only companies touched by this discovery job",
+              "title": "Job Id"
+            },
+            "description": "Only companies touched by this discovery job"
+          },
+          {
+            "name": "new_in_job",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "With job_id: only companies created by that job",
+              "default": false,
+              "title": "New In Job"
+            },
+            "description": "With job_id: only companies created by that job"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/companies/{company_id}": {
+      "get": {
+        "tags": [
+          "companies"
+        ],
+        "summary": "Get Company",
+        "operationId": "get_company_api_companies__company_id__get",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Company Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/companies/{company_id}/scan": {
+      "post": {
+        "tags": [
+          "companies"
+        ],
+        "summary": "Scan Company",
+        "description": "Queue one company for career-page scanning (verified websites only).\n\nUnverified websites are verified first; the company is queued automatically if\nverification succeeds.",
+        "operationId": "scan_company_api_companies__company_id__scan_post",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Company Id"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/companies/scan": {
+      "post": {
+        "tags": [
+          "companies"
+        ],
+        "summary": "Scan Companies",
+        "description": "Queue several companies (dashboard: 'Queue selected for vacancy scanning').",
+        "operationId": "scan_companies_api_companies_scan_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScanBulkIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/companies/{company_id}/verify": {
+      "post": {
+        "tags": [
+          "companies"
+        ],
+        "summary": "Verify Company",
+        "operationId": "verify_company_api_companies__company_id__verify_post",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Company Id"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "List Jobs",
+        "operationId": "list_jobs_api_jobs_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "full-text search in title, location and description",
+              "title": "Q"
+            },
+            "description": "full-text search in title, location and description"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(open|closed|expired|all)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "open",
+              "title": "Status"
+            }
+          },
+          {
+            "name": "company_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Company Id"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 80
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "City"
+            }
+          },
+          {
+            "name": "remote_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(onsite|hybrid|remote|unknown)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Remote Type"
+            }
+          },
+          {
+            "name": "employment_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 32
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Employment Type"
+            }
+          },
+          {
+            "name": "skill",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Skill"
+            }
+          },
+          {
+            "name": "method",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(ats|jsonld|html|content|pdf|browser|llm)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Method"
+            }
+          },
+          {
+            "name": "new_days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 365,
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "discovered in the last N days",
+              "title": "New Days"
+            },
+            "description": "discovered in the last N days"
+          },
+          {
+            "name": "posted_days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 365,
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "published in the last N days (source date)",
+              "title": "Posted Days"
+            },
+            "description": "published in the last N days (source date)"
+          },
+          {
+            "name": "min_confidence",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "maximum": 1,
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Confidence"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(discovered|posted|title|company|relevance)$",
+              "default": "discovered",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/skills": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Top Skills",
+        "operationId": "top_skills_api_jobs_skills_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 40,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Get Job",
+        "operationId": "get_job_api_jobs__job_id__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/stats": {
+      "get": {
+        "tags": [
+          "crawler"
+        ],
+        "summary": "Stats",
+        "operationId": "stats_api_crawler_stats_get",
+        "parameters": [
+          {
+            "name": "hours",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 720,
+              "minimum": 1,
+              "default": 24,
+              "title": "Hours"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/timeseries": {
+      "get": {
+        "tags": [
+          "crawler"
+        ],
+        "summary": "Timeseries",
+        "operationId": "timeseries_api_crawler_timeseries_get",
+        "parameters": [
+          {
+            "name": "hours",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 336,
+              "minimum": 1,
+              "default": 24,
+              "title": "Hours"
+            }
+          },
+          {
+            "name": "bucket_minutes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 240,
+              "minimum": 1,
+              "default": 15,
+              "title": "Bucket Minutes"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/runs": {
+      "get": {
+        "tags": [
+          "crawler"
+        ],
+        "summary": "Runs",
+        "operationId": "runs_api_crawler_runs_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(running|done|partial|failed|abandoned)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/problem-domains": {
+      "get": {
+        "tags": [
+          "crawler"
+        ],
+        "summary": "Problem Domains",
+        "description": "Slow or failing sites: error streaks, rate limits, high latency.",
+        "operationId": "problem_domains_api_crawler_problem_domains_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 30,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/companies/{company_id}": {
+      "get": {
+        "tags": [
+          "crawler"
+        ],
+        "summary": "Company Crawl",
+        "description": "Everything needed to understand why a company yields (no) postings.",
+        "operationId": "company_crawl_api_crawler_companies__company_id__get",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Company Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/companies/{company_id}/rescan": {
+      "post": {
+        "tags": [
+          "crawler"
+        ],
+        "summary": "Rescan",
+        "operationId": "rescan_api_crawler_companies__company_id__rescan_post",
+        "parameters": [
+          {
+            "name": "company_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Company Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/RescanIn"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
     }
-   }
   },
-  "/api/health": {
-   "get": {
-    "tags": [
-     "health"
-    ],
-    "summary": "Health",
-    "operationId": "health_api_health_get",
-    "responses": {
-     "200": {
-      "description": "Successful Response",
-      "content": {
-       "application/json": {
-        "schema": {}
-       }
+  "components": {
+    "schemas": {
+      "Body_import_companies_api_companies_import_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File",
+            "description": "CSV file, UTF-8 or Windows-1252, delimiter , ; tab or |"
+          },
+          "profile": {
+            "type": "string",
+            "title": "Profile",
+            "default": "generic"
+          },
+          "source_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Name",
+            "description": "Directory name, e.g. 'IHK Dresden'"
+          },
+          "license": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "License"
+          },
+          "attribution": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attribution"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "verify": {
+            "type": "boolean",
+            "title": "Verify",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_import_companies_api_companies_import_post"
+      },
+      "CompanyDetail": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Url"
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain"
+          },
+          "domain_display": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain Display"
+          },
+          "website_raw": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Raw"
+          },
+          "website_rejected_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Rejected Reason"
+          },
+          "verification_status": {
+            "type": "string",
+            "title": "Verification Status"
+          },
+          "verification_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verification Confidence"
+          },
+          "verified_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified At"
+          },
+          "street": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street"
+          },
+          "postcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postcode"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "district_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District Key"
+          },
+          "district_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District Name"
+          },
+          "state_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State Code"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lat"
+          },
+          "lon": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lon"
+          },
+          "industries": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Industries"
+          },
+          "scan_status": {
+            "type": "string",
+            "title": "Scan Status"
+          },
+          "last_scan_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Scan At"
+          },
+          "first_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "First Seen At"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "sources": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sources",
+            "default": []
+          },
+          "alt_names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Alt Names"
+          },
+          "verification_detail": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Verification Detail"
+          },
+          "source_records": {
+            "items": {
+              "$ref": "#/components/schemas/SourceOut"
+            },
+            "type": "array",
+            "title": "Source Records"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "website_url",
+          "domain",
+          "website_raw",
+          "website_rejected_reason",
+          "verification_status",
+          "verification_confidence",
+          "verified_at",
+          "street",
+          "postcode",
+          "city",
+          "district_key",
+          "district_name",
+          "state_code",
+          "lat",
+          "lon",
+          "industries",
+          "scan_status",
+          "last_scan_at",
+          "first_seen_at",
+          "last_seen_at",
+          "alt_names",
+          "verification_detail",
+          "source_records"
+        ],
+        "title": "CompanyDetail"
+      },
+      "CompanyOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Url"
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain"
+          },
+          "domain_display": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain Display"
+          },
+          "website_raw": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Raw"
+          },
+          "website_rejected_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Rejected Reason"
+          },
+          "verification_status": {
+            "type": "string",
+            "title": "Verification Status"
+          },
+          "verification_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verification Confidence"
+          },
+          "verified_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified At"
+          },
+          "street": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street"
+          },
+          "postcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postcode"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "district_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District Key"
+          },
+          "district_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District Name"
+          },
+          "state_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State Code"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lat"
+          },
+          "lon": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lon"
+          },
+          "industries": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Industries"
+          },
+          "scan_status": {
+            "type": "string",
+            "title": "Scan Status"
+          },
+          "last_scan_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Scan At"
+          },
+          "first_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "First Seen At"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "sources": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sources",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "website_url",
+          "domain",
+          "website_raw",
+          "website_rejected_reason",
+          "verification_status",
+          "verification_confidence",
+          "verified_at",
+          "street",
+          "postcode",
+          "city",
+          "district_key",
+          "district_name",
+          "state_code",
+          "lat",
+          "lon",
+          "industries",
+          "scan_status",
+          "last_scan_at",
+          "first_seen_at",
+          "last_seen_at"
+        ],
+        "title": "CompanyOut"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "JobDetail": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "company_id": {
+            "type": "integer",
+            "title": "Company Id"
+          },
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          },
+          "company_domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Domain"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "postcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postcode"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "location_raw": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Raw"
+          },
+          "remote_type": {
+            "type": "string",
+            "title": "Remote Type"
+          },
+          "employment_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Employment Types"
+          },
+          "date_posted": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Posted"
+          },
+          "discovered_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Discovered At"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url"
+          },
+          "application_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Application Url"
+          },
+          "extraction_method": {
+            "type": "string",
+            "title": "Extraction Method"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "salary_min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salary Min"
+          },
+          "salary_max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salary Max"
+          },
+          "salary_currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salary Currency"
+          },
+          "salary_period": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salary Period"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Skills",
+            "default": []
+          },
+          "career_page_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Career Page Url"
+          },
+          "canonical_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Canonical Url"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "requirements": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Requirements"
+          },
+          "responsibilities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Responsibilities"
+          },
+          "languages": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Languages"
+          },
+          "salary_raw": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salary Raw"
+          },
+          "valid_through": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valid Through"
+          },
+          "closed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          },
+          "miss_count": {
+            "type": "integer",
+            "title": "Miss Count"
+          },
+          "ats_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ats Type"
+          },
+          "ats_job_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ats Job Id"
+          },
+          "source_values": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Source Values"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "company_id",
+          "company_name",
+          "company_domain",
+          "title",
+          "city",
+          "postcode",
+          "country",
+          "location_raw",
+          "remote_type",
+          "employment_types",
+          "date_posted",
+          "discovered_at",
+          "last_seen_at",
+          "status",
+          "source_url",
+          "application_url",
+          "extraction_method",
+          "confidence",
+          "salary_min",
+          "salary_max",
+          "salary_currency",
+          "salary_period",
+          "career_page_url",
+          "canonical_url",
+          "description",
+          "requirements",
+          "responsibilities",
+          "languages",
+          "salary_raw",
+          "valid_through",
+          "closed_at",
+          "miss_count",
+          "ats_type",
+          "ats_job_id",
+          "source_values"
+        ],
+        "title": "JobDetail"
+      },
+      "JobPage": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/career_crawler__api__JobOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "items"
+        ],
+        "title": "JobPage"
+      },
+      "LoginIn": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "LoginIn"
+      },
+      "OsmJobIn": {
+        "properties": {
+          "regions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Regions"
+          },
+          "industries": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Industries"
+          },
+          "verify": {
+            "type": "boolean",
+            "title": "Verify",
+            "default": true
+          }
+        },
+        "type": "object",
+        "title": "OsmJobIn"
+      },
+      "Page": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "Page"
+      },
+      "RescanIn": {
+        "properties": {
+          "full": {
+            "type": "boolean",
+            "title": "Full",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "RescanIn"
+      },
+      "ScanBulkIn": {
+        "properties": {
+          "ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "minItems": 1,
+            "title": "Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ids"
+        ],
+        "title": "ScanBulkIn"
+      },
+      "SourceOut": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "source_record_id": {
+            "type": "string",
+            "title": "Source Record Id"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "license": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "License"
+          },
+          "attribution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attribution"
+          },
+          "first_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "First Seen At"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "data_timestamp": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Timestamp"
+          },
+          "discovery_job_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discovery Job Id"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "source_record_id",
+          "source_url",
+          "name",
+          "license",
+          "attribution",
+          "first_seen_at",
+          "last_seen_at",
+          "data_timestamp",
+          "discovery_job_id"
+        ],
+        "title": "SourceOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "career_crawler__api__JobOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "company_id": {
+            "type": "integer",
+            "title": "Company Id"
+          },
+          "company_name": {
+            "type": "string",
+            "title": "Company Name"
+          },
+          "company_domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Domain"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "postcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postcode"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "location_raw": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Raw"
+          },
+          "remote_type": {
+            "type": "string",
+            "title": "Remote Type"
+          },
+          "employment_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Employment Types"
+          },
+          "date_posted": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Posted"
+          },
+          "discovered_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Discovered At"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url"
+          },
+          "application_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Application Url"
+          },
+          "extraction_method": {
+            "type": "string",
+            "title": "Extraction Method"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "salary_min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salary Min"
+          },
+          "salary_max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salary Max"
+          },
+          "salary_currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salary Currency"
+          },
+          "salary_period": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Salary Period"
+          },
+          "skills": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Skills",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "company_id",
+          "company_name",
+          "company_domain",
+          "title",
+          "city",
+          "postcode",
+          "country",
+          "location_raw",
+          "remote_type",
+          "employment_types",
+          "date_posted",
+          "discovered_at",
+          "last_seen_at",
+          "status",
+          "source_url",
+          "application_url",
+          "extraction_method",
+          "confidence",
+          "salary_min",
+          "salary_max",
+          "salary_currency",
+          "salary_period"
+        ],
+        "title": "JobOut"
+      },
+      "company_discovery__api__JobOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "params": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Params"
+          },
+          "stats": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Stats"
+          },
+          "errors": {
+            "items": {},
+            "type": "array",
+            "title": "Errors"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "cancel_requested": {
+            "type": "boolean",
+            "title": "Cancel Requested"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "license": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "License"
+          },
+          "attribution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attribution"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "data_timestamp": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Timestamp"
+          },
+          "file_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Name"
+          },
+          "file_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "File Sha256"
+          },
+          "requested_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requested By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "status",
+          "params",
+          "stats",
+          "errors",
+          "error",
+          "cancel_requested",
+          "source",
+          "license",
+          "attribution",
+          "source_url",
+          "data_timestamp",
+          "file_name",
+          "file_sha256",
+          "requested_by",
+          "created_at",
+          "started_at",
+          "finished_at"
+        ],
+        "title": "JobOut"
       }
-     }
     }
-   }
   }
- },
- "components": {
-  "schemas": {
-   "Body_import_companies_api_companies_import_post": {
-    "properties": {
-     "file": {
-      "type": "string",
-      "contentMediaType": "application/octet-stream",
-      "title": "File",
-      "description": "CSV file, UTF-8 or Windows-1252, delimiter , ; tab or |"
-     },
-     "profile": {
-      "type": "string",
-      "title": "Profile",
-      "default": "generic"
-     },
-     "source_name": {
-      "anyOf": [
-       {
-        "type": "string",
-        "maxLength": 80
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Source Name",
-      "description": "Directory name, e.g. 'IHK Dresden'"
-     },
-     "license": {
-      "anyOf": [
-       {
-        "type": "string",
-        "maxLength": 64
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "License"
-     },
-     "attribution": {
-      "anyOf": [
-       {
-        "type": "string",
-        "maxLength": 500
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Attribution"
-     },
-     "source_url": {
-      "anyOf": [
-       {
-        "type": "string",
-        "maxLength": 500
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Source Url"
-     },
-     "verify": {
-      "type": "boolean",
-      "title": "Verify",
-      "default": true
-     }
-    },
-    "type": "object",
-    "required": [
-     "file"
-    ],
-    "title": "Body_import_companies_api_companies_import_post"
-   },
-   "CompanyDetail": {
-    "properties": {
-     "id": {
-      "type": "integer",
-      "title": "Id"
-     },
-     "name": {
-      "type": "string",
-      "title": "Name"
-     },
-     "website_url": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Website Url"
-     },
-     "domain": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Domain"
-     },
-     "domain_display": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Domain Display"
-     },
-     "website_raw": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Website Raw"
-     },
-     "website_rejected_reason": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Website Rejected Reason"
-     },
-     "verification_status": {
-      "type": "string",
-      "title": "Verification Status"
-     },
-     "verification_confidence": {
-      "anyOf": [
-       {
-        "type": "number"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Verification Confidence"
-     },
-     "verified_at": {
-      "anyOf": [
-       {
-        "type": "string",
-        "format": "date-time"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Verified At"
-     },
-     "street": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Street"
-     },
-     "postcode": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Postcode"
-     },
-     "city": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "City"
-     },
-     "district_key": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "District Key"
-     },
-     "district_name": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "District Name"
-     },
-     "state_code": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "State Code"
-     },
-     "lat": {
-      "anyOf": [
-       {
-        "type": "number"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Lat"
-     },
-     "lon": {
-      "anyOf": [
-       {
-        "type": "number"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Lon"
-     },
-     "industries": {
-      "items": {
-       "type": "string"
-      },
-      "type": "array",
-      "title": "Industries"
-     },
-     "scan_status": {
-      "type": "string",
-      "title": "Scan Status"
-     },
-     "last_scan_at": {
-      "anyOf": [
-       {
-        "type": "string",
-        "format": "date-time"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Last Scan At"
-     },
-     "first_seen_at": {
-      "type": "string",
-      "format": "date-time",
-      "title": "First Seen At"
-     },
-     "last_seen_at": {
-      "type": "string",
-      "format": "date-time",
-      "title": "Last Seen At"
-     },
-     "sources": {
-      "items": {
-       "type": "string"
-      },
-      "type": "array",
-      "title": "Sources",
-      "default": []
-     },
-     "alt_names": {
-      "items": {
-       "type": "string"
-      },
-      "type": "array",
-      "title": "Alt Names"
-     },
-     "verification_detail": {
-      "additionalProperties": true,
-      "type": "object",
-      "title": "Verification Detail"
-     },
-     "source_records": {
-      "items": {
-       "$ref": "#/components/schemas/SourceOut"
-      },
-      "type": "array",
-      "title": "Source Records"
-     }
-    },
-    "type": "object",
-    "required": [
-     "id",
-     "name",
-     "website_url",
-     "domain",
-     "website_raw",
-     "website_rejected_reason",
-     "verification_status",
-     "verification_confidence",
-     "verified_at",
-     "street",
-     "postcode",
-     "city",
-     "district_key",
-     "district_name",
-     "state_code",
-     "lat",
-     "lon",
-     "industries",
-     "scan_status",
-     "last_scan_at",
-     "first_seen_at",
-     "last_seen_at",
-     "alt_names",
-     "verification_detail",
-     "source_records"
-    ],
-    "title": "CompanyDetail"
-   },
-   "CompanyOut": {
-    "properties": {
-     "id": {
-      "type": "integer",
-      "title": "Id"
-     },
-     "name": {
-      "type": "string",
-      "title": "Name"
-     },
-     "website_url": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Website Url"
-     },
-     "domain": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Domain"
-     },
-     "domain_display": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Domain Display"
-     },
-     "website_raw": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Website Raw"
-     },
-     "website_rejected_reason": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Website Rejected Reason"
-     },
-     "verification_status": {
-      "type": "string",
-      "title": "Verification Status"
-     },
-     "verification_confidence": {
-      "anyOf": [
-       {
-        "type": "number"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Verification Confidence"
-     },
-     "verified_at": {
-      "anyOf": [
-       {
-        "type": "string",
-        "format": "date-time"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Verified At"
-     },
-     "street": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Street"
-     },
-     "postcode": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Postcode"
-     },
-     "city": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "City"
-     },
-     "district_key": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "District Key"
-     },
-     "district_name": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "District Name"
-     },
-     "state_code": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "State Code"
-     },
-     "lat": {
-      "anyOf": [
-       {
-        "type": "number"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Lat"
-     },
-     "lon": {
-      "anyOf": [
-       {
-        "type": "number"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Lon"
-     },
-     "industries": {
-      "items": {
-       "type": "string"
-      },
-      "type": "array",
-      "title": "Industries"
-     },
-     "scan_status": {
-      "type": "string",
-      "title": "Scan Status"
-     },
-     "last_scan_at": {
-      "anyOf": [
-       {
-        "type": "string",
-        "format": "date-time"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Last Scan At"
-     },
-     "first_seen_at": {
-      "type": "string",
-      "format": "date-time",
-      "title": "First Seen At"
-     },
-     "last_seen_at": {
-      "type": "string",
-      "format": "date-time",
-      "title": "Last Seen At"
-     },
-     "sources": {
-      "items": {
-       "type": "string"
-      },
-      "type": "array",
-      "title": "Sources",
-      "default": []
-     }
-    },
-    "type": "object",
-    "required": [
-     "id",
-     "name",
-     "website_url",
-     "domain",
-     "website_raw",
-     "website_rejected_reason",
-     "verification_status",
-     "verification_confidence",
-     "verified_at",
-     "street",
-     "postcode",
-     "city",
-     "district_key",
-     "district_name",
-     "state_code",
-     "lat",
-     "lon",
-     "industries",
-     "scan_status",
-     "last_scan_at",
-     "first_seen_at",
-     "last_seen_at"
-    ],
-    "title": "CompanyOut"
-   },
-   "HTTPValidationError": {
-    "properties": {
-     "detail": {
-      "items": {
-       "$ref": "#/components/schemas/ValidationError"
-      },
-      "type": "array",
-      "title": "Detail"
-     }
-    },
-    "type": "object",
-    "title": "HTTPValidationError"
-   },
-   "JobOut": {
-    "properties": {
-     "id": {
-      "type": "integer",
-      "title": "Id"
-     },
-     "kind": {
-      "type": "string",
-      "title": "Kind"
-     },
-     "status": {
-      "type": "string",
-      "title": "Status"
-     },
-     "params": {
-      "additionalProperties": true,
-      "type": "object",
-      "title": "Params"
-     },
-     "stats": {
-      "additionalProperties": true,
-      "type": "object",
-      "title": "Stats"
-     },
-     "errors": {
-      "items": {},
-      "type": "array",
-      "title": "Errors"
-     },
-     "error": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Error"
-     },
-     "cancel_requested": {
-      "type": "boolean",
-      "title": "Cancel Requested"
-     },
-     "source": {
-      "type": "string",
-      "title": "Source"
-     },
-     "license": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "License"
-     },
-     "attribution": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Attribution"
-     },
-     "source_url": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Source Url"
-     },
-     "data_timestamp": {
-      "anyOf": [
-       {
-        "type": "string",
-        "format": "date-time"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Data Timestamp"
-     },
-     "file_name": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "File Name"
-     },
-     "file_sha256": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "File Sha256"
-     },
-     "requested_by": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Requested By"
-     },
-     "created_at": {
-      "type": "string",
-      "format": "date-time",
-      "title": "Created At"
-     },
-     "started_at": {
-      "anyOf": [
-       {
-        "type": "string",
-        "format": "date-time"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Started At"
-     },
-     "finished_at": {
-      "anyOf": [
-       {
-        "type": "string",
-        "format": "date-time"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Finished At"
-     }
-    },
-    "type": "object",
-    "required": [
-     "id",
-     "kind",
-     "status",
-     "params",
-     "stats",
-     "errors",
-     "error",
-     "cancel_requested",
-     "source",
-     "license",
-     "attribution",
-     "source_url",
-     "data_timestamp",
-     "file_name",
-     "file_sha256",
-     "requested_by",
-     "created_at",
-     "started_at",
-     "finished_at"
-    ],
-    "title": "JobOut"
-   },
-   "LoginIn": {
-    "properties": {
-     "username": {
-      "type": "string",
-      "title": "Username"
-     },
-     "password": {
-      "type": "string",
-      "title": "Password"
-     }
-    },
-    "type": "object",
-    "required": [
-     "username",
-     "password"
-    ],
-    "title": "LoginIn"
-   },
-   "OsmJobIn": {
-    "properties": {
-     "regions": {
-      "items": {
-       "type": "string"
-      },
-      "type": "array",
-      "maxItems": 50,
-      "minItems": 1,
-      "title": "Regions"
-     },
-     "industries": {
-      "items": {
-       "type": "string"
-      },
-      "type": "array",
-      "minItems": 1,
-      "title": "Industries"
-     },
-     "verify": {
-      "type": "boolean",
-      "title": "Verify",
-      "default": true
-     }
-    },
-    "type": "object",
-    "title": "OsmJobIn"
-   },
-   "Page": {
-    "properties": {
-     "items": {
-      "items": {
-       "$ref": "#/components/schemas/CompanyOut"
-      },
-      "type": "array",
-      "title": "Items"
-     },
-     "total": {
-      "type": "integer",
-      "title": "Total"
-     },
-     "page": {
-      "type": "integer",
-      "title": "Page"
-     },
-     "page_size": {
-      "type": "integer",
-      "title": "Page Size"
-     }
-    },
-    "type": "object",
-    "required": [
-     "items",
-     "total",
-     "page",
-     "page_size"
-    ],
-    "title": "Page"
-   },
-   "ScanBulkIn": {
-    "properties": {
-     "ids": {
-      "items": {
-       "type": "integer"
-      },
-      "type": "array",
-      "maxItems": 1000,
-      "minItems": 1,
-      "title": "Ids"
-     }
-    },
-    "type": "object",
-    "required": [
-     "ids"
-    ],
-    "title": "ScanBulkIn"
-   },
-   "SourceOut": {
-    "properties": {
-     "source": {
-      "type": "string",
-      "title": "Source"
-     },
-     "source_record_id": {
-      "type": "string",
-      "title": "Source Record Id"
-     },
-     "source_url": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Source Url"
-     },
-     "name": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Name"
-     },
-     "license": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "License"
-     },
-     "attribution": {
-      "anyOf": [
-       {
-        "type": "string"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Attribution"
-     },
-     "first_seen_at": {
-      "type": "string",
-      "format": "date-time",
-      "title": "First Seen At"
-     },
-     "last_seen_at": {
-      "type": "string",
-      "format": "date-time",
-      "title": "Last Seen At"
-     },
-     "data_timestamp": {
-      "anyOf": [
-       {
-        "type": "string",
-        "format": "date-time"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Data Timestamp"
-     },
-     "discovery_job_id": {
-      "anyOf": [
-       {
-        "type": "integer"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Discovery Job Id"
-     },
-     "data": {
-      "anyOf": [
-       {
-        "additionalProperties": true,
-        "type": "object"
-       },
-       {
-        "type": "null"
-       }
-      ],
-      "title": "Data"
-     }
-    },
-    "type": "object",
-    "required": [
-     "source",
-     "source_record_id",
-     "source_url",
-     "name",
-     "license",
-     "attribution",
-     "first_seen_at",
-     "last_seen_at",
-     "data_timestamp",
-     "discovery_job_id"
-    ],
-    "title": "SourceOut"
-   },
-   "ValidationError": {
-    "properties": {
-     "loc": {
-      "items": {
-       "anyOf": [
-        {
-         "type": "string"
-        },
-        {
-         "type": "integer"
-        }
-       ]
-      },
-      "type": "array",
-      "title": "Location"
-     },
-     "msg": {
-      "type": "string",
-      "title": "Message"
-     },
-     "type": {
-      "type": "string",
-      "title": "Error Type"
-     },
-     "input": {
-      "title": "Input"
-     },
-     "ctx": {
-      "type": "object",
-      "title": "Context"
-     }
-    },
-    "type": "object",
-    "required": [
-     "loc",
-     "msg",
-     "type"
-    ],
-    "title": "ValidationError"
-   }
-  }
- }
 }

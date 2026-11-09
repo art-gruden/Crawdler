@@ -5,6 +5,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+import career_crawler.models  # noqa: F401
 import company_discovery.models  # noqa: F401
 import gcc_core.models  # noqa: F401
 from gcc_core.config import get_settings

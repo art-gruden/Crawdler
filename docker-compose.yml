@@ -1,6 +1,10 @@
-# Germany Career Crawler – company discovery stack.
+# Germany Career Crawler – company discovery + career crawler.
 #   cp .env.example .env   # fill in passwords and SITE_ADDRESS
 #   docker compose up -d --build
+#
+# Sized for one 2 vCPU / 4 GB VPS. mem_limit values are ceilings (sum ~3.9 GB); typical use
+# is well below. The crawler's resource controller additionally watches host MemAvailable,
+# CPU and its container's cgroup memory and slows down / pauses the browser before limits.
 name: gcc
 
 x-backend: &backend
@@ -19,6 +23,9 @@ x-backend: &backend
 services:
   db:
     image: postgres:16-alpine
+    command: ["postgres", "-c", "shared_buffers=256MB", "-c", "effective_cache_size=768MB", "-c", "work_mem=8MB",
+              "-c", "maintenance_work_mem=64MB", "-c", "max_connections=60"]
+    mem_limit: 640m
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-gcc}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
@@ -35,7 +42,9 @@ services:
 
   redis:
     image: redis:7-alpine
-    command: ["redis-server", "--appendonly", "yes", "--save", "60", "100"]
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "100", "--maxmemory", "96mb",
+              "--maxmemory-policy", "noeviction"]
+    mem_limit: 128m
     volumes:
       - redisdata:/data
     healthcheck:
@@ -48,6 +57,7 @@ services:
 
   api:
     <<: *backend
+    mem_limit: 320m
     depends_on:
       db: { condition: service_healthy }
       redis: { condition: service_healthy }
@@ -62,6 +72,7 @@ services:
   worker-discovery:
     <<: *backend
     command: ["celery", "-A", "gcc_core.celery_app", "worker", "-Q", "discovery", "-c", "1", "-n", "discovery@%h", "--loglevel=INFO"]
+    mem_limit: 320m
     depends_on:
       api: { condition: service_healthy }
     healthcheck:
@@ -73,6 +84,7 @@ services:
   worker-verify:
     <<: *backend
     command: ["celery", "-A", "gcc_core.celery_app", "worker", "-Q", "verify,default", "-c", "2", "-n", "verify@%h", "--loglevel=INFO"]
+    mem_limit: 320m
     depends_on:
       api: { condition: service_healthy }
     healthcheck:
@@ -81,9 +93,46 @@ services:
       timeout: 20s
       retries: 3
 
+  # Career crawler, HTML/ATS: one process runs up to CRAWLER_COMPANIES_IN_PARALLEL company scans
+  # concurrently (asyncio), global HTTP concurrency up to CRAWLER_HTTP_CONCURRENCY, 1 request per
+  # domain every CRAWLER_PER_DOMAIN_DELAY_S. Also serves the extract and maintenance queues.
+  worker-crawl:
+    <<: *backend
+    command: ["celery", "-A", "gcc_core.celery_app", "worker", "-Q", "career_scan,extract,maintenance", "-c", "1",
+              "--max-tasks-per-child", "50", "-n", "crawl@%h", "--loglevel=INFO"]
+    mem_limit: 700m
+    depends_on:
+      api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A gcc_core.celery_app inspect ping -d crawl@$$HOSTNAME --timeout 10 | grep -q pong"]
+      interval: 60s
+      timeout: 20s
+      retries: 3
+
+  # Career crawler, JavaScript rendering: separate container so a Chromium crash or memory
+  # spike never stops the HTTP crawler. One browser, one context, one page at a time.
+  worker-browser:
+    <<: *backend
+    build:
+      context: ./backend
+      target: browser
+    image: gcc-backend-browser:0.1.0
+    command: ["celery", "-A", "gcc_core.celery_app", "worker", "-Q", "browser_scan", "-c", "1",
+              "--max-tasks-per-child", "20", "-n", "browser@%h", "--loglevel=INFO"]
+    mem_limit: 1100m
+    init: true  # reaps orphaned Chromium processes
+    depends_on:
+      api: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A gcc_core.celery_app inspect ping -d browser@$$HOSTNAME --timeout 10 | grep -q pong"]
+      interval: 60s
+      timeout: 20s
+      retries: 3
+
   beat:
     <<: *backend
     command: ["celery", "-A", "gcc_core.celery_app", "beat", "--loglevel=INFO", "-s", "/data/celerybeat-schedule"]
+    mem_limit: 160m
     depends_on:
       api: { condition: service_healthy }
 
@@ -92,6 +141,7 @@ services:
       context: .
       dockerfile: deploy/Dockerfile.web
     image: gcc-web:0.1.0
+    mem_limit: 96m
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
     ports:

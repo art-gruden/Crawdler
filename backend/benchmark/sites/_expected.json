@@ -1,0 +1,275 @@
+{
+  "gcc-fixture-static.de": {
+    "career_pages": [
+      "https://gcc-fixture-static.de/karriere"
+    ],
+    "outcome": "jobs_found",
+    "jobs": [
+      {
+        "title": "DevOps Engineer (m/w/d)",
+        "city": "Dresden",
+        "postcode": "01067",
+        "employment_types": [
+          "full_time",
+          "permanent"
+        ],
+        "remote_type": "hybrid",
+        "date_posted": "2026-10-15",
+        "skills": [
+          "Kubernetes",
+          "Terraform",
+          "Ansible",
+          "Prometheus"
+        ]
+      },
+      {
+        "title": "Linux Administrator (m/w/d)",
+        "city": "Leipzig",
+        "employment_types": [
+          "full_time"
+        ],
+        "salary_min": 48000
+      },
+      {
+        "title": "Werkstudent IT-Support (m/w/d)",
+        "city": "Dresden",
+        "employment_types": [
+          "part_time",
+          "working_student"
+        ]
+      }
+    ]
+  },
+  "gcc-fixture-jsonld.de": {
+    "career_pages": [
+      "https://gcc-fixture-jsonld.de/jobs"
+    ],
+    "outcome": "jobs_found",
+    "jobs": [
+      {
+        "title": "Site Reliability Engineer (m/w/d)",
+        "city": "Dresden",
+        "postcode": "01069",
+        "remote_type": "remote",
+        "date_posted": "2026-10-20",
+        "salary_min": 60000,
+        "salary_max": 75000,
+        "employment_types": [
+          "full_time"
+        ]
+      },
+      {
+        "title": "Backend Developer Go (m/w/d)",
+        "city": "Chemnitz",
+        "date_posted": "2026-09-30",
+        "employment_types": [
+          "full_time"
+        ]
+      }
+    ]
+  },
+  "gcc-fixture-personio.de": {
+    "career_pages": [
+      "https://fixturecorp.jobs.personio.de/xml"
+    ],
+    "outcome": "jobs_found",
+    "ats": "personio",
+    "jobs": [
+      {
+        "title": "Cloud Engineer (m/w/d)",
+        "city": "Dresden",
+        "date_posted": "2026-10-01",
+        "ats_job_id": "2001"
+      },
+      {
+        "title": "IT-Systemadministrator (m/w/d)",
+        "city": "Leipzig",
+        "date_posted": "2026-08-15",
+        "ats_job_id": "2002"
+      },
+      {
+        "title": "Werkstudent DevOps (m/w/d)",
+        "city": "Dresden",
+        "date_posted": "2026-10-25",
+        "ats_job_id": "2003"
+      }
+    ]
+  },
+  "gcc-fixture-greenhouse.de": {
+    "career_pages": [
+      "https://gcc-fixture-greenhouse.de/karriere"
+    ],
+    "outcome": "jobs_found",
+    "ats": "greenhouse",
+    "jobs": [
+      {
+        "title": "Platform Engineer",
+        "city": "Leipzig",
+        "date_posted": "2026-10-10",
+        "employment_types": [
+          "full_time"
+        ]
+      },
+      {
+        "title": "Security Engineer (remote)",
+        "remote_type": "remote",
+        "date_posted": null
+      }
+    ]
+  },
+  "gcc-fixture-lever.de": {
+    "career_pages": [
+      "https://api.eu.lever.co/v0/postings/fixturelever?mode=json"
+    ],
+    "outcome": "jobs_found",
+    "ats": "lever",
+    "jobs": [
+      {
+        "title": "Data Engineer",
+        "city": "Dresden",
+        "remote_type": "hybrid",
+        "date_posted": "2026-09-21",
+        "salary_min": 55000,
+        "employment_types": [
+          "full_time"
+        ]
+      }
+    ]
+  },
+  "gcc-fixture-redirect.de": {
+    "career_pages": [
+      "https://fixturecorp2.jobs.personio.de/xml"
+    ],
+    "outcome": "jobs_found",
+    "ats": "personio",
+    "jobs": [
+      {
+        "title": "Mechatroniker (m/w/d)",
+        "city": "Chemnitz",
+        "date_posted": "2026-10-05"
+      }
+    ]
+  },
+  "gcc-fixture-jsapp.de": {
+    "career_pages": [
+      "https://gcc-fixture-jsapp.de/karriere"
+    ],
+    "outcome": "needs_browser",
+    "needs_browser": true,
+    "jobs": [
+      {
+        "title": "Embedded Software Entwickler (m/w/d)",
+        "city": "Dresden"
+      },
+      {
+        "title": "FPGA Ingenieur (m/w/d)",
+        "city": "Dresden"
+      }
+    ]
+  },
+  "gcc-fixture-paginated.de": {
+    "career_pages": [
+      "https://gcc-fixture-paginated.de/stellenangebote"
+    ],
+    "outcome": "jobs_found",
+    "jobs": [
+      {
+        "title": "Elektroniker (m/w/d)",
+        "city": "Freiberg"
+      },
+      {
+        "title": "Softwareentwickler C++ (m/w/d)",
+        "city": "Chemnitz"
+      },
+      {
+        "title": "Projektmanager (m/w/d)",
+        "city": "Zwickau"
+      },
+      {
+        "title": "Fachinformatiker Systemintegration (m/w/d)",
+        "city": "Plauen"
+      },
+      {
+        "title": "Qualitätsingenieur (m/w/d)",
+        "city": "Chemnitz"
+      },
+      {
+        "title": "Vertriebsingenieur (m/w/d)",
+        "city": "Dresden"
+      }
+    ]
+  },
+  "gcc-fixture-pdf.de": {
+    "career_pages": [
+      "https://gcc-fixture-pdf.de/karriere"
+    ],
+    "outcome": "jobs_found",
+    "jobs": [
+      {
+        "title": "Netzwerkadministrator (m/w/d)"
+      }
+    ]
+  },
+  "gcc-fixture-novacancy.de": {
+    "career_pages": [
+      "https://gcc-fixture-novacancy.de/karriere"
+    ],
+    "outcome": "no_vacancies",
+    "jobs": []
+  },
+  "gcc-fixture-ratelimit.de": {
+    "career_pages": [],
+    "outcome": "rate_limited",
+    "jobs": [],
+    "retry_after_s": 120
+  },
+  "gcc-fixture-timeout.de": {
+    "career_pages": [],
+    "outcome": "no_career_page",
+    "jobs": [],
+    "expect_error": "unreachable"
+  },
+  "gcc-fixture-malformed.de": {
+    "career_pages": [
+      "https://gcc-fixture-malformed.de/jobs"
+    ],
+    "outcome": "jobs_found",
+    "jobs": [
+      {
+        "title": "Kundenberater (m/w/d)",
+        "city": "Bautzen"
+      },
+      {
+        "title": "Lagerist (m/w/d)",
+        "city": "Görlitz"
+      }
+    ]
+  },
+  "gcc-fixture-nocareer.de": {
+    "career_pages": [],
+    "outcome": "no_career_page",
+    "jobs": []
+  },
+  "gcc-fixture-sitemap.de": {
+    "career_pages": [
+      "https://gcc-fixture-sitemap.de/unternehmen/karriere/offene-stellen"
+    ],
+    "outcome": "jobs_found",
+    "jobs": [
+      {
+        "title": "Servicetechniker (m/w/d)",
+        "city": "Plauen",
+        "postcode": "08523"
+      },
+      {
+        "title": "Buchhalter (m/w/d)",
+        "city": "Plauen"
+      }
+    ]
+  },
+  "gcc-fixture-challenge.de": {
+    "career_pages": [],
+    "outcome": "access_restricted",
+    "jobs": []
+  }
+}

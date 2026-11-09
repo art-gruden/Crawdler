@@ -155,6 +155,9 @@ def domain_key(host: str) -> str:
     return registrable
 
 
+_DOUBLED_SCHEME = re.compile(r"^https?://(https?)(?::)?//", re.IGNORECASE)
+
+
 def normalize_website(
     raw: str | None, *, allowed_ports: frozenset[int] | set[int] = frozenset({80, 443})
 ) -> NormalizedUrl:
@@ -162,6 +165,9 @@ def normalize_website(
         raise UrlRejected("empty", raw or "")
     original = str(raw)
     value = _clean(original)
+    # Directory exports sometimes double the scheme: "http://http//www.x.de",
+    # "http://https://www.x.de". Keep the inner (intended) scheme.
+    value = _DOUBLED_SCHEME.sub(lambda m: m.group(1).lower() + "://", value, count=1)
 
     guessed = False
     if value.startswith("//"):

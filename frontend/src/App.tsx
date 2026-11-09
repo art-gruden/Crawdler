@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
 import { api, post, setUnauthorizedHandler } from "./api";
 import Companies from "./pages/Companies";
+import Crawler from "./pages/Crawler";
 import Discovery from "./pages/Discovery";
+import Jobs from "./pages/Jobs";
 import Login from "./pages/Login";
 import { Attribution } from "./components/common";
 
-type Route = { page: "discovery" | "companies"; params: URLSearchParams };
+type Page = "discovery" | "companies" | "jobs" | "crawler";
+type Route = { page: Page; params: URLSearchParams };
+const PAGES: Page[] = ["discovery", "companies", "jobs", "crawler"];
 
 function parseHash(): Route {
   const raw = window.location.hash.replace(/^#\/?/, "");
   const [path, query = ""] = raw.split("?");
-  const page = path === "companies" ? "companies" : "discovery";
+  const page = (PAGES as string[]).includes(path) ? (path as Page) : "discovery";
   return { page, params: new URLSearchParams(query) };
 }
 
@@ -39,12 +43,18 @@ export default function App() {
   return (
     <div className="app">
       <nav className="top">
-        <span className="brand">Career Crawler · Company discovery</span>
+        <span className="brand">Career Crawler</span>
         <a className={route.page === "discovery" ? "active" : ""} href="#/discovery">
           Discovery
         </a>
         <a className={route.page === "companies" ? "active" : ""} href="#/companies">
           Companies
+        </a>
+        <a className={route.page === "jobs" ? "active" : ""} href="#/jobs">
+          Vacancies
+        </a>
+        <a className={route.page === "crawler" ? "active" : ""} href="#/crawler">
+          Crawler
         </a>
         <span className="spacer" />
         <a href="/api/docs" target="_blank" rel="noopener noreferrer">
@@ -55,7 +65,12 @@ export default function App() {
           Sign out
         </button>
       </nav>
-      <main>{route.page === "companies" ? <Companies params={route.params} /> : <Discovery />}</main>
+      <main>
+        {route.page === "companies" && <Companies params={route.params} />}
+        {route.page === "jobs" && <Jobs key={route.params.toString()} params={route.params} />}
+        {route.page === "crawler" && <Crawler />}
+        {route.page === "discovery" && <Discovery />}
+      </main>
       <Attribution />
     </div>
   );

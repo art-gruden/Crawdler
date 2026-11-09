@@ -29,6 +29,7 @@ import httpx
 from .urls import UrlRejected, normalize_host
 
 REDIRECT_CODES = {301, 302, 303, 307, 308}
+_EXTRA_HEADERS = {"if-none-match", "if-modified-since", "accept", "accept-language"}
 
 Resolver = Callable[[str, int], Awaitable[list[str]]]
 
@@ -152,6 +153,7 @@ async def safe_get(
     resolver: Resolver = system_resolver,
     before_request: Callable[[str], Awaitable[None]] | None = None,
     client: httpx.AsyncClient | None = None,
+    extra_headers: dict[str, str] | None = None,
 ) -> FetchResult:
     own_client = client is None
     if client is None:
@@ -188,6 +190,8 @@ async def safe_get(
                 "Accept": accept,
                 "Accept-Language": "de,en;q=0.8",
             }
+            if extra_headers:  # only safe, request-shaping headers (conditional GET, Accept)
+                headers.update({k: v for k, v in extra_headers.items() if k.lower() in _EXTRA_HEADERS})
             extensions = {"sni_hostname": host} if scheme == "https" else {}
             request = client.build_request("GET", pinned, headers=headers, extensions=extensions)
             try:

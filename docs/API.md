@@ -75,3 +75,26 @@ Bulk: `POST /api/companies/scan` with `{"ids": [1, 2, 3]}` returns counts `queue
 | POST | `/api/companies/{id}/verify` | re-check the website now |
 | GET | `/api/health` | database and broker status (used by the container health check) |
 | POST | `/api/auth/login`, `/api/auth/logout`; GET `/api/auth/me` | session |
+
+## Career crawler
+
+All endpoints need the session cookie; `POST` needs `X-Requested-With: gcc-ui`. The queue
+endpoint is unchanged: `POST /api/companies/{id}/scan` (and `/api/companies/scan` for bulk).
+
+| Method | Path | |
+|---|---|---|
+| GET | `/api/jobs?q=&status=open\|closed\|expired\|all&company_id=&city=&remote_type=&employment_type=&skill=&method=&new_days=&posted_days=&min_confidence=&sort=discovered\|posted\|title\|company\|relevance&limit=&offset=` | vacancy search. `q` uses PostgreSQL `websearch_to_tsquery` (quotes, `-exclude`, `or`) plus a title substring match. `skill` can repeat (AND). |
+| GET | `/api/jobs/{id}` | full posting: plain-text description, requirements, responsibilities, languages, salary, source values, extraction method/confidence |
+| GET | `/api/jobs/skills?limit=40` | most frequent skills in open postings |
+| GET | `/api/crawler/stats?hours=24` | dashboard figures: active/completed scans, domains per hour, pages per second, open/new postings, 429/503 share, latency, extraction success/failure per method, queues, latest CPU/RAM sample per worker |
+| GET | `/api/crawler/timeseries?hours=24&bucket_minutes=15` | pages, new postings, errors, 429/503, companies, CPU, MemAvailable, browser pages, HTTP limit per bucket |
+| GET | `/api/crawler/runs?status=running\|done\|partial\|failed\|abandoned&limit=50` | company scans |
+| GET | `/api/crawler/problem-domains` | slow or failing sites (error streak, latency, rate limit, last error) |
+| GET | `/api/crawler/companies/{id}` | diagnosis in plain words, site fingerprint (strategy, success rates, ATS, career URLs, schedule), career sources with evidence, last runs, errors, career pages |
+| POST | `/api/crawler/companies/{id}/rescan` body `{"full": false}` | queue with manual priority; `full: true` also forgets the cached strategy/ATS (next scan runs full discovery). 409 if the website is not verified. |
+
+Example:
+
+```bash
+curl -s -b cookies 'https://crawdler.duckdns.org/api/jobs?q=kubernetes&city=Dresden&new_days=7' | jq '.items[] | {title, company_name, date_posted, skills}'
+```

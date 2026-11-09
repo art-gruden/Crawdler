@@ -72,3 +72,15 @@ def test_first_valid_reports_reason():
 def test_scheme_guess_flag():
     assert normalize_website("firma-beispiel.de").scheme_guessed
     assert not normalize_website("http://firma-beispiel.de").scheme_guessed
+
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        ("http://http//www.4dhome.de", "http://www.4dhome.de/"),
+        ("http://https//www.telekom-mms.com", "https://www.telekom-mms.com/"),
+        ("http://https://www.x-firma.de/de", "https://www.x-firma.de/de"),
+    ],
+)
+def test_doubled_scheme_repaired(raw, expected):
+    assert normalize_website(raw).url == expected

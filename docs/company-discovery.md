@@ -6,7 +6,7 @@
 |---|---|---|
 | `gcc_core` | `companies`, `company_sources`, `scan_requests`, `external_api_usage`; auth, settings, URL rules, SSRF-safe HTTP, companies API | nothing module-specific |
 | `company_discovery` | `discovery_jobs`, `discovery_job_items`; regions, industries, Overpass, CSV, verification | `gcc_core` |
-| career crawler (future) | `career_sources`, `jobs`, `crawl_runs`, … | `gcc_core` |
+| `career_crawler` | `career_sources`, `jobs`, `job_skills`, `crawl_runs`, `crawl_pages`, `crawl_metrics`, `site_fingerprints`, `extraction_errors` ([career-crawler.md](career-crawler.md)) | `gcc_core` |
 
 The only coupling between discovery and the crawler is data:
 

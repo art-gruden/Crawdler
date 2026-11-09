@@ -1,0 +1,6 @@
+{
+  "/v1/boards/fixturegh/jobs?content=true": {
+    "file": "jobs.json",
+    "content_type": "application/json"
+  }
+}

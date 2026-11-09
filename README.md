@@ -1,30 +1,38 @@
-# Germany Career Crawler: company discovery (Sachsen)
+# Germany Career Crawler: company discovery (Sachsen) + adaptive career crawler
 
-Self-hosted platform for finding German employers and, later, their vacancies. This repository currently contains the **`company_discovery` module**, plus the shared core it needs: the `companies` table, the dashboard and the scan queue the career crawler will consume.
+Self-hosted platform for finding German employers and their vacancies, built to run on a single 2 vCPU / 4 GB server. Two modules share one core (`companies` table, scan queue, SSRF-safe HTTP client, dashboard):
 
-What the module does:
+**`company_discovery`**: finds employers.
 
-1. Finds companies with a website in **Sachsen (DE-SN)** via the **OpenStreetMap Overpass API** (`website`, `contact:website`), filtered by **region** (all of Sachsen, Dresden, Leipzig, Chemnitz or any of the 10 Landkreise) and **industry** (IT, engineering, industry and manufacturing, research and technology; life sciences and "other companies" are opt-in).
-2. Imports **CSV files** from other company directories, including a profile for exports of the WFS **Firmendatenbank Sachsen** (technology fields `MICRO!`, `MASCHINE!`, `LIFE SCIENCES!` and WZ/NACE codes).
-3. Normalizes URLs (IDN, tracking parameters, social-media links rejected) and **deduplicates by registrable domain**.
-4. **Verifies websites** without bypassing anything: it checks robots.txt first, does no CAPTCHA or bot-challenge workarounds, uses an SSRF-safe client, and backs off exponentially on transient errors.
-5. Keeps **provenance** for every record: source, record ID (`node/123`, `id:SN-1001`), licence, attribution, data timestamp, and first/last seen.
-6. **Inserts or updates** `companies` in PostgreSQL. It shows new vs. duplicate domains per job and queues verified websites for career-page crawling.
+1. Finds companies with a website in **Sachsen (DE-SN)** via the **OpenStreetMap Overpass API** (`website`, `contact:website`), filtered by **region** (all of Sachsen, Dresden, Leipzig, Chemnitz or any of the 10 Landkreise) and **industry**.
+2. Imports **CSV files** from company directories, including a profile for the WFS **Firmendatenbank Sachsen** (`MICRO!`, `MASCHINE!`, `LIFE SCIENCES!`, WZ/NACE).
+3. Normalizes URLs and **deduplicates by registrable domain**, keeps **provenance** for every record, **verifies websites** (robots.txt first, no bypassing) and queues verified ones for crawling.
 
-The career crawler (Phase 1 of the main spec) is **not part of this repository yet**. Discovery writes `scan_requests`, and the crawler will claim them with `gcc_core.scan_queue.claim()`. Neither module imports the other (see [docs/company-discovery.md](docs/company-discovery.md)).
+**`career_crawler`**: finds their vacancies ([docs/career-crawler.md](docs/career-crawler.md)).
+
+1. **Adaptive strategy ladder per site:** public ATS feeds (Personio XML, Greenhouse, Lever), schema.org **JobPosting** JSON-LD, static HTML (lists, pagination, detail pages), Trafilatura content extraction and PDFs, **Chromium only for JavaScript career pages**, and an optional LLM fallback. The best strategy per site is cached with its success rate.
+2. **Evidence-based ATS detection** (links, iframes, scripts, redirects). Account IDs are never guessed.
+3. **Prioritized URL discovery** with robots.txt, sitemaps, German/English career terms, page/depth budgets, canonical URLs, content hashes, conditional GET, bounded external hops and early stopping.
+4. **Resource-aware scheduling:** per-domain politeness across processes, a resource controller (CPU, RAM, container memory, latency, 429/503) with hysteresis, a browser pause under memory pressure, and PostgreSQL-backed queues with backpressure, checkpoints and crash recovery.
+5. **Vacancy database:** normalized location, remote/hybrid, employment type, publication date (source only), skills, language levels, salary, confidence and method. Conservative dedup; postings are never closed after a single failed request.
+6. **Adaptive recrawl** (12 h … 30 days), a dashboard with crawler metrics and vacancy search, and per-company failure diagnosis.
+7. **Safe test mode and an offline benchmark** with 16 fixture websites ([backend/benchmark](backend/benchmark/README.md)).
 
 ```
             ┌──────────── Caddy (HTTPS, static dashboard, /api proxy) ────────────┐
 Browser ───▶│  React dashboard                       FastAPI  /api/...            │
             └─────────────────────────────────────────────┬────────────────────────┘
-                                                          │
-          ┌───────────────── Redis (Celery broker) ◀──────┤
-          ▼                                               ▼
-  worker-discovery (-c 1)        worker-verify (-c 2)   PostgreSQL
-  Overpass jobs, CSV imports     robots.txt + homepage   companies, company_sources,
-  ──▶ overpass-api.de            ──▶ company websites    discovery_jobs, scan_requests …
-                                                          ▲
-  beat: re-verifies due websites every 10 min             │ claim()  (future career crawler)
+          ┌───────────────── Redis (Celery broker, per-domain throttle) ◀──┤
+          ▼                    ▼                     ▼                     ▼
+  worker-discovery (-c 1)  worker-verify (-c 2)  worker-crawl (-c 1)    worker-browser (-c 1)
+  Overpass, CSV imports    robots + homepage     career_scan, extract,  browser_scan:
+                                                 maintenance (asyncio,  Chromium, every request
+                                                 up to 16 sites)        via the SSRF-safe client
+                                   │                     │                     │
+                                   └──────── PostgreSQL ◀┴─────────────────────┘
+          companies · scan_requests · jobs · career_sources · crawl_runs · crawl_pages ·
+          site_fingerprints · crawl_metrics · extraction_errors · discovery tables
+  beat: verify due sites 10 min · career_scan 60 s · browser_scan 120 s · maintenance 5 min
 ```
 
 ## Install on a new Ubuntu server (crawdler.duckdns.org)
@@ -71,6 +79,10 @@ Database migrations run when the API container starts (`alembic upgrade head`). 
 
 **Discovery → Import CSV:** upload a file and choose a format. Columns are recognised by name (`Firma`/`Name`, `Webseite`/`URL`/`Internet`, `PLZ`, `Ort`, `Landkreis`, `Branche`, `WZ 2008`, `Technologiefelder`, `Firmen-ID`, …). Encodings UTF-8 and Windows-1252 are supported, as are the delimiters `,` `;` tab and `|`. Give a **source name** for each directory so record IDs from different files don't collide, and set licence and attribution. Examples: [examples/](examples/).
 
+**Vacancies:** full-text search (German/English, e.g. `kubernetes -werkstudent`), filters for city, work model, employment type, skill, extraction method, "new this week" and status. The details show responsibilities, requirements, languages, salary, source links and how the posting was extracted. The publication date is shown only when the source states one.
+
+**Crawler:** active and completed scans, domains per hour, pages per second, new postings, ATS vs. HTML vs. browser extraction with success and failure rates, queue lengths, browser usage, CPU and RAM per worker, slow or failing domains. Click a company to see *why* it yields no postings (diagnosis, cached strategy, career sources, last scans, errors) and to *Rescan* or run a *Full rediscovery*.
+
 **Companies:** filter by text, region, industry, website status, scan status, source or job. You can export the filtered list as CSV (every row carries its sources, licences and attribution), open the details (all source records, OSM links, verification result), and **queue selected companies for vacancy scanning**. Only verified websites can be queued. Unverified ones are verified first and queued automatically if verification succeeds.
 
 ### Firmendatenbank Sachsen (firmen.standort-sachsen.de)
@@ -90,6 +102,7 @@ There is **no scraper for that site**, on purpose. When I checked on 9 November 
 | Access restrictions | 401/403, Cloudflare/DDoS-Guard challenges and CAPTCHA pages are recorded as `access_restricted`. They are not retried and not worked around. |
 | SSRF | Only http/https on ports 80/443. Every resolved address must be public: no loopback, RFC 1918, link-local/metadata, CGNAT, ULA or IPv4-mapped. The connection is pinned to the checked IP, with SNI/Host set to the real name. No proxy environment. Redirects are re-checked, and redirects to social networks are not followed. |
 | Crawl scope | Only `verified` companies can enter `scan_requests`. |
+| Career crawler | The same SSRF-safe client for every page, feed, PDF and **every browser subresource** (Chromium only gets a black-hole proxy; requests are fulfilled by the client). robots.txt for every host and redirect, 1 request per domain every 2 s across all workers, `Retry-After` honoured, login walls and bot challenges stop the crawl of that site, size limits, XXE-safe XML. Postings are stored and shown as plain text. Details: [docs/career-crawler.md](docs/career-crawler.md#9-security). |
 | Auth | Single admin login, HttpOnly + SameSite=Strict session cookie, `X-Requested-With` header required for state-changing requests, HTTPS via Caddy, CSP. |
 
 This is not legal advice. Check the licence terms of every directory you import yourself.
@@ -108,6 +121,15 @@ All settings come from environment variables; [.env.example](.env.example) lists
 | `AUTO_QUEUE_VERIFIED` | true | Queue newly verified companies for career crawling |
 | `IMPORT_MAX_MB` / `IMPORT_MAX_ROWS` | 20 / 50 000 | CSV limits |
 | `CRAWLER_USER_AGENT` | GermanyCareerCrawler/0.1 (+…) | Sent to Overpass and websites. Put your contact URL here. |
+| `CRAWLER_HTTP_CONCURRENCY` / `CRAWLER_COMPANIES_IN_PARALLEL` | 16 / 16 | Upper bounds; the resource controller adapts below them |
+| `CRAWLER_PER_DOMAIN_DELAY_S` | 2 | Minimum spacing of requests to one domain (all workers) |
+| `CRAWLER_MAX_PAGES_PER_COMPANY` / `CRAWLER_MAX_DEPTH` | 50 / 4 | Crawl budget per company |
+| `CRAWLER_BROWSER_ENABLED` | true | JavaScript rendering fallback (worker-browser) |
+| `CRAWLER_CLOSE_AFTER_MISSES` / `CRAWLER_CLOSE_MIN_DAYS` | 3 / 3 | Complete scans without a posting and days unseen before it is closed |
+| `CRAWLER_LLM_ENABLED` / `CRAWLER_LLM_URL` | false / – | Optional LLM fallback via an OpenAI-compatible endpoint (e.g. local Ollama) |
+| `CRAWLER_TEST_MODE` / `CRAWLER_FIXTURES_DIR` | false / – | Serve every request from local fixture websites |
+
+All `CRAWLER_*` settings: [backend/career_crawler/config.py](backend/career_crawler/config.py).
 
 ## Development
 
@@ -121,6 +143,9 @@ export DATABASE_URL=postgresql+psycopg://gcc:gcc@localhost:5432/gcc SECRET_KEY=$
 alembic upgrade head
 uvicorn gcc_core.main:app --reload --port 8000
 celery -A gcc_core.celery_app worker -Q discovery,verify,default -c 2     # second terminal
+celery -A gcc_core.celery_app worker -Q career_scan,extract,maintenance,browser_scan -c 1  # crawler
+celery -A gcc_core.celery_app beat                                         # schedules
+python -m playwright install chromium-headless-shell                       # once, for the browser fallback
 
 # frontend
 cd frontend && npm ci && npm run dev      # http://localhost:5173, proxies /api to :8000
@@ -128,9 +153,25 @@ cd frontend && npm ci && npm run dev      # http://localhost:5173, proxies /api 
 # tests: real PostgreSQL, no network needed (Overpass and websites are faked)
 TEST_DATABASE_URL=postgresql+psycopg://gcc:gcc@localhost:5432/gcc_test pytest
 ruff check .
+python -m benchmark.run --repeat 3        # offline crawler benchmark (add --browser for Chromium)
 ```
 
 ## What was tested, and what not
+
+### Career crawler
+
+**Tested** (Python 3.13, PostgreSQL 16, Redis 7, Chrome 2 vCPU sandbox):
+- 64 new automated tests (173 in total, all passing): extraction and normalization (dates never taken from discovery, placeholders rejected; skills, CEFR language levels, salary, location, remote/hybrid, employment types; JSON-LD with `@graph`, broken JSON and microdata; XXE-safe sitemaps), evidence-only ATS detection, the engine on all 16 fixture websites with field-level checks, robots.txt disallow, 429 + Retry-After, bot challenge, remembered ATS (no site crawl), fallback when a cached ATS disappears, SSRF (company host resolving to 10.0.0.5 / 169.254.169.254), the external-hop limit, page budgets, early stop, unchanged pages and 304s, the throttle and limiter. With PostgreSQL: the batch runner end to end, dedup on rescan, lifecycle (no miss on a failed page, closing only after 3 complete misses *and* 3 days, reopening), one running scan per company, crash recovery with checkpoint resume, bounded retries, adaptive scheduling, retention, the resource controller's hysteresis and browser pause, all new API endpoints, and two real Chromium tests: an end-to-end browser pass, and a page that tries to load `169.254.169.254`, `10.0.0.1` and a host rebinding to `192.168.1.10` (all blocked, no request reaches them).
+- Migration `0002`: `upgrade` → `alembic check` → `downgrade 0001` → `upgrade`.
+- The dashboard against a database seeded by a real batch + browser run over the fixtures, checked in headless Chrome. The offline benchmark: [backend/benchmark/README.md](backend/benchmark/README.md).
+
+**Not tested:**
+- **Real employer websites and real ATS endpoints.** The Personio XML, Greenhouse and Lever formats follow their public documentation; the fixtures imitate them. Field names may differ in practice. Start with a few companies and look at *Crawler → company → Career crawl*.
+- **Extraction accuracy on real sites.** The fixture scores are a regression check, not a real-world measurement.
+- **The Docker images** (no Docker Hub access here). In particular the browser stage (`playwright install --with-deps --only-shell chromium`) has not been built. `docker compose config` validates.
+- Throughput and memory on the target VPS under live load.
+
+### Company discovery
 
 **Tested** (Python 3.13, PostgreSQL 16, Redis 7, Chrome):
 - 106 automated tests: URL normalization (31 cases), the Overpass query builder and parser, the client (cache, budget, minimum interval, 429 via `/api/status`, 504 back-off, 400 error text), the region registry, CSV import (cp1252/`;`, BOM/tab, row limit, WFS categories, NACE), end-to-end OSM and CSV jobs on PostgreSQL (new / duplicate-in-job / duplicate-existing / invalid, re-runs without duplicates, provenance, OSM + CSV merge), website verification against local HTTP servers (robots.txt disallow without a homepage request, 403, Cloudflare challenge, parked domain, 429, robots 5xx, redirects, redirect to the cloud metadata IP, redirect to Facebook, DNS errors, https→http fallback, 14 address classes for SSRF), and every API endpoint including auth/CSRF, filters, pagination, CSV export, scan queue and the crawler-side `claim`/`finish`.
@@ -149,13 +190,17 @@ ruff check .
 backend/
   gcc_core/            shared: settings, DB, auth, URL normalization, SSRF-safe fetch,
                        companies API, scan queue (outbox for the crawler), Celery app
-  company_discovery/   this module: regions/ (Sachsen), industries, overpass, csv_import,
+  company_discovery/   regions/ (Sachsen), industries, overpass, csv_import,
                        service (upsert/dedup), verify, jobs, tasks, api
-  migrations/          Alembic
+  career_crawler/      engine, fetch, urls, discovery, extract/ (jsonld, html, pdf, normalize,
+                       skills), ats/ (Personio, Greenhouse, Lever), store, runner, browser,
+                       resources, schedule, maintenance, llm, tasks, api, testing
+  benchmark/           offline fixture websites + ground truth, benchmark runner
+  migrations/          Alembic (0001 discovery, 0002 career crawler)
   tests/               pytest (PostgreSQL), fixtures with fictional companies
 frontend/              React + TypeScript dashboard (Vite)
 deploy/                Caddyfile, web image
-docs/                  module design, API, OpenAPI
+docs/                  module design (company-discovery.md, career-crawler.md), API, OpenAPI
 examples/              example CSV files
 install.sh             server installer / updater (Ubuntu)
 docker-compose.yml, .env.example

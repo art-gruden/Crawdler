@@ -1,0 +1,9 @@
+{
+  "/": {
+    "status": 429,
+    "headers": {
+      "retry-after": "120"
+    },
+    "body": "Too many requests"
+  }
+}

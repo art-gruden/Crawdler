@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { CrawlDetails } from "../components/CrawlDrawer";
 import { api, post, qs } from "../api";
 import { navigate } from "../App";
 import { Badge, Card, ErrorNote, SafeLink, VERIFICATION_STATUSES, fmtDate, verificationLabel } from "../components/common";
@@ -403,7 +404,10 @@ function CompanyDrawer({ id, onClose, onChanged }: { id: number; onClose: () => 
             <button onClick={verify} disabled={!c.domain}>
               Re-check website
             </button>
+            <a href={`#/jobs?company_id=${c.id}&status=all`}>Show vacancies</a>
           </div>
+          <h3>Career crawl</h3>
+          <CrawlDetails companyId={c.id} onChanged={onChanged} />
           <h3>Sources ({c.source_records.length})</h3>
           <ul className="sources">
             {c.source_records.map((s) => (

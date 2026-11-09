@@ -1,0 +1,6 @@
+{
+  "/v0/postings/fixturelever?mode=json&skip=0&limit=100": {
+    "file": "postings.json",
+    "content_type": "application/json"
+  }
+}
