@@ -1,7 +1,9 @@
 # SITE_ADDRESS: your domain (automatic Let's Encrypt certificate) or "localhost"
 # (Caddy's internal CA, for testing). Port 80 redirects to HTTPS.
 {
-	email {$ACME_EMAIL:}
+	# Optional global options, e.g. "email you@example.net" for certificate expiry
+	# notices. install.sh writes deploy/caddy.d/acme.caddy when --email is given.
+	import /etc/caddy/caddy.d/*.caddy
 }
 
 {$SITE_ADDRESS:localhost} {

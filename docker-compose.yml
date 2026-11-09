@@ -94,12 +94,12 @@ services:
     image: gcc-web:0.1.0
     environment:
       SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
-      ACME_EMAIL: ${ACME_EMAIL:-}
     ports:
       - "80:80"
       - "443:443"
       - "443:443/udp"
     volumes:
+      - ./deploy/caddy.d:/etc/caddy/caddy.d:ro
       - caddydata:/data
       - caddyconfig:/config
     depends_on:

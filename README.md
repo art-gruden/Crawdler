@@ -27,13 +27,36 @@ Browser ───▶│  React dashboard                       FastAPI  /api/...
   beat: re-verifies due websites every 10 min             │ claim()  (future career crawler)
 ```
 
-## Quick start (Linux VPS, Docker Compose)
+## Install on a new Ubuntu server (crawdler.duckdns.org)
+
+From your Mac, copy the project to the server (`.env` is excluded so a later copy never overwrites the server's secrets):
+
+```bash
+rsync -av --exclude node_modules --exclude dist --exclude .env --exclude 'deploy/caddy.d/*.caddy' \
+      ./ root@<server-ip>:/opt/germany-career-crawler/
+ssh root@<server-ip>
+cd /opt/germany-career-crawler
+sudo ./install.sh --duckdns-token <your-duckdns-token> --email <you@example.net>
+```
+
+`install.sh` (Ubuntu 22.04/24.04/26.04) does the following:
+- installs Docker with the Compose plugin, and adds 2 GB swap on servers with less than 2 GB RAM;
+- with `--duckdns-token`, points `crawdler.duckdns.org` to the server and keeps it updated (systemd timer every 5 min);
+- checks that the domain resolves to this server and that ports 80/443 are free, and opens them in ufw if ufw is active;
+- creates `.env` with random secrets and admin password (first run only);
+- builds and starts the stack, then waits until the API is healthy and Let's Encrypt has issued the certificate.
+
+At the end it prints the URL and the admin password (shown once, stored in `.env`). Run it again after copying new code to update; secrets and data are kept. Options: `./install.sh --help`. Without a DuckDNS token, set the record at duckdns.org yourself. Any other domain works with `--domain`.
+
+Also allow inbound TCP 80 and 443 in your provider's cloud firewall if it has one. Let's Encrypt needs port 80 for the HTTP challenge.
+
+### Manual alternative
 
 ```bash
 cp .env.example .env
-# set POSTGRES_PASSWORD, SECRET_KEY (openssl rand -hex 32), ADMIN_PASSWORD,
-# SITE_ADDRESS (your domain; DNS A/AAAA record must point to the server), ACME_EMAIL,
+# set POSTGRES_PASSWORD, SECRET_KEY (openssl rand -hex 32), ADMIN_PASSWORD, SITE_ADDRESS,
 # CRAWLER_USER_AGENT (with a URL or e-mail where site owners can reach you)
+echo "email you@example.net" > deploy/caddy.d/acme.caddy   # optional: certificate notices
 docker compose up -d --build
 docker compose ps            # all services "healthy"
 ```
@@ -117,7 +140,8 @@ ruff check .
 **Not tested**, because this sandbox can't reach them:
 - The real **overpass-api.de**. Tests use a stand-in that returns Overpass-formatted JSON with fictional companies. The query syntax follows the Overpass QL docs. Whether every Kreis boundary in OSM carries `de:regionalschluessel` / `de:amtlicher_gemeindeschluessel` was not checked live. If a Kreis is not found, the job names it ("region boundary not found"). Run the first job on Dresden only and look at the results before scanning all of Sachsen.
 - **Docker images** (Docker Hub is blocked here). `docker compose config` validates, but the images were not built. Expect the first `docker compose up --build` to be the first real build.
-- **Caddy** with a real certificate, and verification of real websites over HTTPS on the internet.
+- **Caddy** with a real certificate, and verification of real websites over HTTPS on the internet. The Caddyfile was checked with `caddy validate` / `caddy adapt` (Caddy 2.10.2), with and without an e-mail.
+- **install.sh** on a real server. It passed shellcheck and ran on Ubuntu 24.04 up to the build (`--no-start`), including the re-run that keeps `.env`. The DuckDNS update, public-IP/DNS check and the Docker installation itself could not run here (no outside network, Docker already present).
 
 ## Repository layout
 
@@ -133,5 +157,6 @@ frontend/              React + TypeScript dashboard (Vite)
 deploy/                Caddyfile, web image
 docs/                  module design, API, OpenAPI
 examples/              example CSV files
+install.sh             server installer / updater (Ubuntu)
 docker-compose.yml, .env.example
 ```
