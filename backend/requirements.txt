@@ -1,6 +1,7 @@
 # Runtime dependencies (versions tested together).
 fastapi==0.162.2
 uvicorn[standard]==0.54.0
+pyyaml==6.0.3
 SQLAlchemy==2.1.8
 alembic==1.20.1
 psycopg[binary]==3.3.8

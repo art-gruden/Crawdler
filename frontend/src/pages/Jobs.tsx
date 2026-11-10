@@ -40,7 +40,7 @@ export default function Jobs({ params }: { params: URLSearchParams }) {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      api<{ total: number; items: Vacancy[] }>(`/api/jobs${qs({ ...f, sort: f.q && f.sort === "discovered" ? "relevance" : f.sort, limit: PAGE, offset })}`)
+      api<{ total: number; items: Vacancy[] }>(`/api/jobs${qs({ ...filterParams, limit: PAGE, offset })}`)
         .then((d) => {
           setData(d);
           setError(null);
@@ -49,6 +49,11 @@ export default function Jobs({ params }: { params: URLSearchParams }) {
     }, 250);
     return () => clearTimeout(t);
   }, [f, offset]);
+
+  // Downloads use the very same filters (and sort) as the table, so the file equals what is shown.
+  const filterParams = { ...f, sort: f.q && f.sort === "discovered" ? "relevance" : f.sort };
+  const exportUrl = (kind: "export.csv" | "export.yaml", extra: Record<string, string> = {}) =>
+    `/api/jobs/${kind}${qs({ ...filterParams, ...extra })}`;
 
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) => {
     setOffset(0);
@@ -119,6 +124,20 @@ export default function Jobs({ params }: { params: URLSearchParams }) {
         )}
       </div>
       <ErrorNote error={error} />
+      <div className="export-bar">
+        <span className="hint">
+          {data ? `${data.total.toLocaleString("de-DE")} ${data.total === 1 ? "vacancy matches" : "vacancies match"}` : "…"} · export all of them (max. 10,000):
+        </span>
+        <a className="button small" href={exportUrl("export.csv")} download title="Table columns, UTF-8, comma separated">
+          CSV
+        </a>
+        <a className="button small" href={exportUrl("export.csv", { delimiter: ";" })} download title="Same, semicolon separated: opens directly in German Excel">
+          CSV (;)
+        </a>
+        <a className="button small" href={exportUrl("export.yaml")} download title="Every stored field including the full description">
+          YAML (full)
+        </a>
+      </div>
       <div className="table-wrap">
         <table className="table">
           <thead>
@@ -218,6 +237,11 @@ function JobDrawer({ id, onClose }: { id: number; onClose: () => void }) {
       <ErrorNote error={error} />
       {j && (
         <div className="stack">
+          <div>
+            <a className="button small" href={`/api/jobs/${j.id}/export.yaml`} download>
+              Download YAML (all fields)
+            </a>
+          </div>
           <dl className="kv">
             <dt>Company</dt>
             <dd>

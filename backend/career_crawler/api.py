@@ -5,6 +5,7 @@ from __future__ import annotations
 import datetime as dt
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import Float, and_, any_, cast, desc, func, or_, select
 from sqlalchemy.orm import Session
@@ -14,6 +15,7 @@ from gcc_core.auth import current_user
 from gcc_core.db import get_db
 from gcc_core.models import Company, ScanRequest
 
+from . import export
 from .models import CareerSource, CrawlMetric, CrawlPage, CrawlRun, ExtractionError, Job, JobSkill, SiteFingerprint
 
 jobs_router = APIRouter(prefix="/api/jobs", tags=["jobs"], dependencies=[Depends(current_user)])
@@ -80,59 +82,87 @@ def _job_out(j: Job, c: Company, skills: list[str], model=JobOut, **extra):
     return model(**data, company_name=c.name, company_domain=c.domain, skills=skills, **extra)
 
 
+class JobFilters:
+    """The filters of the Vacancies table. One definition, shared by the list and the exports,
+    so a download always contains exactly the rows the table is showing."""
+
+    def __init__(
+        self,
+        q: str | None = Query(None, max_length=200, description="full-text search in title, location and description"),
+        status_: str | None = Query("open", alias="status", pattern="^(open|closed|expired|all)$"),
+        company_id: int | None = None,
+        city: str | None = Query(None, max_length=80),
+        remote_type: str | None = Query(None, pattern="^(onsite|hybrid|remote|unknown)$"),
+        employment_type: str | None = Query(None, max_length=32),
+        skill: list[str] | None = Query(None),
+        method: str | None = Query(None, pattern="^(ats|jsonld|html|content|pdf|browser|llm)$"),
+        new_days: int | None = Query(None, ge=1, le=365, description="discovered in the last N days"),
+        posted_days: int | None = Query(None, ge=1, le=365, description="published in the last N days (source date)"),
+        min_confidence: float | None = Query(None, ge=0, le=1),
+        sort: str = Query("discovered", pattern="^(discovered|posted|title|company|relevance)$"),
+    ):
+        self.q, self.status, self.company_id, self.city = q, status_, company_id, city
+        self.remote_type, self.employment_type, self.skill, self.method = remote_type, employment_type, skill, method
+        self.new_days, self.posted_days, self.min_confidence, self.sort = new_days, posted_days, min_confidence, sort
+
+    def as_dict(self) -> dict:
+        """Active filters only (written into the export header)."""
+        d = {
+            k: getattr(self, k)
+            for k in (
+                "q status company_id city remote_type employment_type skill method new_days posted_days "
+                "min_confidence sort"
+            ).split()
+        }
+        return {k: v for k, v in d.items() if v not in (None, "", [])}
+
+    def query(self):
+        conds = []
+        if self.status and self.status != "all":
+            conds.append(Job.status == self.status)
+        if self.company_id:
+            conds.append(Job.company_id == self.company_id)
+        if self.city:
+            conds.append(or_(Job.city.ilike(f"%{self.city}%"), Job.location_raw.ilike(f"%{self.city}%")))
+        if self.remote_type:
+            conds.append(Job.remote_type == self.remote_type)
+        if self.employment_type:
+            conds.append(self.employment_type == any_(Job.employment_types))
+        if self.method:
+            conds.append(Job.extraction_method == self.method)
+        if self.new_days:
+            conds.append(Job.discovered_at >= _now() - dt.timedelta(days=self.new_days))
+        if self.posted_days:
+            conds.append(Job.date_posted >= (_now() - dt.timedelta(days=self.posted_days)).date())
+        if self.min_confidence is not None:
+            conds.append(Job.confidence >= self.min_confidence)
+        for sk in self.skill or []:
+            conds.append(Job.id.in_(select(JobSkill.job_id).where(func.lower(JobSkill.skill) == sk.lower())))
+        tsq = None
+        if self.q and self.q.strip():
+            tsq = func.websearch_to_tsquery("simple", self.q.strip())
+            conds.append(or_(Job.search.op("@@")(tsq), Job.title.ilike(f"%{self.q.strip()}%")))
+        base = select(Job, Company).join(Company, Company.id == Job.company_id).where(and_(*conds) if conds else True)
+        order = {
+            "discovered": [desc(Job.discovered_at)],
+            "posted": [desc(Job.date_posted).nulls_last(), desc(Job.discovered_at)],
+            "title": [func.lower(Job.title)],
+            "company": [func.lower(Company.name), func.lower(Job.title)],
+            "relevance": [desc(func.ts_rank(Job.search, tsq))] if tsq is not None else [desc(Job.discovered_at)],
+        }[self.sort]
+        return base, [*order, Job.id]
+
+
 @jobs_router.get("", response_model=JobPage)
 def list_jobs(
-    q: str | None = Query(None, max_length=200, description="full-text search in title, location and description"),
-    status_: str | None = Query("open", alias="status", pattern="^(open|closed|expired|all)$"),
-    company_id: int | None = None,
-    city: str | None = Query(None, max_length=80),
-    remote_type: str | None = Query(None, pattern="^(onsite|hybrid|remote|unknown)$"),
-    employment_type: str | None = Query(None, max_length=32),
-    skill: list[str] | None = Query(None),
-    method: str | None = Query(None, pattern="^(ats|jsonld|html|content|pdf|browser|llm)$"),
-    new_days: int | None = Query(None, ge=1, le=365, description="discovered in the last N days"),
-    posted_days: int | None = Query(None, ge=1, le=365, description="published in the last N days (source date)"),
-    min_confidence: float | None = Query(None, ge=0, le=1),
-    sort: str = Query("discovered", pattern="^(discovered|posted|title|company|relevance)$"),
+    f: JobFilters = Depends(),
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
 ):
-    conds = []
-    if status_ and status_ != "all":
-        conds.append(Job.status == status_)
-    if company_id:
-        conds.append(Job.company_id == company_id)
-    if city:
-        conds.append(or_(Job.city.ilike(f"%{city}%"), Job.location_raw.ilike(f"%{city}%")))
-    if remote_type:
-        conds.append(Job.remote_type == remote_type)
-    if employment_type:
-        conds.append(employment_type == any_(Job.employment_types))
-    if method:
-        conds.append(Job.extraction_method == method)
-    if new_days:
-        conds.append(Job.discovered_at >= _now() - dt.timedelta(days=new_days))
-    if posted_days:
-        conds.append(Job.date_posted >= (_now() - dt.timedelta(days=posted_days)).date())
-    if min_confidence is not None:
-        conds.append(Job.confidence >= min_confidence)
-    for sk in skill or []:
-        conds.append(Job.id.in_(select(JobSkill.job_id).where(func.lower(JobSkill.skill) == sk.lower())))
-    tsq = None
-    if q and q.strip():
-        tsq = func.websearch_to_tsquery("simple", q.strip())
-        conds.append(or_(Job.search.op("@@")(tsq), Job.title.ilike(f"%{q.strip()}%")))
-    base = select(Job, Company).join(Company, Company.id == Job.company_id).where(and_(*conds) if conds else True)
+    base, order = f.query()
     total = db.execute(select(func.count()).select_from(base.subquery())).scalar_one()
-    order = {
-        "discovered": [desc(Job.discovered_at)],
-        "posted": [desc(Job.date_posted).nulls_last(), desc(Job.discovered_at)],
-        "title": [func.lower(Job.title)],
-        "company": [func.lower(Company.name), func.lower(Job.title)],
-        "relevance": [desc(func.ts_rank(Job.search, tsq))] if tsq is not None else [desc(Job.discovered_at)],
-    }[sort]
-    rows = db.execute(base.order_by(*order, Job.id).limit(limit).offset(offset)).all()
+    rows = db.execute(base.order_by(*order).limit(limit).offset(offset)).all()
     ids = [j.id for j, _ in rows]
     skills: dict[int, list[str]] = {}
     if ids:
@@ -152,6 +182,62 @@ def top_skills(limit: int = Query(40, ge=1, le=200), db: Session = Depends(get_d
         .limit(limit)
     ).all()
     return [{"skill": s, "category": c, "jobs": n} for s, c, n in rows]
+
+
+def _download(chunks, media: str, name: str) -> StreamingResponse:
+    return StreamingResponse(
+        chunks,
+        media_type=media,
+        headers={"Content-Disposition": f'attachment; filename="{name}"', "Cache-Control": "no-store"},
+    )
+
+
+def _stamp() -> str:
+    return _now().strftime("%Y-%m-%d")
+
+
+@jobs_router.get("/export.csv", summary="Download the filtered vacancies as CSV (same filters as the table)")
+def export_csv(
+    f: JobFilters = Depends(),
+    delimiter: str = Query(",", pattern="^[,;]$", description="';' opens directly in German-locale Excel"),
+    limit: int = Query(export.MAX_ROWS, ge=1, le=export.MAX_ROWS),
+    db: Session = Depends(get_db),
+):
+    base, order = f.query()
+    return _download(
+        export.csv_stream(base, order, limit, delimiter), "text/csv; charset=utf-8", f"vacancies-{_stamp()}.csv"
+    )
+
+
+@jobs_router.get("/export.yaml", summary="Download the filtered vacancies as YAML: every field, full description")
+def export_yaml(
+    f: JobFilters = Depends(),
+    limit: int = Query(export.MAX_ROWS, ge=1, le=export.MAX_ROWS),
+    db: Session = Depends(get_db),
+):
+    base, order = f.query()
+    total = db.execute(select(func.count()).select_from(base.subquery())).scalar_one()
+    return _download(
+        export.yaml_stream(base, order, limit, total=total, filters=f.as_dict()),
+        "application/yaml; charset=utf-8",
+        f"vacancies-{_stamp()}.yaml",
+    )
+
+
+@jobs_router.get("/{job_id}/export.yaml", summary="Download one vacancy as YAML (all fields, full description)")
+def export_job_yaml(job_id: int, db: Session = Depends(get_db)):
+    j = db.get(Job, job_id)
+    if j is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Job not found")
+    skills = list(
+        db.execute(select(JobSkill.skill, JobSkill.category).where(JobSkill.job_id == j.id).order_by(JobSkill.skill))
+    )
+    body = export.single_yaml(j, db.get(Company, j.company_id), [(s, c) for s, c in skills])
+    return Response(
+        body,
+        media_type="application/yaml; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="vacancy-{j.id}.yaml"', "Cache-Control": "no-store"},
+    )
 
 
 @jobs_router.get("/{job_id}", response_model=JobDetail)

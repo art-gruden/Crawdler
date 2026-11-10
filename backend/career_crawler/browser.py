@@ -27,12 +27,14 @@ from gcc_core.log import get_logger
 
 from .config import CrawlerSettings, get_crawler_settings
 from .engine import SiteScan
-from .fetch import CrawlStop, Fetcher, Page, RobotsDisallowed
+from .fetch import CrawlStop, Fetcher, Page, RobotsDisallowed, RobotsUnavailable
 from .models import CrawlRun, ExtractionError
 from .resources import ResourceController
 from .store import load_context, persist
 
 log = get_logger(__name__)
+
+DATA_TYPES = frozenset({"xhr", "fetch"})
 
 CHROMIUM_ARGS = [
     "--proxy-server=http://127.0.0.1:9",  # fail closed: nothing may bypass request interception
@@ -211,7 +213,15 @@ class BrowserRenderer:
             if request.frame != page.main_frame:  # iframes: only same-document helpers, no third-party widgets
                 await route.abort("blockedbyclient")
                 return
-            res = await self.f.get_subresource(url, accept=request.headers.get("accept", "*/*"))
+            try:
+                res = await self.f.get_subresource(
+                    url,
+                    accept=request.headers.get("accept", "*/*"),
+                    check_robots=request.resource_type in DATA_TYPES,  # data requests obey robots.txt too
+                )
+            except (RobotsDisallowed, RobotsUnavailable):  # this data request only; the page goes on
+                await route.abort("blockedbyclient")
+                return
         headers = {k: v for k, v in res.headers.items() if k.lower() in PASS_HEADERS}
         await route.fulfill(status=res.status, headers=headers, body=res.body)
 

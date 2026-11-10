@@ -212,7 +212,10 @@ class OverpassClient:
     ):
         self.s = settings
         self.session_factory = session_factory
-        self.http = http or httpx.Client(timeout=httpx.Timeout(settings.overpass_query_timeout_s + 30, connect=15))
+        self.http = http or httpx.Client(
+            timeout=httpx.Timeout(settings.overpass_query_timeout_s + 30, connect=15),
+            headers={"User-Agent": settings.crawler_user_agent},  # also set per request below
+        )
         self.sleep = sleep
         self.cancelled = cancelled
         self.cache_dir = Path(settings.data_dir) / "overpass-cache"

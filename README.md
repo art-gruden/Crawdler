@@ -81,6 +81,8 @@ Database migrations run when the API container starts (`alembic upgrade head`). 
 
 **Vacancies:** full-text search (German/English, e.g. `kubernetes -werkstudent`), filters for city, work model, employment type, skill, extraction method, "new this week" and status. The details show responsibilities, requirements, languages, salary, source links and how the posting was extracted. The publication date is shown only when the source states one.
 
+**Export:** above the table, *CSV* and *CSV (;)* (semicolon: opens directly in German Excel) download **all** vacancies matching the current filters (the table columns, UTF-8 with BOM, max. 10 000 rows; text that looks like a spreadsheet formula is prefixed with `'`). *YAML (full)* downloads the same selection with **every stored field and the full description**, plus the company and skills; the file starts with the filters used and says if it was truncated. A single posting: *Download YAML* in its details. Same via the API: `/api/jobs/export.csv`, `/api/jobs/export.yaml`, `/api/jobs/{id}/export.yaml` accept the filters of `/api/jobs`.
+
 **Crawler:** active and completed scans, domains per hour, pages per second, new postings, ATS vs. HTML vs. browser extraction with success and failure rates, queue lengths, browser usage, CPU and RAM per worker, slow or failing domains. Click a company to see *why* it yields no postings (diagnosis, cached strategy, career sources, last scans, errors) and to *Rescan* or run a *Full rediscovery*.
 
 **Companies:** filter by text, region, industry, website status, scan status, source or job. You can export the filtered list as CSV (every row carries its sources, licences and attribution), open the details (all source records, OSM links, verification result), and **queue selected companies for vacancy scanning**. Only verified websites can be queued. Unverified ones are verified first and queued automatically if verification succeeds.
@@ -107,6 +109,28 @@ There is **no scraper for that site**, on purpose. When I checked on 9 November 
 
 This is not legal advice. Check the licence terms of every directory you import yourself.
 
+## Crawler identity and the bot page
+
+Every outgoing request (Overpass, website verification, `robots.txt`, career pages, ATS feeds and the browser's page loads) carries the single `CRAWLER_USER_AGENT` from `.env`; there is no second setting. `robots.txt` is matched against the **product token** derived from it, not against the whole string, so a Mozilla-style value works too:
+
+| `CRAWLER_USER_AGENT` | robots.txt token |
+|---|---|
+| `GermanyCareerCrawler/0.1 (+https://host/bot)` | `GermanyCareerCrawler` |
+| `Mozilla/5.0 (compatible; GermanyCareerCrawler/0.1; +https://host/bot)` | `GermanyCareerCrawler` |
+
+Website owners can therefore use `User-agent: GermanyCareerCrawler` with `Disallow:` and `Crawl-delay:`. Disallowed pages are not fetched, which also holds for data requests (XHR/fetch) of the browser. A `Crawl-delay` is honoured up to 30 s.
+
+**Public page for website owners:** `https://<SITE_ADDRESS>/bot` (no login). It explains the purpose, what is collected, the crawl policy, the active User-Agent and token, how to ask for a lower rate or exclusion, and shows `BOT_CONTACT_EMAIL`. The data comes from the public endpoint `/api/public/bot`, which exposes nothing else. Put the URL in `CRAWLER_USER_AGENT` and set `BOT_CONTACT_EMAIL`. Without a contact address the page says that none is published; it never invents one.
+
+**Check the active configuration** (prints no secrets):
+
+```bash
+docker compose exec api python -m gcc_core.botinfo
+curl -s https://<SITE_ADDRESS>/api/public/bot | jq
+```
+
+After changing `.env`: `docker compose up -d` (containers are recreated and read it again).
+
 ## Configuration
 
 All settings come from environment variables; [.env.example](.env.example) lists them with defaults. The most important ones:
@@ -120,7 +144,8 @@ All settings come from environment variables; [.env.example](.env.example) lists
 | `VERIFY_RECHECK_DAYS` | 30 | Re-verify verified sites after this time |
 | `AUTO_QUEUE_VERIFIED` | true | Queue newly verified companies for career crawling |
 | `IMPORT_MAX_MB` / `IMPORT_MAX_ROWS` | 20 / 50 000 | CSV limits |
-| `CRAWLER_USER_AGENT` | GermanyCareerCrawler/0.1 (+…) | Sent to Overpass and websites. Put your contact URL here. |
+| `CRAWLER_USER_AGENT` | GermanyCareerCrawler/0.1 (+…/bot) | The one User-Agent of every outgoing request; robots.txt token derived from it. See [Crawler identity](#crawler-identity-and-the-bot-page). |
+| `BOT_CONTACT_EMAIL` | empty | Contact address shown on the public `/bot` page |
 | `CRAWLER_HTTP_CONCURRENCY` / `CRAWLER_COMPANIES_IN_PARALLEL` | 16 / 16 | Upper bounds; the resource controller adapts below them |
 | `CRAWLER_PER_DOMAIN_DELAY_S` | 2 | Minimum spacing of requests to one domain (all workers) |
 | `CRAWLER_MAX_PAGES_PER_COMPANY` / `CRAWLER_MAX_DEPTH` | 50 / 4 | Crawl budget per company |
@@ -170,6 +195,12 @@ python -m benchmark.run --repeat 3        # offline crawler benchmark (add --bro
 - **Extraction accuracy on real sites.** The fixture scores are a regression check, not a real-world measurement.
 - **The Docker images** (no Docker Hub access here). In particular the browser stage (`playwright install --with-deps --only-shell chromium`) has not been built. `docker compose config` validates.
 - Throughput and memory on the target VPS under live load.
+
+### Crawler identity, bot page and exports
+
+- 32 more automated tests (205 in total, all passing): the User-Agent is read from the environment and no second one exists; docker-compose forwards `.env` and never overrides it; the robots.txt token for plain and Mozilla-style User-Agents (a `Mozilla` group in someone's robots.txt does not apply to us); website verification and the career fetcher send the configured User-Agent for both robots.txt and pages; disallowed URLs are never requested (checked against what the server received); browser XHR/fetch is checked against robots.txt, static assets are not; `/api/public/bot` works without login and leaks no secrets or invented contact; every other endpoint in the OpenAPI schema answers 401 without a session; CSV/YAML exports equal the table for the same filters, neutralise spreadsheet formulas, keep umlauts, contain every column and the full description, declare truncation, require login.
+- In headless Chrome: `/bot` renders without a session; the export buttons download the files for the filtered selection.
+- **Not verified:** `https://crawdler.duckdns.org/bot` on the real server (Caddy serving the SPA fallback is configured but was not exercised here) and the exports on a real database of scraped postings.
 
 ### Company discovery
 

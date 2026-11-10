@@ -25,6 +25,7 @@ from urllib.parse import urlsplit
 import httpx
 from protego import Protego
 
+from gcc_core.botinfo import robots_token
 from gcc_core.netsafe import FetchError, FetchResult, NetPolicy, Resolver, safe_get, system_resolver
 from gcc_core.urls import domain_key
 
@@ -258,7 +259,7 @@ class AdjustableLimiter:
 class Robots:
     def __init__(self, fetch_raw: Callable[[str], Awaitable[Page]], user_agent: str):
         self._fetch_raw = fetch_raw
-        self._ua = user_agent
+        self._ua = robots_token(user_agent)  # robots.txt groups match the product token
         self._cache: dict[str, Protego | None] = {}
         self._locks: dict[str, asyncio.Lock] = {}
 
@@ -434,18 +435,26 @@ class Fetcher:
             page.body = _gunzip_bounded(page.body, self.settings.max_feed_bytes)
         return page
 
-    async def get_subresource(self, url: str, *, accept: str = "*/*", max_bytes: int = 3 * 1024 * 1024) -> Page:
+    async def get_subresource(
+        self, url: str, *, accept: str = "*/*", max_bytes: int = 3 * 1024 * 1024, check_robots: bool = False
+    ) -> Page:
         """For the browser: scripts/styles/XHR needed to render an allowed page.
 
         Same SSRF protection (public IPs, pinning, redirect checks, size limit) and global
-        concurrency, but no robots.txt lookup and no per-domain spacing — they are part of
-        a page fetch that already passed both.
+        concurrency. Static assets (scripts, styles, fonts) are part of a page fetch that already
+        passed robots.txt and the per-domain spacing. Data requests (XHR/fetch) are not: with
+        ``check_robots`` they are evaluated against robots.txt of their own origin and raise
+        RobotsDisallowed when disallowed.
         """
 
         async def no_check(_u: str) -> None:
             return None
 
-        return await self._get(url, max_bytes=max_bytes, before=no_check, accept=accept)
+        async def robots_check(u: str) -> None:
+            await self.robots.check(u)
+
+        before = robots_check if check_robots else no_check
+        return await self._get(url, max_bytes=max_bytes, before=before, accept=accept)
 
     async def _check_stop(self, page: Page) -> None:
         key = domain_key(host_of(page.final_url)) or host_of(page.final_url)

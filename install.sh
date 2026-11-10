@@ -315,7 +315,7 @@ env_set SITE_ADDRESS "$DOMAIN"
 env_set COOKIE_SECURE true
 ua="$(env_get CRAWLER_USER_AGENT)"
 if [[ -z "$ua" || "$ua" == *jobs.example.org* || "$ua" == *your-org* ]]; then
-	env_set CRAWLER_USER_AGENT "GermanyCareerCrawler/0.1 (+https://${DOMAIN}/)"
+	env_set CRAWLER_USER_AGENT "GermanyCareerCrawler/0.1 (+https://${DOMAIN}/bot)"
 fi
 sed -i '/^ACME_EMAIL=/d' "$ENV_FILE" # replaced by deploy/caddy.d/acme.caddy
 ok "SITE_ADDRESS=$DOMAIN, CRAWLER_USER_AGENT=$(env_get CRAWLER_USER_AGENT)"

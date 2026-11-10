@@ -37,7 +37,10 @@ def create_app(*, check_secrets: bool = True) -> FastAPI:
     from career_crawler.api import crawler_router, jobs_router
     from company_discovery.api import router as discovery_router
 
+    from .public_api import router as public_router
+
     app.include_router(auth_router)
+    app.include_router(public_router)
     app.include_router(discovery_router)
     app.include_router(companies_router)
     app.include_router(jobs_router)

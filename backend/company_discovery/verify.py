@@ -1,7 +1,7 @@
 """Website verification.
 
 For each company website:
-1. robots.txt of the host is fetched and evaluated for our User-Agent. If the homepage
+1. robots.txt of the host is fetched and evaluated for our robots.txt product token. If the homepage
    is disallowed, nothing else is requested and the domain is never crawled.
 2. The homepage is fetched with the SSRF-safe client (max. 5 redirects, every hop
    re-checked, robots.txt checked for every new host).
@@ -24,6 +24,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from gcc_core import scan_queue
+from gcc_core.botinfo import robots_token
 from gcc_core.log import get_logger
 from gcc_core.models import RETRYABLE_VERIFICATION, Company
 from gcc_core.netsafe import (
@@ -83,7 +84,7 @@ class RobotsCache:
         rules = self._cache[origin]
         if rules == "unavailable":
             raise RobotsUnavailable(origin)
-        if isinstance(rules, Protego) and not rules.can_fetch(url, user_agent):
+        if isinstance(rules, Protego) and not rules.can_fetch(url, robots_token(user_agent)):
             raise RobotsDisallowed(url)
 
     async def _load(self, origin: str):

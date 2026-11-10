@@ -27,7 +27,12 @@ class Settings(BaseSettings):
     cookie_secure: bool = True
 
     # --- outbound HTTP (verification, crawler) --------------------------
-    crawler_user_agent: str = "GermanyCareerCrawler/0.1 (+https://github.com/your-org/germany-career-crawler)"
+    # The one identity every outgoing request uses (HTTP clients, robots.txt, the browser). The
+    # robots.txt product token is derived from it (gcc_core.botinfo.robots_token); the public
+    # page /bot explains the crawler to site owners.
+    crawler_user_agent: str = "GermanyCareerCrawler/0.1 (+https://crawdler.duckdns.org/bot)"
+    # Contact address shown on /bot. Empty: an address in CRAWLER_USER_AGENT is used, else none.
+    bot_contact_email: str = ""
     # Ports a website may use. Anything else is rejected (SSRF hardening).
     net_allowed_ports: str = "80,443"
     # CIDRs that are exempt from the private-network block. Leave empty in production.

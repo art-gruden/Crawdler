@@ -84,6 +84,10 @@ endpoint is unchanged: `POST /api/companies/{id}/scan` (and `/api/companies/scan
 | Method | Path | |
 |---|---|---|
 | GET | `/api/jobs?q=&status=open\|closed\|expired\|all&company_id=&city=&remote_type=&employment_type=&skill=&method=&new_days=&posted_days=&min_confidence=&sort=discovered\|posted\|title\|company\|relevance&limit=&offset=` | vacancy search. `q` uses PostgreSQL `websearch_to_tsquery` (quotes, `-exclude`, `or`) plus a title substring match. `skill` can repeat (AND). |
+| GET | `/api/jobs/export.csv?<same filters>&delimiter=,\|;&limit=` | download of **all** matching vacancies (max. 10 000) as CSV: the table columns, UTF-8 BOM, formula-like text prefixed with `'` |
+| GET | `/api/jobs/export.yaml?<same filters>&limit=` | the same selection as YAML with every stored field incl. full description, company and skills; header with filters, `total_matching`, `exported`, `truncated` |
+| GET | `/api/jobs/{id}/export.yaml` | one vacancy as YAML, all fields |
+| GET | `/api/public/bot` | **no login**: crawler name, User-Agent, robots.txt token, contact address, crawl delay (for the `/bot` page) |
 | GET | `/api/jobs/{id}` | full posting: plain-text description, requirements, responsibilities, languages, salary, source values, extraction method/confidence |
 | GET | `/api/jobs/skills?limit=40` | most frequent skills in open postings |
 | GET | `/api/crawler/stats?hours=24` | dashboard figures: active/completed scans, domains per hour, pages per second, open/new postings, 429/503 share, latency, extraction success/failure per method, queues, latest CPU/RAM sample per worker |
