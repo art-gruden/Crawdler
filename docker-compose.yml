@@ -65,7 +65,9 @@ services:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=5).status == 200 else 1)"]
       interval: 15s
       timeout: 6s
-      start_period: 30s
+      # `alembic upgrade head` runs before uvicorn; a big data migration (e.g. the DACH backfill of tens of
+      # thousands of rows) must not make `docker compose up` give up. Failures in this window do not count.
+      start_period: 900s
       retries: 5
 
   # One Overpass request at a time: the discovery queue runs with concurrency 1.

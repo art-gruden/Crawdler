@@ -133,3 +133,24 @@ def test_data_quality_invariants_after_ingest(db):
                              "(SELECT 1 FROM job_locations jl WHERE jl.job_id = j.id)")).scalar()
     assert orphan == 0
     assert dt  # noqa
+
+
+def test_backfill_survives_a_row_that_cannot_be_derived(db, monkeypatch):
+    from career_crawler import backfill
+
+    c = make_company(db, "kaputt.de", name="Kaputt GmbH")
+    bad = legacy_job(db, c, 1, title="Defekt", city="Dresden")
+    good = legacy_job(db, c, 2, title="Gut", city="Berlin")
+    real = backfill.derive_job_fields
+
+    def flaky(row, skills):
+        if row["id"] == bad.id:
+            raise RecursionError("boom")
+        return real(row, skills)
+
+    monkeypatch.setattr(backfill, "derive_job_fields", flaky)
+    with get_engine().begin() as conn:
+        assert backfill.backfill_jobs(conn) == 2
+    db.expire_all()
+    assert db.get(Job, bad.id).norm_version >= 2 and db.get(Job, bad.id).geo_status == "unknown"
+    assert db.get(Job, good.id).country_codes == ["DE"]

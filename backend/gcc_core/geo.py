@@ -206,11 +206,12 @@ def _classify(raw_tok: str, *, force_region: bool = False) -> list[_Item]:
     # parentheses: "Dresden (Sachsen)", "Halle (Saale)" -> try whole first
     if "(" in tok and f not in _CITY_INDEX:
         base = re.sub(r"\([^)]*\)", " ", tok).strip()
-        inner = re.findall(r"\(([^)]*)\)", tok)
-        out = _classify(base) if base else []
-        for part in inner:
-            out += _classify(part)
-        return out
+        if base != tok:  # balanced parentheses were removed; an unclosed "(" is dropped below (never recurse on it)
+            inner = re.findall(r"\(([^)]*)\)", tok)
+            out = _classify(base) if base else []
+            for part in inner:
+                out += _classify(part)
+            return out
     tok = tok.replace("(", " ").replace(")", " ").strip()
     if f in _NATIONWIDE:
         return [_Item("nationwide", tok, countries=(_NATIONWIDE[f],))]

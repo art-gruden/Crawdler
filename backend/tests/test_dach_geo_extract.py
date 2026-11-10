@@ -146,3 +146,20 @@ def test_cefr_is_only_taken_when_written():
     assert langs["de"]["level"] is None and langs["en"]["level"] is None
     rng = {x["language"]: x for x in find_languages("Englisch B2-C1 erforderlich")}
     assert rng["en"]["level"] == "B2"  # range -> lower bound
+
+
+@pytest.mark.parametrize("raw", ["Dresden (Sachsen", "(", "((", "Berlin (a (b)", "x)(", "Köln (", "(Wien", "a ( b ( c ) d"])
+def test_unbalanced_parentheses_never_recurse(raw):
+    # regression: "Dresden (Sachsen" recursed forever and aborted the production migration
+    r = resolve_location(raw)
+    assert r.status in ("resolved", "partial", "ambiguous", "unknown")
+    assert normalize(RawJob(title="Entwickler", source_url="https://x.example/p", method="html", location_raw=raw)) is not None
+
+
+def test_resolver_survives_random_garbage():
+    import random
+
+    rnd = random.Random(3)
+    alphabet = "()[]Dresden Wien,;/ -üßZ0123 remote\n\t:"
+    for _ in range(3000):
+        resolve_location("".join(rnd.choice(alphabet) for _ in range(rnd.randint(0, 60))))

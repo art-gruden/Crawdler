@@ -97,10 +97,14 @@ def backfill_companies(conn) -> int:
         region = state if state in REGIONS else None
         place = None
         if city:
-            res = resolve_location(
-                None, [{"city": city, "postcode": postcode, "region": REGIONS[region][1] if region else None, "country": country}]
-            )
-            place = res.places[0] if res.places else Place(country, region, city, postcode, confidence=0.6, source="company")
+            try:
+                res = resolve_location(
+                    None, [{"city": city, "postcode": postcode, "region": REGIONS[region][1] if region else None, "country": country}]
+                )
+                found = res.places
+            except Exception:  # a malformed city name falls back to the plain value
+                found = []
+            place = found[0] if found else Place(country, region, city, postcode, confidence=0.6, source="company")
         elif region:
             place = Place(country, region, None, postcode, confidence=0.8, source="company")
         if place:
@@ -231,7 +235,16 @@ def backfill_jobs(conn, *, batch: int = 500, below_version: int = NORMALIZATION_
             skill_map[jid].append(skill)
         for r in rows:
             last_id = r["id"]
-            d = derive_job_fields(dict(r), skill_map[r["id"]])
+            try:
+                d = derive_job_fields(dict(r), skill_map[r["id"]])
+            except Exception as exc:  # one odd row must never abort the whole migration
+                print(f"backfill: vacancy {r['id']} skipped ({type(exc).__name__}); it is re-derived on its next scan", file=sys.stderr)
+                conn.execute(
+                    text("UPDATE jobs SET norm_version = :v, geo_status = 'unknown' WHERE id = :i"),
+                    {"v": NORMALIZATION_VERSION, "i": r["id"]},
+                )
+                done += 1
+                continue
             loc_ids, countries, regions = set_job_locations(conn, r["id"], d["places"], cache)
             conn.execute(text("DELETE FROM job_languages WHERE job_id = :j"), {"j": r["id"]})
             lang_rows = [
