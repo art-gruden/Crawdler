@@ -79,6 +79,7 @@ class Company(Base):
     district_key: Mapped[str | None] = mapped_column(String(12), index=True)  # Kreisschlüssel, e.g. 14612
     district_name: Mapped[str | None] = mapped_column(Text)
     state_code: Mapped[str | None] = mapped_column(String(6), index=True)  # ISO 3166-2, e.g. DE-SN
+    country_code: Mapped[str | None] = mapped_column(String(2), index=True)  # ISO 3166-1; NULL = not established
     lat: Mapped[float | None] = mapped_column(Float)
     lon: Mapped[float | None] = mapped_column(Float)
 
@@ -105,6 +106,77 @@ class Company(Base):
         Index("ix_companies_industries", "industries", postgresql_using="gin"),
         Index("ix_companies_next_verify_at", "next_verify_at"),
         Index("ix_companies_first_seen_at", "first_seen_at"),
+    )
+
+
+class GeoCountry(Base):
+    """ISO 3166-1 countries. DACH countries have ``in_dach``; others exist so that a vacancy in e.g.
+    Poland can be stored without being forced into DACH."""
+
+    __tablename__ = "geo_countries"
+
+    code: Mapped[str] = mapped_column(String(2), primary_key=True)
+    name: Mapped[str] = mapped_column(Text)
+    name_local: Mapped[str] = mapped_column(Text)
+    in_dach: Mapped[bool] = mapped_column(Boolean, server_default="false")
+    aliases: Mapped[list[str]] = mapped_column(ARRAY(Text), server_default=text("'{}'"))
+
+
+class GeoRegion(Base):
+    """ISO 3166-2 first-level divisions: 16 German Länder, 9 Austrian Länder, 26 Swiss cantons."""
+
+    __tablename__ = "geo_regions"
+
+    code: Mapped[str] = mapped_column(String(8), primary_key=True)  # DE-SN, AT-9, CH-ZH
+    country_code: Mapped[str] = mapped_column(ForeignKey("geo_countries.code"), index=True)
+    name: Mapped[str] = mapped_column(Text)
+    name_local: Mapped[str] = mapped_column(Text)
+    kind: Mapped[str] = mapped_column(String(16))
+    aliases: Mapped[list[str]] = mapped_column(ARRAY(Text), server_default=text("'{}'"))
+
+
+class GeoLocation(Base):
+    """A city-level (or region/country-level) place with a stable id.
+
+    ``loc_key`` = ``country|region|folded city`` is unique, so every job and company that points at
+    "Dresden" shares one row. ``search_name`` is the folded name used for lookups.
+    """
+
+    __tablename__ = "geo_locations"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    loc_key: Mapped[str] = mapped_column(Text, unique=True)
+    country_code: Mapped[str] = mapped_column(ForeignKey("geo_countries.code"))
+    region_code: Mapped[str | None] = mapped_column(ForeignKey("geo_regions.code"))
+    city: Mapped[str | None] = mapped_column(Text)
+    search_name: Mapped[str] = mapped_column(Text, server_default="")
+    postcode: Mapped[str | None] = mapped_column(String(10))
+    lat: Mapped[float | None] = mapped_column(Float)
+    lon: Mapped[float | None] = mapped_column(Float)
+    aliases: Mapped[list[str]] = mapped_column(ARRAY(Text), server_default=text("'{}'"))
+    source: Mapped[str] = mapped_column(String(24), server_default="gazetteer")
+    confidence: Mapped[float] = mapped_column(Float, server_default="1")
+
+    __table_args__ = (
+        Index("ix_geo_locations_country_region", "country_code", "region_code"),
+        Index("ix_geo_locations_search_name", "search_name", postgresql_ops={"search_name": "text_pattern_ops"}),
+    )
+
+
+class CompanyLocation(Base):
+    """Company headquarters and offices. Kept apart from vacancy work locations on purpose."""
+
+    __tablename__ = "company_locations"
+
+    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id", ondelete="CASCADE"), primary_key=True)
+    location_id: Mapped[int] = mapped_column(ForeignKey("geo_locations.id"), primary_key=True)
+    kind: Mapped[str] = mapped_column(String(8), primary_key=True)  # hq | office
+    source: Mapped[str] = mapped_column(String(24), server_default="company")
+    confidence: Mapped[float] = mapped_column(Float, server_default="0.9")
+
+    __table_args__ = (
+        CheckConstraint(_in("kind", ("hq", "office")), name="kind"),
+        Index("ix_company_locations_location", "location_id", "company_id"),
     )
 
 

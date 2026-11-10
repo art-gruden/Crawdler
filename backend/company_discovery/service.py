@@ -22,11 +22,14 @@ from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
+from gcc_core.log import get_logger
 from gcc_core.models import Company, CompanySource
 from gcc_core.urls import NormalizedUrl, first_valid_website
 
 from .models import DiscoveryJobItem
 from .regions import fold
+
+log = get_logger(__name__)
 
 LEGAL_FORMS = re.compile(
     r"\b(gmbh\s*&\s*co\.?\s*kg(aa)?|gmbh|mbh|ag|kg|ohg|gbr|ug|haftungsbeschrankt|e\.?\s?k\.?|e\.?\s?v\.?|"
@@ -78,6 +81,11 @@ class UpsertResult:
     is_new_company: bool
 
 
+def _country_of(state_code: str | None) -> str | None:
+    """ISO 3166-1 alpha-2 from an ISO 3166-2 code ("DE-SN" -> "DE")."""
+    return state_code[:2] if state_code and len(state_code) > 3 and state_code[2] == "-" else None
+
+
 FILLABLE = ("street", "postcode", "city", "district_key", "district_name", "state_code", "lat", "lon")
 
 
@@ -114,11 +122,43 @@ class CompanyUpserter:
             "first_seen_at": now,
             "last_seen_at": now,
             **{k: getattr(cand, k) for k in FILLABLE},
+            "country_code": _country_of(cand.state_code),
         }
         stmt = insert(Company).values(**values)
         if url:
             stmt = stmt.on_conflict_do_nothing(index_elements=["domain"])
-        return self.session.execute(stmt.returning(Company.id)).scalar_one_or_none()
+        company_id = self.session.execute(stmt.returning(Company.id)).scalar_one_or_none()
+        if company_id is not None:
+            self._headquarters(company_id, cand)
+        return company_id
+
+    def _headquarters(self, company_id: int, cand: Candidate) -> None:
+        """Headquarters location (kept separate from vacancy locations). Never blocks discovery."""
+        country = _country_of(cand.state_code)
+        if not country or not (cand.city or cand.state_code):
+            return
+        try:
+            from gcc_core.geo import Place, resolve_location
+            from gcc_core.geo_data import REGIONS
+            from gcc_core.geo_db import set_company_location
+
+            region = cand.state_code if cand.state_code in REGIONS else None
+            place = None
+            if cand.city:
+                res = resolve_location(
+                    None,
+                    [{"city": cand.city, "postcode": cand.postcode, "country": country,
+                      "region": REGIONS[region][1] if region else None}],
+                )
+                place = res.places[0] if res.places else None
+            elif region:
+                place = Place(country, region, None, None, confidence=0.8, source="company")
+            if place is not None:
+                place.postcode = place.postcode or cand.postcode
+                with self.session.begin_nested():
+                    set_company_location(self.session, company_id, place, "hq")
+        except Exception:  # pragma: no cover - geography must never break company import
+            log.warning("company_hq_failed", company_id=company_id, exc_info=True)
 
     def _merge(self, company_id: int, cand: Candidate, url: NormalizedUrl | None) -> None:
         company = self.session.get(Company, company_id)
@@ -130,6 +170,8 @@ class CompanyUpserter:
         for attr in FILLABLE:
             if getattr(company, attr) in (None, "") and getattr(cand, attr) not in (None, ""):
                 setattr(company, attr, getattr(cand, attr))
+        if company.country_code is None and company.state_code:
+            company.country_code = _country_of(company.state_code)
         if cand.industries:
             merged = list(dict.fromkeys([*(company.industries or []), *cand.industries]))
             if merged != company.industries:

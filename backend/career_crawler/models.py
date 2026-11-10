@@ -15,6 +15,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    SmallInteger,
     String,
     Text,
     UniqueConstraint,
@@ -28,6 +29,10 @@ from gcc_core.db import Base
 
 JOB_STATUSES = ("open", "closed", "expired")
 REMOTE_TYPES = ("onsite", "hybrid", "remote", "unknown")
+WORK_MODELS = ("REMOTE", "HYBRID", "ONSITE", "UNKNOWN")
+GEO_STATUSES = ("resolved", "partial", "ambiguous", "unknown")
+SENIORITIES = ("INTERN", "JUNIOR", "MID", "SENIOR", "LEAD", "EXECUTIVE", "UNKNOWN")
+EVENT_TYPES = ("job.created", "job.updated", "job.closed", "job.reopened")
 RUN_STATUSES = ("running", "done", "partial", "failed", "abandoned")
 SOURCE_KINDS = ("career_page", "job_list", "ats_feed", "sitemap")
 STRATEGIES = ("ats", "jsonld", "html", "content", "pdf", "browser", "llm")
@@ -108,6 +113,29 @@ class Job(Base):
     salary_currency: Mapped[str | None] = mapped_column(String(3))
     salary_period: Mapped[str | None] = mapped_column(String(8))
     salary_raw: Mapped[str | None] = mapped_column(Text)
+    salary_basis: Mapped[str] = mapped_column(String(7), server_default="unknown")  # gross | net | unknown
+    salary_confidence: Mapped[float | None] = mapped_column(Float)
+
+    # --- DACH platform: normalized fields (see docs/DACH.md). The legacy columns above stay as they were.
+    geo_status: Mapped[str] = mapped_column(String(9), server_default="unknown")
+    geo_detail: Mapped[dict] = mapped_column(JSONB, server_default=text("'{}'::jsonb"))
+    country_codes: Mapped[list[str]] = mapped_column(ARRAY(String(2)), server_default=text("'{}'"))
+    region_codes: Mapped[list[str]] = mapped_column(ARRAY(String(8)), server_default=text("'{}'"))
+    location_ids: Mapped[list[int]] = mapped_column(ARRAY(BigInteger), server_default=text("'{}'"))
+    work_model: Mapped[str] = mapped_column(String(7), server_default="UNKNOWN")
+    remote_scope: Mapped[str] = mapped_column(String(9), server_default="unknown")
+    remote_countries: Mapped[list[str]] = mapped_column(ARRAY(String(2)), server_default=text("'{}'"))
+    employment_kinds: Mapped[list[str]] = mapped_column(ARRAY(Text), server_default=text("'{UNKNOWN}'"))
+    specialization_id: Mapped[int | None] = mapped_column(
+        SmallInteger, ForeignKey("specializations.id", ondelete="SET NULL")
+    )
+    specialization_confidence: Mapped[float | None] = mapped_column(Float)
+    seniority: Mapped[str] = mapped_column(String(9), server_default="UNKNOWN")
+    last_checked_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))
+    description_hash: Mapped[str | None] = mapped_column(String(40))
+    quality_score: Mapped[float | None] = mapped_column(Float)
+    quality: Mapped[dict] = mapped_column(JSONB, server_default=text("'{}'::jsonb"))
+    norm_version: Mapped[int] = mapped_column(SmallInteger, server_default="1")
 
     confidence: Mapped[float] = mapped_column(Float, server_default="0")
     extraction_method: Mapped[str] = mapped_column(String(16))
@@ -137,6 +165,31 @@ class Job(Base):
         Index("ix_jobs_canonical_url", "canonical_url"),
         Index("ix_jobs_search", "search", postgresql_using="gin"),
         Index("ix_jobs_employment_types", "employment_types", postgresql_using="gin"),
+        CheckConstraint(_in("work_model", WORK_MODELS), name="work_model"),
+        CheckConstraint(_in("geo_status", GEO_STATUSES), name="geo_status"),
+        CheckConstraint(_in("seniority", SENIORITIES), name="seniority"),
+        Index("ix_jobs_country_codes", "country_codes", postgresql_using="gin"),
+        Index("ix_jobs_region_codes", "region_codes", postgresql_using="gin"),
+        Index("ix_jobs_location_ids", "location_ids", postgresql_using="gin"),
+        Index("ix_jobs_employment_kinds", "employment_kinds", postgresql_using="gin"),
+        Index("ix_jobs_remote_countries", "remote_countries", postgresql_using="gin"),
+        Index(
+            "ix_jobs_open_first_seen",
+            text("discovered_at DESC"),
+            text("id DESC"),
+            postgresql_where=text("status = 'open'"),
+        ),
+        Index("ix_jobs_open_work_model", "work_model", postgresql_where=text("status = 'open'")),
+        Index("ix_jobs_open_specialization", "specialization_id", postgresql_where=text("status = 'open'")),
+        Index("ix_jobs_open_seniority", "seniority", postgresql_where=text("status = 'open'")),
+        Index(
+            "ix_jobs_salary",
+            "salary_currency",
+            "salary_period",
+            "salary_max",
+            postgresql_where=text("salary_max IS NOT NULL OR salary_min IS NOT NULL"),
+        ),
+        Index("ix_jobs_last_checked", "last_checked_at"),
     )
 
 
@@ -147,7 +200,90 @@ class JobSkill(Base):
     skill: Mapped[str] = mapped_column(Text, primary_key=True)  # canonical name, e.g. "Kubernetes"
     category: Mapped[str] = mapped_column(String(24))  # cloud | language | devops | db | os | …
 
-    __table_args__ = (Index("ix_job_skills_skill", "skill"),)
+    __table_args__ = (Index("ix_job_skills_skill", "skill"), Index("ix_job_skills_skill_job", "skill", "job_id"))
+
+
+class Specialization(Base):
+    """Taxonomy (groups and leaves). Seeded from ``career_crawler.extract.taxonomy``; ids are stable."""
+
+    __tablename__ = "specializations"
+
+    id: Mapped[int] = mapped_column(SmallInteger, primary_key=True, autoincrement=False)
+    slug: Mapped[str] = mapped_column(String(48), unique=True)
+    name_en: Mapped[str] = mapped_column(Text)
+    name_de: Mapped[str] = mapped_column(Text)
+    parent_id: Mapped[int | None] = mapped_column(SmallInteger, ForeignKey("specializations.id"))
+    is_it: Mapped[bool] = mapped_column(Boolean, server_default="false")
+    sort_order: Mapped[int] = mapped_column(Integer, server_default="0")
+
+
+class JobSpecialization(Base):
+    __tablename__ = "job_specializations"
+
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), primary_key=True)
+    specialization_id: Mapped[int] = mapped_column(
+        SmallInteger, ForeignKey("specializations.id", ondelete="CASCADE"), primary_key=True
+    )
+    is_primary: Mapped[bool] = mapped_column(Boolean, server_default="false")
+    confidence: Mapped[float] = mapped_column(Float, server_default="0")
+
+    __table_args__ = (Index("ix_job_specializations_spec", "specialization_id", "job_id"),)
+
+
+class JobLocation(Base):
+    """Work locations of a vacancy (several allowed, cross-border allowed)."""
+
+    __tablename__ = "job_locations"
+
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), primary_key=True)
+    location_id: Mapped[int] = mapped_column(ForeignKey("geo_locations.id"), primary_key=True)
+    is_primary: Mapped[bool] = mapped_column(Boolean, server_default="false")
+    postcode: Mapped[str | None] = mapped_column(String(10))
+    confidence: Mapped[float] = mapped_column(Float, server_default="0.9")
+    source: Mapped[str] = mapped_column(String(16), server_default="gazetteer")
+
+    __table_args__ = (Index("ix_job_locations_location", "location_id", "job_id"),)
+
+
+class JobLanguage(Base):
+    """Language requirements. ``level`` is a CEFR level only when the posting wrote one."""
+
+    __tablename__ = "job_languages"
+
+    job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id", ondelete="CASCADE"), primary_key=True)
+    language: Mapped[str] = mapped_column(String(3), primary_key=True)
+    level: Mapped[str | None] = mapped_column(String(2))
+    level_rank: Mapped[int | None] = mapped_column(SmallInteger)  # A1=1 … C2=6
+    requirement: Mapped[str] = mapped_column(String(9), server_default="unknown")
+    descriptor: Mapped[str | None] = mapped_column(String(10))
+    evidence: Mapped[str | None] = mapped_column(Text)
+    confidence: Mapped[float] = mapped_column(Float, server_default="0.5")
+
+    __table_args__ = (
+        CheckConstraint(_in("requirement", ("required", "preferred", "unknown")), name="requirement"),
+        Index("ix_job_languages_lang", "language", "requirement", "level_rank"),
+    )
+
+
+class JobEvent(Base):
+    """Durable outbox of vacancy events, read through ``/api/bot/v1/changes``.
+
+    ``id`` order equals commit order (see ``career_crawler.events``). There is deliberately no foreign
+    key on ``job_id``: history survives a deleted vacancy.
+    """
+
+    __tablename__ = "job_events"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    event_type: Mapped[str] = mapped_column(String(12))
+    job_id: Mapped[int] = mapped_column(BigInteger)
+    occurred_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), server_default=text("clock_timestamp()"))
+    payload: Mapped[dict] = mapped_column(JSONB, server_default=text("'{}'::jsonb"))
+
+    __table_args__ = (
+        CheckConstraint(_in("event_type", EVENT_TYPES), name="event_type"),
+        Index("ix_job_events_job", "job_id", "id"),
+    )
 
 
 class CrawlRun(Base):

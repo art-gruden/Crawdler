@@ -252,6 +252,11 @@ class AdjustableLimiter:
             self._active -= 1
             self._cond.notify_all()
 
+    def reclaim(self) -> None:
+        """Count a slot as held again without waiting (used when re-acquiring was cancelled, so that the
+        enclosing ``async with`` still releases a slot that is counted)."""
+        self._active += 1
+
 
 # --- robots ----------------------------------------------------------------------------
 
@@ -379,8 +384,32 @@ class Fetcher:
         status = None
         size = 0
         err = None
+        idle = 0.0  # time spent waiting (slot queue, robots.txt, per-domain delay): not network latency
+
+        async def gated(hop_url: str) -> None:
+            # robots.txt and the per-domain delay may wait for a long time and robots.txt needs a slot of its
+            # own: holding ours meanwhile starves the limiter (with the limit at its minimum it deadlocks).
+            nonlocal idle
+            w0 = time.monotonic()
+            await self.limiter.__aexit__(None, None, None)
+            try:
+                await before(hop_url)
+            finally:
+                try:
+                    await self.limiter.__aenter__()
+                except BaseException:
+                    self.limiter.reclaim()
+                    raise
+                finally:
+                    idle += time.monotonic() - w0
+
+        def network_ms() -> int:
+            return max(0, int((time.monotonic() - t0 - idle) * 1000))
+
         try:
+            q0 = time.monotonic()
             async with self.limiter:
+                idle += time.monotonic() - q0
                 res = await safe_get(
                     url,
                     policy=self.policy,
@@ -390,18 +419,18 @@ class Fetcher:
                     max_redirects=self.settings.max_redirects,
                     accept=accept,
                     resolver=self.resolver,
-                    before_request=before,
+                    before_request=gated,
                     client=self._client,
                     extra_headers=extra_headers,
                 )
             status, size = res.status, len(res.body)
-            return Page.from_result(res, int((time.monotonic() - t0) * 1000))
+            return Page.from_result(res, network_ms())
         except FetchError as exc:
             err = exc.kind
             raise
         finally:
             if self.on_stat is not None:
-                self.on_stat(FetchStat(url, status, int((time.monotonic() - t0) * 1000), size, err))
+                self.on_stat(FetchStat(url, status, network_ms(), size, err))
 
     async def get(
         self,

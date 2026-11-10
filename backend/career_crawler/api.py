@@ -54,6 +54,13 @@ class JobOut(BaseModel):
     salary_currency: str | None
     salary_period: str | None
     skills: list[str] = []
+    # DACH platform fields (additive; older clients ignore them)
+    country_codes: list[str] = []
+    region_codes: list[str] = []
+    geo_status: str = "unknown"
+    work_model: str = "UNKNOWN"
+    seniority: str = "UNKNOWN"
+    employment_kinds: list[str] = []
 
 
 class JobDetail(JobOut):
@@ -100,7 +107,17 @@ class JobFilters:
         posted_days: int | None = Query(None, ge=1, le=365, description="published in the last N days (source date)"),
         min_confidence: float | None = Query(None, ge=0, le=1),
         sort: str = Query("discovered", pattern="^(discovered|posted|title|company|relevance)$"),
+        country_code: list[str] | None = Query(None, description="ISO 3166-1 (DE, AT, CH); several = OR"),
+        region: list[str] | None = Query(None, description="ISO 3166-2 (DE-SN, AT-9, CH-ZH); several = OR"),
+        specialization: list[str] | None = Query(None, description="taxonomy slug or id; a group includes its members"),
+        work_model: list[str] | None = Query(None, description="REMOTE | HYBRID | ONSITE | UNKNOWN"),
+        seniority: list[str] | None = Query(None, description="INTERN | JUNIOR | MID | SENIOR | LEAD | EXECUTIVE | UNKNOWN"),
     ):
+        self.country_code = [x.upper() for x in country_code or []]
+        self.region = [x.upper() for x in region or []]
+        self.specialization = list(specialization or [])
+        self.work_model = [x.upper() for x in work_model or []]
+        self.seniority = [x.upper() for x in seniority or []]
         self.q, self.status, self.company_id, self.city = q, status_, company_id, city
         self.remote_type, self.employment_type, self.skill, self.method = remote_type, employment_type, skill, method
         self.new_days, self.posted_days, self.min_confidence, self.sort = new_days, posted_days, min_confidence, sort
@@ -111,7 +128,7 @@ class JobFilters:
             k: getattr(self, k)
             for k in (
                 "q status company_id city remote_type employment_type skill method new_days posted_days "
-                "min_confidence sort"
+                "min_confidence sort country_code region specialization work_model seniority"
             ).split()
         }
         return {k: v for k, v in d.items() if v not in (None, "", [])}
@@ -136,6 +153,21 @@ class JobFilters:
             conds.append(Job.date_posted >= (_now() - dt.timedelta(days=self.posted_days)).date())
         if self.min_confidence is not None:
             conds.append(Job.confidence >= self.min_confidence)
+        if self.country_code:
+            conds.append(Job.country_codes.overlap(self.country_code))
+        if self.region:
+            conds.append(Job.region_codes.overlap(self.region))
+        if self.specialization:
+            from .search import SearchError, expand_specializations
+
+            try:
+                conds.append(Job.specialization_id.in_(expand_specializations(self.specialization)))
+            except SearchError as exc:
+                raise HTTPException(422, str(exc)) from exc
+        if self.work_model:
+            conds.append(Job.work_model.in_(self.work_model))
+        if self.seniority:
+            conds.append(Job.seniority.in_(self.seniority))
         for sk in self.skill or []:
             conds.append(Job.id.in_(select(JobSkill.job_id).where(func.lower(JobSkill.skill) == sk.lower())))
         tsq = None

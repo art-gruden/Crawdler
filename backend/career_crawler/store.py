@@ -13,12 +13,27 @@ from sqlalchemy import and_, any_, case, func, or_, select, text, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
+from gcc_core.geo import resolve_location
+from gcc_core.geo_db import set_job_locations
 from gcc_core.models import Company
 
+from . import events
 from .config import CrawlerSettings
 from .engine import CompanyInfo, FingerprintView, FoundJob, KnownPage, ScanResult
+from .extract.normalize import NORMALIZATION_VERSION
 from .extract.normalize import Job as NJob
-from .models import CareerSource, CrawlPage, CrawlRun, ExtractionError, Job, JobSkill, SiteFingerprint
+from .extract.skills import CEFR_ORDER
+from .models import (
+    CareerSource,
+    CrawlPage,
+    CrawlRun,
+    ExtractionError,
+    Job,
+    JobLanguage,
+    JobSkill,
+    JobSpecialization,
+    SiteFingerprint,
+)
 from .schedule import next_interval_h
 from .urls import canonicalize, url_hash
 
@@ -235,6 +250,76 @@ def _apply(row: Job, j: NJob, *, overwrite: bool) -> None:
         row.ats_type, row.ats_job_id = j.ats_type, j.ats_job_id
 
 
+def _sync_languages(s: Session, job_id: int, languages: list[dict]) -> None:
+    s.execute(JobLanguage.__table__.delete().where(JobLanguage.job_id == job_id))
+    rows = [
+        {
+            "job_id": job_id,
+            "language": x["language"][:3],
+            "level": x.get("level"),
+            "level_rank": CEFR_ORDER.get(x.get("level") or ""),
+            "requirement": x.get("requirement") or ("required" if x.get("required") else "preferred"),
+            "descriptor": x.get("descriptor"),
+            "evidence": (x.get("evidence") or x.get("raw") or "")[:300] or None,
+            "confidence": x.get("confidence") or 0.5,
+        }
+        for x in languages
+        if x.get("language")
+    ]
+    if rows:
+        s.execute(insert(JobLanguage).values(rows).on_conflict_do_nothing())
+
+
+def _sync_specializations(s: Session, job_id: int, primary: int | None, conf: float, secondary: list) -> None:
+    s.execute(JobSpecialization.__table__.delete().where(JobSpecialization.job_id == job_id))
+    if primary:
+        rows = [{"job_id": job_id, "specialization_id": primary, "is_primary": True, "confidence": conf}]
+        rows += [
+            {"job_id": job_id, "specialization_id": i, "is_primary": False, "confidence": c}
+            for i, c in secondary
+            if i != primary
+        ]
+        s.execute(insert(JobSpecialization).values(rows).on_conflict_do_nothing())
+
+
+def _apply_derived(s: Session, row: Job, j: NJob, *, overwrite: bool, company_country: str | None, cache: dict) -> None:
+    """Normalized DACH fields. Same merge rule as the legacy columns: better data replaces, nothing
+    known is erased by a weaker read."""
+    unknown_before = not row.location_ids
+    geo = j.geo
+    if geo is not None and geo.status in ("ambiguous", "partial") and company_country and j.location_raw:
+        geo = resolve_location(j.location_raw, j.locations_struct, context_country=company_country)
+    if geo is not None and (overwrite or unknown_before):
+        if geo.places:
+            ids, countries, regions = set_job_locations(s, row.id, geo.places, cache)
+            row.location_ids, row.country_codes, row.region_codes = ids, countries, regions
+            row.geo_status, row.geo_detail = geo.status, geo.detail()
+        elif unknown_before:
+            row.geo_status, row.geo_detail = geo.status, geo.detail()
+    if j.work_model != "UNKNOWN" and (overwrite or row.work_model == "UNKNOWN"):
+        row.work_model = j.work_model
+        row.remote_scope, row.remote_countries = j.remote_scope, list(j.remote_countries)
+    if j.employment_kinds != ["UNKNOWN"] and (overwrite or row.employment_kinds in (None, [], ["UNKNOWN"])):
+        row.employment_kinds = list(j.employment_kinds)
+    if j.languages and (overwrite or not row.languages):
+        row.languages = j.languages
+        _sync_languages(s, row.id, j.languages)
+    if j.specialization_id and (overwrite or row.specialization_id is None):
+        row.specialization_id = j.specialization_id
+        row.specialization_confidence = j.specialization_confidence
+        _sync_specializations(s, row.id, j.specialization_id, j.specialization_confidence, j.secondary_specializations)
+    if j.seniority != "UNKNOWN" and (overwrite or row.seniority == "UNKNOWN"):
+        row.seniority = j.seniority
+    if (j.salary_min is not None or j.salary_max is not None) and (
+        overwrite or (row.salary_min is None and row.salary_max is None)
+    ):
+        row.salary_basis, row.salary_confidence = j.salary_basis, j.salary_confidence
+    if overwrite:
+        row.description_hash = j.description_hash
+        row.quality_score, row.quality = j.quality_score, j.quality
+        row.norm_version = NORMALIZATION_VERSION
+
+
 def _set_skills(s: Session, job_id: int, skills: list[tuple[str, str]]) -> None:
     s.execute(JobSkill.__table__.delete().where(JobSkill.job_id == job_id))
     if skills:
@@ -255,6 +340,8 @@ def upsert_jobs(
         url_counts[f.job.source_url] = url_counts.get(f.job.source_url, 0) + 1
     seen: set[int] = set()
     new = updated = 0
+    company_country = s.execute(select(Company.country_code).where(Company.id == company_id)).scalar()
+    geo_cache: dict = {}
     for f in found:
         j = f.job
         key = dedup_key(company_id, j, url_counts[j.source_url] > 1)
@@ -278,12 +365,26 @@ def upsert_jobs(
                 source_values=j.source_values,
                 discovered_at=t,
                 last_seen_at=t,
+                last_checked_at=t,
                 status="open",
                 remote_type="unknown",
+                work_model="UNKNOWN",
+                employment_kinds=["UNKNOWN"],
+                seniority="UNKNOWN",
+                geo_status="unknown",
+                remote_scope="unknown",
+                country_codes=[],
+                region_codes=[],
+                location_ids=[],
+                remote_countries=[],
+                languages=[],
+                norm_version=NORMALIZATION_VERSION,
             )
             _apply(row, j, overwrite=True)
             s.add(row)
             s.flush()
+            _apply_derived(s, row, j, overwrite=True, company_country=company_country, cache=geo_cache)
+            events.emit(s, events.CREATED, row.id)
             new += 1
         else:
             if row.id in seen:
@@ -292,7 +393,9 @@ def upsert_jobs(
                 METHOD_RANK.get(j.method, 0) >= METHOD_RANK.get(row.extraction_method, 0)
                 and j.confidence >= (row.confidence or 0) - 0.1
             )
+            before = events.snapshot(row)
             _apply(row, j, overwrite=better)
+            _apply_derived(s, row, j, overwrite=better, company_country=company_country, cache=geo_cache)
             if canon and canon != row.canonical_url and canon not in (row.alt_urls or []):
                 row.alt_urls = [*(row.alt_urls or []), canon][-10:]
             if j.ats_type and j.ats_job_id and ":ats:" not in row.dedup_key:
@@ -300,10 +403,20 @@ def upsert_jobs(
                 if s.execute(select(Job.id).where(Job.dedup_key == stronger)).first() is None:
                     row.dedup_key = stronger
             row.career_source_id = source_ids.get(f.source_url, row.career_source_id)
-            row.last_seen_at = t
+            row.last_seen_at = row.last_checked_at = t
             row.miss_count = 0
+            reopened = False
             if row.status != "open":
-                row.status, row.closed_at = "open", None
+                # an expired posting whose own end date still lies in the past is not "active again"
+                if not (row.status == "expired" and row.valid_through is not None and row.valid_through < t):
+                    row.status, row.closed_at = "open", None
+                    reopened = True
+            if reopened:
+                events.emit(s, events.REOPENED, row.id)
+            if row.status == "open":
+                fields = events.changed_fields(before, events.snapshot(row))
+                if fields:
+                    events.emit(s, events.UPDATED, row.id, {"fields": fields})
             updated += 1
         seen.add(row.id)
         _set_skills(s, row.id, j.skills)
@@ -318,7 +431,7 @@ def touch_unchanged(s: Session, company_id: int, urls: list[str]) -> set[int]:
             update(Job)
             .where(Job.company_id == company_id, Job.status == "open")
             .where(or_(Job.canonical_url.in_(urls), Job.source_url.in_(urls)))
-            .values(last_seen_at=now(), miss_count=0)
+            .values(last_seen_at=now(), last_checked_at=now(), miss_count=0)
             .returning(Job.id)
         )
         .scalars()
@@ -338,13 +451,23 @@ def apply_lifecycle(
 ) -> int:
     """Misses only after *complete* reads; closing needs several misses and a minimum age."""
     t = now()
-    s.execute(
-        update(Job)
-        .where(
-            Job.company_id == company_id, Job.status == "open", Job.valid_through.is_not(None), Job.valid_through < t
+    expired = (
+        s.execute(
+            update(Job)
+            .where(
+                Job.company_id == company_id,
+                Job.status == "open",
+                Job.valid_through.is_not(None),
+                Job.valid_through < t,
+            )
+            .values(status="expired", closed_at=t)
+            .returning(Job.id)
         )
-        .values(status="expired", closed_at=t)
+        .scalars()
+        .all()
     )
+    for jid in sorted(expired):
+        events.emit(s, events.CLOSED, jid, {"reason": "expired"})
     if result.stop is not None:
         return 0
     scope = None
@@ -370,7 +493,7 @@ def apply_lifecycle(
     cond = and_(scope, Job.status == "open")
     if seen:
         cond = and_(cond, Job.id.not_in(seen))
-    s.execute(update(Job).where(cond).values(miss_count=Job.miss_count + 1))
+    s.execute(update(Job).where(cond).values(miss_count=Job.miss_count + 1, last_checked_at=t))
     closed = (
         s.execute(
             update(Job)
@@ -385,6 +508,8 @@ def apply_lifecycle(
         .scalars()
         .all()
     )
+    for jid in sorted(closed):
+        events.emit(s, events.CLOSED, jid, {"reason": "missed"})
     return len(closed)
 
 

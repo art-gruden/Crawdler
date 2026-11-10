@@ -35,6 +35,7 @@ def create_app(*, check_secrets: bool = True) -> FastAPI:
 
     # Order matters: /api/companies/import (discovery) must be registered before /api/companies/{id}.
     from career_crawler.api import crawler_router, jobs_router
+    from career_crawler.bot_api import router as bot_router
     from company_discovery.api import router as discovery_router
 
     from .public_api import router as public_router
@@ -45,6 +46,7 @@ def create_app(*, check_secrets: bool = True) -> FastAPI:
     app.include_router(companies_router)
     app.include_router(jobs_router)
     app.include_router(crawler_router)
+    app.include_router(bot_router)
 
     @app.exception_handler(KeyError)
     async def _key_error(_request: Request, exc: KeyError):

@@ -102,3 +102,89 @@ Example:
 ```bash
 curl -s -b cookies 'https://crawdler.duckdns.org/api/jobs?q=kubernetes&city=Dresden&new_days=7' | jq '.items[] | {title, company_name, date_posted, skills}'
 ```
+
+
+## Bot API (`/api/bot/v1`)
+
+Read-only, Bearer-token authenticated, independent of the administrator session. See [DACH.md](DACH.md) for semantics
+and guarantees; `BOT_API_KEYS` in `.env` (never put a token in a repository or a log).
+
+Typical client flow (token in the `GCC_BOT_TOKEN` environment variable):
+
+```bash
+H="Authorization: Bearer $GCC_BOT_TOKEN"; B=https://<SITE_ADDRESS>/api/bot/v1
+
+# 1. what can be chosen
+curl -s -H "$H" $B/facets/countries | jq '.[] | {code, name, open_jobs}'
+curl -s -H "$H" "$B/facets/regions?country=AT" | jq '.[] | {code, name, open_jobs}'
+curl -s -H "$H" "$B/facets/cities?country=CH&region=CH-ZH" | jq
+
+# 2. filtered search: Python/Kubernetes in Switzerland, German B2 + English C1, CHF 100k+, newest first
+curl -s -H "$H" -G $B/jobs \
+  --data-urlencode country=CH --data-urlencode "skills=Python,Kubernetes" --data-urlencode skills_mode=any \
+  --data-urlencode "languages=de:B2,en:C1" --data-urlencode salary_min=100000 --data-urlencode currency=CHF \
+  --data-urlencode limit=10 | jq '.items[] | {id, title, company: .company.name, language_fit, salary}'
+#    next page: add  --data-urlencode "cursor=<next_cursor>"  with the same filters
+
+# 3. start following changes from now (first run) ...
+CUR=$(curl -s -H "$H" $B/changes/head | jq -r .cursor)
+
+# 4. ... and poll; persist next_cursor only after the page was processed
+curl -s -H "$H" -G $B/changes --data-urlencode "cursor=$CUR" --data-urlencode limit=100 \
+  | jq '{n: (.items|length), next_cursor, has_more, first: .items[0]}'
+```
+
+Python sketch of a resumable consumer:
+
+```python
+import os, requests
+
+S = requests.Session(); S.headers["Authorization"] = f"Bearer {os.environ['GCC_BOT_TOKEN']}"
+BASE = "https://<SITE_ADDRESS>/api/bot/v1"
+
+def poll(cursor: str | None, handle) -> str | None:
+    while True:
+        page = S.get(f"{BASE}/changes", params={"cursor": cursor, "limit": 200} if cursor else {"limit": 200}, timeout=30)
+        page.raise_for_status()
+        body = page.json()
+        for ev in body["items"]:
+            handle(ev)                      # idempotent: de-duplicate on ev["event_id"]
+        cursor = body["next_cursor"]        # store durably here
+        if not body["has_more"]:
+            return cursor
+```
+
+Example `GET /jobs/{id}` response (abridged):
+
+```json
+{
+  "id": 42, "title": "Senior Python Developer (m/w/d)",
+  "company": {"id": 7, "name": "A GmbH", "domain": "a-firma.de", "country": "DE"},
+  "status": "open", "published_at": "2026-11-01",
+  "geo_status": "resolved",
+  "locations": [{"id": 9, "country": "DE", "country_name": "Germany", "region": "DE-SN", "region_name": "Sachsen",
+                 "city": "Dresden", "postcode": null, "is_primary": true, "confidence": 0.9, "source": "gazetteer"}],
+  "work_model": "HYBRID", "remote_eligibility": {"scope": "unknown", "countries": []},
+  "employment_types": ["FULL_TIME"], "seniority": "SENIOR",
+  "specialization": {"id": 10, "slug": "backend-development", "name": "Backend development", "group": "information-technology", "is_it": true, "confidence": 0.8},
+  "skills": [{"name": "Python", "category": "language"}],
+  "languages": [{"language": "de", "level": "C1", "requirement": "required", "descriptor": null, "evidence": "Deutsch C1 erforderlich", "confidence": 0.9}],
+  "salary": {"min": 60000, "max": 75000, "currency": "EUR", "period": "year", "basis": "unknown", "raw": "60.000 - 75.000 € pro Jahr", "confidence": 0.9},
+  "quality": {"score": 0.82, "completeness": 0.85, "missing": ["date_posted"], "field_confidence": {}}
+}
+```
+
+Example `GET /changes`:
+
+```json
+{"items": [{"event_id": 118, "event_type": "job.updated", "job_id": 42, "occurred_at": "2026-11-10T09:15:02Z", "fields": ["salary"]},
+           {"event_id": 119, "event_type": "job.closed", "job_id": 17, "occurred_at": "2026-11-10T09:15:03Z", "reason": "missed"}],
+ "next_cursor": "eyJ2IjoxLCJlIjoxMTl9", "has_more": false}
+```
+
+Errors: 401 (token), 422 (invalid filter: unknown skill/country/level, `salary_min` without `currency`, foreign
+cursor), 429 (`Retry-After`), 503 (bot API disabled or misconfigured), `/changes`: 400 invalid cursor, 409 cursor ahead of the log.
+
+The `/api/jobs` endpoints above also accept the additive filters `country_code`, `region`, `specialization`,
+`work_model` and `seniority` (repeatable), and return `country_codes`, `region_codes`, `geo_status`, `work_model`,
+`seniority`, `employment_kinds` per vacancy.

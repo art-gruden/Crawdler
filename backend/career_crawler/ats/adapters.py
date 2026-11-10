@@ -245,7 +245,7 @@ class LeverAdapter:
                     salary = {
                         "min": float(sal["min"]),
                         "max": float(sal["max"]),
-                        "currency": sal.get("currency") or "EUR",
+                        "currency": sal.get("currency") or None,
                         "period": period,
                         "raw": json.dumps(sal)[:200],
                     }

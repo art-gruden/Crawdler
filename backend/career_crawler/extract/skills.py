@@ -81,74 +81,173 @@ def find_skills(text: str) -> list[tuple[str, str]]:
 
 
 _LANGS = {
-    "de": r"deutsch(?:kenntnisse|e|en)?|german",
-    "en": r"englisch(?:kenntnisse|e|en)?|english",
-    "fr": r"französisch|french",
+    "de": r"deutsch(?:kenntnisse)?|deutsche[rn]? sprache|german|allemand|tedesco|schweizerdeutsch|swiss german",
+    "en": r"englisch(?:kenntnisse)?|english|anglais|inglese",
+    "fr": r"franz(?:ö|oe|o)sisch(?:kenntnisse)?|french|fran(?:ç|c)ais|francese",
+    "it": r"italienisch(?:kenntnisse)?|italian|italiano|italien",
+    "es": r"spanisch(?:kenntnisse)?|spanish|espa(?:ñ|n)ol|spagnolo",
+    "nl": r"niederl(?:ä|ae|a)ndisch|dutch|holl(?:ä|ae|a)ndisch",
+    "pt": r"portugiesisch|portuguese",
     "pl": r"polnisch|polish",
     "cs": r"tschechisch|czech",
     "ru": r"russisch|russian",
     "uk": r"ukrainisch|ukrainian",
+    "tr": r"t(?:ü|ue|u)rkisch|turkish",
+    "ar": r"arabisch|arabic",
 }
-_LEVEL = (
-    r"(?P<cefr>[abc][12](?:\s*[-/+]\s*[abc]?[12])?)|"
-    r"(?P<word>muttersprach\w*|native|verhandlungssicher\w*|fließend\w*|fliessend\w*|fluent\w*|sehr gut\w*|"
-    r"exzellent\w*|excellent|proficient|gut\w*|good|solide\w*|grundkenntnisse|basic|business[- ]fluent|"
-    r"wünschenswert|von vorteil|nice to have|plus)"
-)
-_LEVEL_MAP = [
-    ("C2", r"muttersprach|native"),
-    ("C1", r"verhandlungssicher|fließend|fliessend|fluent|exzellent|excellent|business[- ]fluent|proficient"),
-    ("B2", r"sehr gut"),
-    ("B1", r"\bgut|good|solide"),
-    ("A2", r"grundkenntnisse|basic"),
+CEFR_ORDER = {"A1": 1, "A2": 2, "B1": 3, "B2": 4, "C1": 5, "C2": 6}
+_CEFR = r"[ABC][12]"
+_CEFR_RANGE = re.compile(rf"(?<![\w/])({_CEFR})(?:\s*(?:[-–/]|bis|to|or|oder)\s*({_CEFR}))?(?![\w])")
+# Descriptive words are *not* CEFR levels: they never produce a level, only a descriptor.
+_DESCRIPTORS = [
+    ("native", r"muttersprach\w*|native|langue maternelle|madrelingua|bilingual|zweisprachig"),
+    ("fluent", r"verhandlungssicher\w*|flie(?:ß|ss)end\w*|fluent\w*|business[- ]fluent|courant\w*|fluente"),
+    ("advanced", r"sehr gut\w*|exzellent\w*|excellent\w*|ausgezeichnet\w*|proficient|très bon\w*|ottim\w*|perfekt\w*"),
+    ("good", r"gut(?:e|en)?\b|good|solid\w*|bon(?:ne)?s?\b|buon\w*"),
+    ("basic", r"grundkenntnisse|grundlagen|basic|notions|conoscenza di base|elementar\w*"),
 ]
+_DESC_RX = [(name, re.compile(rx, re.I)) for name, rx in _DESCRIPTORS]
+_PREFERRED = re.compile(
+    r"wünschenswert|wuenschenswert|von vorteil|vorteilhaft|nice[- ]to[- ]have|\bplus\b|pluspunkt|optional|ideally|"
+    r"idealerweise|desirable|preferred|bevorzugt|souhait|apprezzat|gerne gesehen|ist ein vorteil|wären? (?:ein )?vorteil",
+    re.I,
+)
+_REQUIRED = re.compile(
+    r"erforderlich|notwendig|vorausgesetzt|voraussetzung|zwingend|unbedingt|\bmust\b|required|essential|mandatory|"
+    r"obligatoire|requis|richiest|sicher(?:e|er|en)?\b|\bmind(?:estens|\.)?\b|at least|minimum",
+    re.I,
+)
+_CONTEXT = re.compile(
+    r"kenntnis|sprach|language|spoken|written|wort und schrift|skills|level|niveau|[abc][12]\b|fließend|flie(?:ß|ss)end|"
+    r"fluent|verhandlungssicher|muttersprach|native|\bgut|good|proficien|kommunik|communicat|plus|vorteil|"
+    r"wünschenswert|nice to have|required|erforderlich|langue|lingua|parl|sprech|speak|konversation|conversation",
+    re.I,
+)
 
 
-def find_languages(text: str) -> list[dict]:
-    """[{"language": "de", "level": "C1", "required": true, "raw": "..."}]"""
+def find_languages(text: str, requirement_lines: list[str] | None = None) -> list[dict]:
+    """Language requirements found in ``text``.
+
+    Each item: ``language`` (ISO 639-1), ``level`` (CEFR A1–C2 *only when written explicitly*, else
+    None), ``requirement`` (required | preferred | unknown), ``required`` (legacy bool: requirement is
+    "required"), ``descriptor`` (native | fluent | advanced | good | basic | None), ``evidence``
+    (the matched wording), ``confidence``. A range such as "B2–C1" yields its lower bound.
+    "Fließende Deutschkenntnisse" is German, required, descriptor ``fluent`` and level None.
+    """
+    req_set = {ln.strip().lower() for ln in (requirement_lines or [])}
     out: dict[str, dict] = {}
-    for line in re.split(r"[\n.;]", text[:40_000]):
+    text = re.sub(r"\b(mind|min|ca|bzw|ggf|inkl|evtl|ggfs|z\.\s?B|u\.a|d\.h)\.", r"\1", text[:40_000], flags=re.I)
+    for line in re.split(r"[\n.;]", text):
         for code, rx in _LANGS.items():
-            m = re.search(rf"(?<!\w)({rx})(?!\w)", line, re.I)
-            if not m:
-                continue
-            # skip "deutsche Firma", "Germany" as location, "German market" etc.
-            window = line[max(0, m.start() - 60) : m.end() + 60]
-            if not re.search(
-                r"kenntnis|sprach|language|spoken|written|wort und schrift|skills|level|niveau|"
-                r"[abc][12]\b|fließend|fluent|verhandlungssicher|muttersprach|native|gut|good|"
-                r"proficien|kommunik|communicat|plus|vorteil|wünschenswert|nice to have|required|erforderlich",
-                window,
-                re.I,
-            ):
-                continue
-            optional = bool(
-                re.search(
-                    r"wünschenswert|von vorteil|nice to have|\bplus\b|optional|ideally|idealerweise", window, re.I
+            for m in re.finditer(rf"(?<!\w)({rx})(?!\w)", line, re.I):
+                window = line[max(0, m.start() - 60) : m.end() + 60]
+                if not _CONTEXT.search(window):
+                    continue
+                # markers belong to this language's clause ("Französisch fließend, Italienisch ein Plus")
+                lo = max(line.rfind(",", 0, m.start()), line.rfind(";", 0, m.start())) + 1
+                hits = [i for i in (line.find(",", m.end()), line.find(";", m.end())) if i >= 0]
+                hi = min(hits) if hits else len(line)
+                clause = line[lo:hi]
+                cs, ce = m.start() - lo, m.end() - lo
+                level, level_text = _explicit_level(clause, cs, ce)
+                descriptor = _descriptor(clause, cs, ce)
+                preferred = bool(_PREFERRED.search(clause))
+                in_req = line.strip().lstrip("-•·*▪► ").strip().lower() in req_set
+                required = (
+                    not preferred
+                    and bool(_REQUIRED.search(clause) or in_req or descriptor in ("native", "fluent", "advanced", "good") or level)
                 )
-            )
-            level = _nearest_level(line, m.start(), m.end())
-            prev = out.get(code)
-            if prev is None or (level and not prev.get("level")):
-                out[code] = {"language": code, "level": level, "required": not optional, "raw": window.strip()[:160]}
+                requirement = "preferred" if preferred else "required" if required else "unknown"
+                conf = 0.95 if level else 0.8 if descriptor else 0.6
+                if requirement == "unknown":
+                    conf = min(conf, 0.5)
+                evidence = window.strip()[:160]
+                item = {
+                    "language": code,
+                    "level": level,
+                    "requirement": requirement,
+                    "required": requirement == "required",
+                    "descriptor": descriptor,
+                    "evidence": evidence,
+                    "raw": evidence,
+                    "confidence": round(conf, 2),
+                }
+                if level_text and "-" in level_text:
+                    item["level_range"] = level_text
+                prev = out.get(code)
+                if prev is None or _better(item, prev):
+                    out[code] = item
     return list(out.values())
 
 
-def _nearest_level(line: str, start: int, end: int) -> str | None:
-    """Level that belongs to *this* language mention (closest; CEFR right after wins)."""
+_REQ_RANK = {"required": 2, "unknown": 1, "preferred": 0}
+
+
+def _better(new: dict, old: dict) -> bool:
+    """Keep the most informative mention: explicit level first, then a firmer requirement."""
+    if bool(new["level"]) != bool(old["level"]):
+        return bool(new["level"])
+    if _REQ_RANK[new["requirement"]] != _REQ_RANK[old["requirement"]]:
+        return _REQ_RANK[new["requirement"]] > _REQ_RANK[old["requirement"]]
+    return bool(new["descriptor"]) and not old["descriptor"]
+
+
+def _explicit_level(line: str, start: int, end: int) -> tuple[str | None, str | None]:
+    """CEFR written near *this* language mention (right after it, or a few characters before)."""
     best = None
-    for lm in re.finditer(_LEVEL, line, re.I):
-        if lm.group("cefr"):
-            after = lm.start() - end
-            before = start - lm.end()
-            if 0 <= after <= 30 or 0 <= before <= 3:
-                return re.sub(r"\s", "", lm.group("cefr")).upper()[:5]
+    for lm in _CEFR_RANGE.finditer(line):
+        after = lm.start() - end
+        before = start - lm.end()
+        dist = after if after >= 0 else (before if before >= 0 else None)
+        if dist is None:
             continue
-        dist = start - lm.end() if lm.end() <= start else lm.start() - end
-        if lm.end() <= start and dist > 25 or lm.start() >= end and dist > 20:
+        limit = 30 if after >= 0 else 6
+        if dist > limit:
             continue
-        word = lm.group("word").lower()
-        lvl = next((lv for lv, rxl in _LEVEL_MAP if re.search(rxl, word)), None)
-        if lvl and (best is None or dist < best[0]):
-            best = (dist, lvl)
+        a, b = lm.group(1).upper(), (lm.group(2) or "").upper()
+        lvl = min((a, b), key=lambda x: CEFR_ORDER[x]) if b else a
+        if best is None or dist < best[0]:
+            best = (dist, lvl, f"{a}-{b}" if b else a)
+    return (best[1], best[2]) if best else (None, None)
+
+
+def _descriptor(line: str, start: int, end: int) -> str | None:
+    best = None
+    for name, rx in _DESC_RX:
+        for lm in rx.finditer(line):
+            dist = start - lm.end() if lm.end() <= start else lm.start() - end
+            if dist < 0:
+                continue
+            limit = 25 if lm.end() <= start else 22
+            if dist > limit:
+                continue
+            if best is None or dist < best[0]:
+                best = (dist, name)
     return best[1] if best else None
+
+
+SKILL_ALIASES = {
+    "k8s": "Kubernetes",
+    "golang": "Go",
+    "postgres": "PostgreSQL",
+    "js": "JavaScript",
+    "ts": "TypeScript",
+    "cicd": "CI/CD",
+    "gitlab": "GitLab CI",
+    "dotnet": "C#",
+    ".net": "C#",
+    "ml": "Machine Learning",
+    "mongo": "MongoDB",
+}
+SKILL_BY_LOWER = {name.lower(): name for name in _SKILLS}
+
+
+def canonical_skill(name: str) -> str | None:
+    """Canonical skill name for user input (case-insensitive, a few common aliases), else None."""
+    key = name.strip().lower()
+    return SKILL_BY_LOWER.get(key) or SKILL_ALIASES.get(key)
+
+
+def skill_category(name: str) -> str | None:
+    entry = _SKILLS.get(name)
+    return entry[0] if entry else None

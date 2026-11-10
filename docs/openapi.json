@@ -1262,6 +1262,111 @@
               "default": "discovered",
               "title": "Sort"
             }
+          },
+          {
+            "name": "country_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-1 (DE, AT, CH); several = OR",
+              "title": "Country Code"
+            },
+            "description": "ISO 3166-1 (DE, AT, CH); several = OR"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-2 (DE-SN, AT-9, CH-ZH); several = OR",
+              "title": "Region"
+            },
+            "description": "ISO 3166-2 (DE-SN, AT-9, CH-ZH); several = OR"
+          },
+          {
+            "name": "specialization",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "taxonomy slug or id; a group includes its members",
+              "title": "Specialization"
+            },
+            "description": "taxonomy slug or id; a group includes its members"
+          },
+          {
+            "name": "work_model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "REMOTE | HYBRID | ONSITE | UNKNOWN",
+              "title": "Work Model"
+            },
+            "description": "REMOTE | HYBRID | ONSITE | UNKNOWN"
+          },
+          {
+            "name": "seniority",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "INTERN | JUNIOR | MID | SENIOR | LEAD | EXECUTIVE | UNKNOWN",
+              "title": "Seniority"
+            },
+            "description": "INTERN | JUNIOR | MID | SENIOR | LEAD | EXECUTIVE | UNKNOWN"
           }
         ],
         "responses": {
@@ -1270,7 +1375,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JobPage"
+                  "$ref": "#/components/schemas/career_crawler__api__JobPage"
                 }
               }
             }
@@ -1572,6 +1677,111 @@
               "default": "discovered",
               "title": "Sort"
             }
+          },
+          {
+            "name": "country_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-1 (DE, AT, CH); several = OR",
+              "title": "Country Code"
+            },
+            "description": "ISO 3166-1 (DE, AT, CH); several = OR"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-2 (DE-SN, AT-9, CH-ZH); several = OR",
+              "title": "Region"
+            },
+            "description": "ISO 3166-2 (DE-SN, AT-9, CH-ZH); several = OR"
+          },
+          {
+            "name": "specialization",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "taxonomy slug or id; a group includes its members",
+              "title": "Specialization"
+            },
+            "description": "taxonomy slug or id; a group includes its members"
+          },
+          {
+            "name": "work_model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "REMOTE | HYBRID | ONSITE | UNKNOWN",
+              "title": "Work Model"
+            },
+            "description": "REMOTE | HYBRID | ONSITE | UNKNOWN"
+          },
+          {
+            "name": "seniority",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "INTERN | JUNIOR | MID | SENIOR | LEAD | EXECUTIVE | UNKNOWN",
+              "title": "Seniority"
+            },
+            "description": "INTERN | JUNIOR | MID | SENIOR | LEAD | EXECUTIVE | UNKNOWN"
           }
         ],
         "responses": {
@@ -1824,6 +2034,111 @@
               "default": "discovered",
               "title": "Sort"
             }
+          },
+          {
+            "name": "country_code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-1 (DE, AT, CH); several = OR",
+              "title": "Country Code"
+            },
+            "description": "ISO 3166-1 (DE, AT, CH); several = OR"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-2 (DE-SN, AT-9, CH-ZH); several = OR",
+              "title": "Region"
+            },
+            "description": "ISO 3166-2 (DE-SN, AT-9, CH-ZH); several = OR"
+          },
+          {
+            "name": "specialization",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "taxonomy slug or id; a group includes its members",
+              "title": "Specialization"
+            },
+            "description": "taxonomy slug or id; a group includes its members"
+          },
+          {
+            "name": "work_model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "REMOTE | HYBRID | ONSITE | UNKNOWN",
+              "title": "Work Model"
+            },
+            "description": "REMOTE | HYBRID | ONSITE | UNKNOWN"
+          },
+          {
+            "name": "seniority",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "INTERN | JUNIOR | MID | SENIOR | LEAD | EXECUTIVE | UNKNOWN",
+              "title": "Seniority"
+            },
+            "description": "INTERN | JUNIOR | MID | SENIOR | LEAD | EXECUTIVE | UNKNOWN"
           }
         ],
         "responses": {
@@ -1912,7 +2227,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JobDetail"
+                  "$ref": "#/components/schemas/career_crawler__api__JobDetail"
                 }
               }
             }
@@ -2230,6 +2545,930 @@
         }
       }
     },
+    "/api/bot/v1/jobs": {
+      "get": {
+        "tags": [
+          "bot-api"
+        ],
+        "summary": "Search vacancies",
+        "description": "Filters combine with AND; several values of one filter combine with OR. Unknown values never match a\nfilter unless named in ``include_unknown``. Pagination is keyset based and stable while data changes.",
+        "operationId": "search_jobs_api_bot_v1_jobs_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 25,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Opaque cursor from a previous page",
+              "title": "Cursor"
+            },
+            "description": "Opaque cursor from a previous page"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Full text; supports \"phrases\" and -excluded words",
+              "title": "Q"
+            },
+            "description": "Full text; supports \"phrases\" and -excluded words"
+          },
+          {
+            "name": "exclude",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Words that must not occur (comma separated or repeated)",
+              "title": "Exclude"
+            },
+            "description": "Words that must not occur (comma separated or repeated)"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-1 codes: DE, AT, CH",
+              "title": "Country"
+            },
+            "description": "ISO 3166-1 codes: DE, AT, CH"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-2 codes: DE-SN, AT-9, CH-ZH",
+              "title": "Region"
+            },
+            "description": "ISO 3166-2 codes: DE-SN, AT-9, CH-ZH"
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Location ids from /facets/cities",
+              "title": "City"
+            },
+            "description": "Location ids from /facets/cities"
+          },
+          {
+            "name": "specialization",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Slugs or ids from /facets/specializations",
+              "title": "Specialization"
+            },
+            "description": "Slugs or ids from /facets/specializations"
+          },
+          {
+            "name": "work_model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "REMOTE, HYBRID, ONSITE",
+              "title": "Work Model"
+            },
+            "description": "REMOTE, HYBRID, ONSITE"
+          },
+          {
+            "name": "employment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "FULL_TIME, PART_TIME, CONTRACT, FREELANCE, TEMPORARY, INTERNSHIP, APPRENTICESHIP, WORKING_STUDENT, OTHER",
+              "title": "Employment"
+            },
+            "description": "FULL_TIME, PART_TIME, CONTRACT, FREELANCE, TEMPORARY, INTERNSHIP, APPRENTICESHIP, WORKING_STUDENT, OTHER"
+          },
+          {
+            "name": "seniority",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "INTERN, JUNIOR, MID, SENIOR, LEAD, EXECUTIVE",
+              "title": "Seniority"
+            },
+            "description": "INTERN, JUNIOR, MID, SENIOR, LEAD, EXECUTIVE"
+          },
+          {
+            "name": "skills",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Skill names from /facets/skills",
+              "title": "Skills"
+            },
+            "description": "Skill names from /facets/skills"
+          },
+          {
+            "name": "skills_mode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "any",
+                "all"
+              ],
+              "type": "string",
+              "default": "any",
+              "title": "Skills Mode"
+            }
+          },
+          {
+            "name": "languages",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Candidate languages, e.g. de:B1,en:C1 (level optional)",
+              "title": "Languages"
+            },
+            "description": "Candidate languages, e.g. de:B1,en:C1 (level optional)"
+          },
+          {
+            "name": "lang_mode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "inclusive",
+                "strict"
+              ],
+              "type": "string",
+              "default": "inclusive",
+              "title": "Lang Mode"
+            }
+          },
+          {
+            "name": "salary_min",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Salary Min"
+            }
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 3
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 4217; required with salary_min",
+              "title": "Currency"
+            },
+            "description": "ISO 4217; required with salary_min"
+          },
+          {
+            "name": "salary_period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "year | month | hour \u2026; salaries are never converted",
+              "default": "year",
+              "title": "Salary Period"
+            },
+            "description": "year | month | hour \u2026; salaries are never converted"
+          },
+          {
+            "name": "new_since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only vacancies first seen after this instant (ISO 8601)",
+              "title": "New Since"
+            },
+            "description": "Only vacancies first seen after this instant (ISO 8601)"
+          },
+          {
+            "name": "employer",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Company ids",
+              "title": "Employer"
+            },
+            "description": "Company ids"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "open",
+                "closed",
+                "expired",
+                "all"
+              ],
+              "type": "string",
+              "default": "open",
+              "title": "Status"
+            }
+          },
+          {
+            "name": "remote_in",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Country codes a remote employee would live in",
+              "title": "Remote In"
+            },
+            "description": "Country codes a remote employee would live in"
+          },
+          {
+            "name": "include_unknown",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filters for which vacancies with an unknown value still match: location, work_model, employment, seniority, specialization, salary, remote",
+              "title": "Include Unknown"
+            },
+            "description": "Filters for which vacancies with an unknown value still match: location, work_model, employment, seniority, specialization, salary, remote"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "newest",
+                "relevance",
+                "salary_desc"
+              ],
+              "type": "string",
+              "default": "newest",
+              "title": "Sort"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/career_crawler__bot_api__JobPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API token"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bot/v1/jobs/{job_id}": {
+      "get": {
+        "tags": [
+          "bot-api"
+        ],
+        "summary": "One vacancy with the full description",
+        "operationId": "get_job_api_bot_v1_jobs__job_id__get",
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Job Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/career_crawler__bot_api__JobDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API token"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bot/v1/facets/countries": {
+      "get": {
+        "tags": [
+          "bot-api"
+        ],
+        "summary": "Countries with open vacancy counts",
+        "operationId": "facet_countries_api_bot_v1_facets_countries_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CountryFacet"
+                  },
+                  "type": "array",
+                  "title": "Response Facet Countries Api Bot V1 Facets Countries Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API token"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/api/bot/v1/facets/regions": {
+      "get": {
+        "tags": [
+          "bot-api"
+        ],
+        "summary": "Regions (L\u00e4nder / cantons) of a country",
+        "operationId": "facet_regions_api_bot_v1_facets_regions_get",
+        "parameters": [
+          {
+            "name": "country",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2,
+              "title": "Country"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RegionFacet"
+                  },
+                  "title": "Response Facet Regions Api Bot V1 Facets Regions Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API token"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bot/v1/facets/cities": {
+      "get": {
+        "tags": [
+          "bot-api"
+        ],
+        "summary": "Cities with open vacancies",
+        "operationId": "facet_cities_api_bot_v1_facets_cities_get",
+        "parameters": [
+          {
+            "name": "country",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2,
+              "title": "Country"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-2 code",
+              "title": "Region"
+            },
+            "description": "ISO 3166-2 code"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 60
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Name prefix (umlauts and ae/oe/ue are interchangeable)",
+              "title": "Q"
+            },
+            "description": "Name prefix (umlauts and ae/oe/ue are interchangeable)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CityFacet"
+                  },
+                  "title": "Response Facet Cities Api Bot V1 Facets Cities Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API token"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bot/v1/facets/specializations": {
+      "get": {
+        "tags": [
+          "bot-api"
+        ],
+        "summary": "Specialization taxonomy with counts",
+        "operationId": "facet_specializations_api_bot_v1_facets_specializations_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SpecializationFacet"
+                  },
+                  "type": "array",
+                  "title": "Response Facet Specializations Api Bot V1 Facets Specializations Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API token"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
+    "/api/bot/v1/facets/skills": {
+      "get": {
+        "tags": [
+          "bot-api"
+        ],
+        "summary": "Skills with open vacancy counts",
+        "operationId": "facet_skills_api_bot_v1_facets_skills_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 40
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Name prefix",
+              "title": "Q"
+            },
+            "description": "Name prefix"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SkillFacet"
+                  },
+                  "title": "Response Facet Skills Api Bot V1 Facets Skills Get"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API token"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bot/v1/changes": {
+      "get": {
+        "tags": [
+          "bot-api"
+        ],
+        "summary": "Ordered, replayable vacancy change feed",
+        "description": "At-least-once feed in commit order. Persist ``next_cursor`` after processing a page; re-reading with the\nsame cursor returns the same events, so process by ``event_id`` idempotently.",
+        "operationId": "changes_api_bot_v1_changes_get",
+        "parameters": [
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Omit to read from the beginning; otherwise the next_cursor you stored",
+              "title": "Cursor"
+            },
+            "description": "Omit to read from the beginning; otherwise the next_cursor you stored"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangesPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API token"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/bot/v1/changes/head": {
+      "get": {
+        "tags": [
+          "bot-api"
+        ],
+        "summary": "Cursor positioned after the newest event",
+        "operationId": "changes_head_api_bot_v1_changes_head_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Head"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid API token"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "tags": [
@@ -2325,6 +3564,135 @@
           "file"
         ],
         "title": "Body_import_companies_api_companies_import_post"
+      },
+      "ChangeItem": {
+        "properties": {
+          "event_id": {
+            "type": "integer",
+            "title": "Event Id"
+          },
+          "event_type": {
+            "type": "string",
+            "enum": [
+              "job.created",
+              "job.updated",
+              "job.closed",
+              "job.reopened"
+            ],
+            "title": "Event Type"
+          },
+          "job_id": {
+            "type": "integer",
+            "title": "Job Id"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          },
+          "fields": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fields",
+            "description": "job.updated only: which fields changed meaningfully"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason",
+            "description": "job.closed only: missed | expired"
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_id",
+          "event_type",
+          "job_id",
+          "occurred_at"
+        ],
+        "title": "ChangeItem"
+      },
+      "ChangesPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ChangeItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "type": "string",
+            "title": "Next Cursor",
+            "description": "persist this and send it on the next poll"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor",
+          "has_more"
+        ],
+        "title": "ChangesPage"
+      },
+      "CityFacet": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "city": {
+            "type": "string",
+            "title": "City"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region"
+          },
+          "open_jobs": {
+            "type": "integer",
+            "title": "Open Jobs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "city",
+          "country",
+          "region",
+          "open_jobs"
+        ],
+        "title": "CityFacet"
       },
       "CompanyDetail": {
         "properties": {
@@ -2846,6 +4214,85 @@
         ],
         "title": "CompanyOut"
       },
+      "CompanyRef": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country",
+            "description": "ISO 3166-1 alpha-2 of the headquarters, null when unknown"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "CompanyRef"
+      },
+      "CountryFacet": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "name_local": {
+            "type": "string",
+            "title": "Name Local"
+          },
+          "in_dach": {
+            "type": "boolean",
+            "title": "In Dach"
+          },
+          "open_jobs": {
+            "type": "integer",
+            "title": "Open Jobs"
+          },
+          "companies": {
+            "type": "integer",
+            "title": "Companies"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "name_local",
+          "in_dach",
+          "open_jobs",
+          "companies"
+        ],
+        "title": "CountryFacet"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -2859,7 +4306,815 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
-      "JobDetail": {
+      "Head": {
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "title": "Cursor",
+            "description": "cursor that points at 'now': use it to receive only future events"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cursor"
+        ],
+        "title": "Head"
+      },
+      "LanguageOut": {
+        "properties": {
+          "language": {
+            "type": "string",
+            "title": "Language",
+            "description": "ISO 639-1"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "A1",
+                  "A2",
+                  "B1",
+                  "B2",
+                  "C1",
+                  "C2"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level",
+            "description": "CEFR level, present only when the posting wrote one"
+          },
+          "requirement": {
+            "type": "string",
+            "enum": [
+              "required",
+              "preferred",
+              "unknown"
+            ],
+            "title": "Requirement"
+          },
+          "descriptor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "native",
+                  "fluent",
+                  "advanced",
+                  "good",
+                  "basic"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Descriptor"
+          },
+          "evidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "language",
+          "requirement",
+          "confidence"
+        ],
+        "title": "LanguageOut"
+      },
+      "LocationOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "country_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country Name"
+          },
+          "region": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region",
+            "description": "ISO 3166-2 code, e.g. DE-SN, AT-9, CH-ZH"
+          },
+          "region_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region Name"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "postcode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postcode"
+          },
+          "is_primary": {
+            "type": "boolean",
+            "title": "Is Primary"
+          },
+          "confidence": {
+            "type": "number",
+            "title": "Confidence"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "description": "structured | gazetteer | text | context | legacy"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "country",
+          "country_name",
+          "region_name",
+          "city",
+          "postcode",
+          "is_primary",
+          "confidence",
+          "source"
+        ],
+        "title": "LocationOut"
+      },
+      "LoginIn": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "LoginIn"
+      },
+      "OsmJobIn": {
+        "properties": {
+          "regions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Regions"
+          },
+          "industries": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Industries"
+          },
+          "verify": {
+            "type": "boolean",
+            "title": "Verify",
+            "default": true
+          }
+        },
+        "type": "object",
+        "title": "OsmJobIn"
+      },
+      "Page": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "Page"
+      },
+      "QualityOut": {
+        "properties": {
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "completeness": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completeness"
+          },
+          "missing": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Missing",
+            "description": "unknown fields; missing is not negative"
+          },
+          "field_confidence": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Field Confidence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "score",
+          "completeness"
+        ],
+        "title": "QualityOut"
+      },
+      "RegionFacet": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "name_local": {
+            "type": "string",
+            "title": "Name Local"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "open_jobs": {
+            "type": "integer",
+            "title": "Open Jobs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "country",
+          "name",
+          "name_local",
+          "kind",
+          "open_jobs"
+        ],
+        "title": "RegionFacet"
+      },
+      "RemoteEligibility": {
+        "properties": {
+          "scope": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "worldwide",
+              "europe",
+              "eu",
+              "dach",
+              "countries"
+            ],
+            "title": "Scope"
+          },
+          "countries": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Countries",
+            "description": "DACH countries a remote employee may live in; [] with scope worldwide/unknown"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scope",
+          "countries"
+        ],
+        "title": "RemoteEligibility"
+      },
+      "RescanIn": {
+        "properties": {
+          "full": {
+            "type": "boolean",
+            "title": "Full",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "RescanIn"
+      },
+      "SalaryOut": {
+        "properties": {
+          "min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min"
+          },
+          "max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency",
+            "description": "ISO 4217; null when the posting named none (never assumed)"
+          },
+          "period": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period",
+            "description": "year | month | hour \u2026 exactly as stated, never converted"
+          },
+          "basis": {
+            "type": "string",
+            "enum": [
+              "gross",
+              "net",
+              "unknown"
+            ],
+            "title": "Basis"
+          },
+          "raw": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Raw"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "min",
+          "max",
+          "basis",
+          "raw",
+          "confidence"
+        ],
+        "title": "SalaryOut"
+      },
+      "ScanBulkIn": {
+        "properties": {
+          "ids": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "minItems": 1,
+            "title": "Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ids"
+        ],
+        "title": "ScanBulkIn"
+      },
+      "SkillFacet": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "open_jobs": {
+            "type": "integer",
+            "title": "Open Jobs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "category",
+          "open_jobs"
+        ],
+        "title": "SkillFacet"
+      },
+      "SkillOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "category"
+        ],
+        "title": "SkillOut"
+      },
+      "SourceOut": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "source_record_id": {
+            "type": "string",
+            "title": "Source Record Id"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "license": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "License"
+          },
+          "attribution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attribution"
+          },
+          "first_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "First Seen At"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "data_timestamp": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Timestamp"
+          },
+          "discovery_job_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discovery Job Id"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "source_record_id",
+          "source_url",
+          "name",
+          "license",
+          "attribution",
+          "first_seen_at",
+          "last_seen_at",
+          "data_timestamp",
+          "discovery_job_id"
+        ],
+        "title": "SourceOut"
+      },
+      "SpecializationFacet": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "name_de": {
+            "type": "string",
+            "title": "Name De"
+          },
+          "is_it": {
+            "type": "boolean",
+            "title": "Is It"
+          },
+          "open_jobs": {
+            "type": "integer",
+            "title": "Open Jobs"
+          },
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/SpecializationFacet"
+            },
+            "type": "array",
+            "title": "Children"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "name_de",
+          "is_it",
+          "open_jobs"
+        ],
+        "title": "SpecializationFacet"
+      },
+      "SpecializationOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "name_de": {
+            "type": "string",
+            "title": "Name De"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Group"
+          },
+          "is_it": {
+            "type": "boolean",
+            "title": "Is It"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "name_de",
+          "group",
+          "is_it"
+        ],
+        "title": "SpecializationOut"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "career_crawler__api__JobDetail": {
         "properties": {
           "id": {
             "type": "integer",
@@ -3044,6 +5299,45 @@
             "title": "Skills",
             "default": []
           },
+          "country_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Country Codes",
+            "default": []
+          },
+          "region_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Region Codes",
+            "default": []
+          },
+          "geo_status": {
+            "type": "string",
+            "title": "Geo Status",
+            "default": "unknown"
+          },
+          "work_model": {
+            "type": "string",
+            "title": "Work Model",
+            "default": "UNKNOWN"
+          },
+          "seniority": {
+            "type": "string",
+            "title": "Seniority",
+            "default": "UNKNOWN"
+          },
+          "employment_kinds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Employment Kinds",
+            "default": []
+          },
           "career_page_url": {
             "anyOf": [
               {
@@ -3206,288 +5500,6 @@
           "source_values"
         ],
         "title": "JobDetail"
-      },
-      "JobPage": {
-        "properties": {
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/career_crawler__api__JobOut"
-            },
-            "type": "array",
-            "title": "Items"
-          }
-        },
-        "type": "object",
-        "required": [
-          "total",
-          "items"
-        ],
-        "title": "JobPage"
-      },
-      "LoginIn": {
-        "properties": {
-          "username": {
-            "type": "string",
-            "title": "Username"
-          },
-          "password": {
-            "type": "string",
-            "title": "Password"
-          }
-        },
-        "type": "object",
-        "required": [
-          "username",
-          "password"
-        ],
-        "title": "LoginIn"
-      },
-      "OsmJobIn": {
-        "properties": {
-          "regions": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "maxItems": 50,
-            "minItems": 1,
-            "title": "Regions"
-          },
-          "industries": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "minItems": 1,
-            "title": "Industries"
-          },
-          "verify": {
-            "type": "boolean",
-            "title": "Verify",
-            "default": true
-          }
-        },
-        "type": "object",
-        "title": "OsmJobIn"
-      },
-      "Page": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/CompanyOut"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "page": {
-            "type": "integer",
-            "title": "Page"
-          },
-          "page_size": {
-            "type": "integer",
-            "title": "Page Size"
-          }
-        },
-        "type": "object",
-        "required": [
-          "items",
-          "total",
-          "page",
-          "page_size"
-        ],
-        "title": "Page"
-      },
-      "RescanIn": {
-        "properties": {
-          "full": {
-            "type": "boolean",
-            "title": "Full",
-            "default": false
-          }
-        },
-        "type": "object",
-        "title": "RescanIn"
-      },
-      "ScanBulkIn": {
-        "properties": {
-          "ids": {
-            "items": {
-              "type": "integer"
-            },
-            "type": "array",
-            "maxItems": 1000,
-            "minItems": 1,
-            "title": "Ids"
-          }
-        },
-        "type": "object",
-        "required": [
-          "ids"
-        ],
-        "title": "ScanBulkIn"
-      },
-      "SourceOut": {
-        "properties": {
-          "source": {
-            "type": "string",
-            "title": "Source"
-          },
-          "source_record_id": {
-            "type": "string",
-            "title": "Source Record Id"
-          },
-          "source_url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Source Url"
-          },
-          "name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Name"
-          },
-          "license": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "License"
-          },
-          "attribution": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Attribution"
-          },
-          "first_seen_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "First Seen At"
-          },
-          "last_seen_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Last Seen At"
-          },
-          "data_timestamp": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Data Timestamp"
-          },
-          "discovery_job_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Discovery Job Id"
-          },
-          "data": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Data"
-          }
-        },
-        "type": "object",
-        "required": [
-          "source",
-          "source_record_id",
-          "source_url",
-          "name",
-          "license",
-          "attribution",
-          "first_seen_at",
-          "last_seen_at",
-          "data_timestamp",
-          "discovery_job_id"
-        ],
-        "title": "SourceOut"
-      },
-      "ValidationError": {
-        "properties": {
-          "loc": {
-            "items": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "integer"
-                }
-              ]
-            },
-            "type": "array",
-            "title": "Location"
-          },
-          "msg": {
-            "type": "string",
-            "title": "Message"
-          },
-          "type": {
-            "type": "string",
-            "title": "Error Type"
-          },
-          "input": {
-            "title": "Input"
-          },
-          "ctx": {
-            "type": "object",
-            "title": "Context"
-          }
-        },
-        "type": "object",
-        "required": [
-          "loc",
-          "msg",
-          "type"
-        ],
-        "title": "ValidationError"
       },
       "career_crawler__api__JobOut": {
         "properties": {
@@ -3673,6 +5685,45 @@
             "type": "array",
             "title": "Skills",
             "default": []
+          },
+          "country_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Country Codes",
+            "default": []
+          },
+          "region_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Region Codes",
+            "default": []
+          },
+          "geo_status": {
+            "type": "string",
+            "title": "Geo Status",
+            "default": "unknown"
+          },
+          "work_model": {
+            "type": "string",
+            "title": "Work Model",
+            "default": "UNKNOWN"
+          },
+          "seniority": {
+            "type": "string",
+            "title": "Seniority",
+            "default": "UNKNOWN"
+          },
+          "employment_kinds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Employment Kinds",
+            "default": []
           }
         },
         "type": "object",
@@ -3702,6 +5753,569 @@
           "salary_period"
         ],
         "title": "JobOut"
+      },
+      "career_crawler__api__JobPage": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/career_crawler__api__JobOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "items"
+        ],
+        "title": "JobPage"
+      },
+      "career_crawler__bot_api__JobDetail": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "company": {
+            "$ref": "#/components/schemas/CompanyRef"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "application_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Application Url"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "closed",
+              "expired"
+            ],
+            "title": "Status"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At",
+            "description": "from the source only, never the discovery date"
+          },
+          "first_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "First Seen At"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "last_checked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Checked At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "closed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          },
+          "geo_status": {
+            "type": "string",
+            "enum": [
+              "resolved",
+              "partial",
+              "ambiguous",
+              "unknown"
+            ],
+            "title": "Geo Status"
+          },
+          "locations": {
+            "items": {
+              "$ref": "#/components/schemas/LocationOut"
+            },
+            "type": "array",
+            "title": "Locations"
+          },
+          "work_model": {
+            "type": "string",
+            "enum": [
+              "REMOTE",
+              "HYBRID",
+              "ONSITE",
+              "UNKNOWN"
+            ],
+            "title": "Work Model"
+          },
+          "remote_eligibility": {
+            "$ref": "#/components/schemas/RemoteEligibility"
+          },
+          "employment_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Employment Types"
+          },
+          "specialization": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpecializationOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "secondary_specializations": {
+            "items": {
+              "$ref": "#/components/schemas/SpecializationOut"
+            },
+            "type": "array",
+            "title": "Secondary Specializations"
+          },
+          "seniority": {
+            "type": "string",
+            "enum": [
+              "INTERN",
+              "JUNIOR",
+              "MID",
+              "SENIOR",
+              "LEAD",
+              "EXECUTIVE",
+              "UNKNOWN"
+            ],
+            "title": "Seniority"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillOut"
+            },
+            "type": "array",
+            "title": "Skills"
+          },
+          "languages": {
+            "items": {
+              "$ref": "#/components/schemas/LanguageOut"
+            },
+            "type": "array",
+            "title": "Languages"
+          },
+          "salary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SalaryOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "quality": {
+            "$ref": "#/components/schemas/QualityOut"
+          },
+          "language_fit": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "compatible",
+                  "unknown",
+                  "exceeds"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Fit",
+            "description": "only when languages were given in the request"
+          },
+          "relevance": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relevance",
+            "description": "only with sort=relevance"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "requirements": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Requirements"
+          },
+          "responsibilities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Responsibilities"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "company",
+          "url",
+          "application_url",
+          "status",
+          "first_seen_at",
+          "last_seen_at",
+          "last_checked_at",
+          "updated_at",
+          "closed_at",
+          "geo_status",
+          "locations",
+          "work_model",
+          "remote_eligibility",
+          "employment_types",
+          "specialization",
+          "seniority",
+          "skills",
+          "languages",
+          "salary",
+          "quality",
+          "description",
+          "requirements",
+          "responsibilities"
+        ],
+        "title": "JobDetail"
+      },
+      "career_crawler__bot_api__JobOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "company": {
+            "$ref": "#/components/schemas/CompanyRef"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "application_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Application Url"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "closed",
+              "expired"
+            ],
+            "title": "Status"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At",
+            "description": "from the source only, never the discovery date"
+          },
+          "first_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "First Seen At"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "last_checked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Checked At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "closed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          },
+          "geo_status": {
+            "type": "string",
+            "enum": [
+              "resolved",
+              "partial",
+              "ambiguous",
+              "unknown"
+            ],
+            "title": "Geo Status"
+          },
+          "locations": {
+            "items": {
+              "$ref": "#/components/schemas/LocationOut"
+            },
+            "type": "array",
+            "title": "Locations"
+          },
+          "work_model": {
+            "type": "string",
+            "enum": [
+              "REMOTE",
+              "HYBRID",
+              "ONSITE",
+              "UNKNOWN"
+            ],
+            "title": "Work Model"
+          },
+          "remote_eligibility": {
+            "$ref": "#/components/schemas/RemoteEligibility"
+          },
+          "employment_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Employment Types"
+          },
+          "specialization": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SpecializationOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "secondary_specializations": {
+            "items": {
+              "$ref": "#/components/schemas/SpecializationOut"
+            },
+            "type": "array",
+            "title": "Secondary Specializations"
+          },
+          "seniority": {
+            "type": "string",
+            "enum": [
+              "INTERN",
+              "JUNIOR",
+              "MID",
+              "SENIOR",
+              "LEAD",
+              "EXECUTIVE",
+              "UNKNOWN"
+            ],
+            "title": "Seniority"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillOut"
+            },
+            "type": "array",
+            "title": "Skills"
+          },
+          "languages": {
+            "items": {
+              "$ref": "#/components/schemas/LanguageOut"
+            },
+            "type": "array",
+            "title": "Languages"
+          },
+          "salary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SalaryOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "quality": {
+            "$ref": "#/components/schemas/QualityOut"
+          },
+          "language_fit": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "compatible",
+                  "unknown",
+                  "exceeds"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Fit",
+            "description": "only when languages were given in the request"
+          },
+          "relevance": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relevance",
+            "description": "only with sort=relevance"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "company",
+          "url",
+          "application_url",
+          "status",
+          "first_seen_at",
+          "last_seen_at",
+          "last_checked_at",
+          "updated_at",
+          "closed_at",
+          "geo_status",
+          "locations",
+          "work_model",
+          "remote_eligibility",
+          "employment_types",
+          "specialization",
+          "seniority",
+          "skills",
+          "languages",
+          "salary",
+          "quality"
+        ],
+        "title": "JobOut"
+      },
+      "career_crawler__bot_api__JobPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/career_crawler__bot_api__JobOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "pass as cursor to get the next page; null on the last page"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "next_cursor",
+          "has_more"
+        ],
+        "title": "JobPage"
       },
       "company_discovery__api__JobOut": {
         "properties": {

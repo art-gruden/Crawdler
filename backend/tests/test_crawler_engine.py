@@ -202,3 +202,21 @@ async def test_throttle_spacing_and_limiter():
 
 def test_fixture_transport_rejects_path_traversal():
     assert FixtureTransport._resolve(SITES / "gcc-fixture-static.de", "/../gcc-fixture-jsonld.de/jobs", "") is None
+
+
+async def test_robots_fetch_does_not_deadlock_a_small_limiter():
+    """robots.txt is fetched while a request waits for its first hop: with the HTTP limit at its minimum
+    both must not need a slot at the same time (regression: crawler stalled at "HTTP limit 2/2")."""
+    import asyncio
+
+    from .crawler_helpers import crawler_settings, fixture_fetcher
+
+    s = crawler_settings(http_concurrency=1, http_concurrency_min=1)
+    f, _t = fixture_fetcher(s, overrides=None)
+    hosts = ["gcc-fixture-static.de", "gcc-fixture-jsonld.de", "gcc-fixture-lever.de"]
+    pages = await asyncio.wait_for(
+        asyncio.gather(*[f.get(f"https://{h}/") for h in hosts], return_exceptions=True), timeout=20
+    )
+    assert any(not isinstance(p, BaseException) for p in pages)
+    assert f.limiter.active == 0
+    await f.aclose()

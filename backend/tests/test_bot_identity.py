@@ -395,7 +395,10 @@ def test_every_other_endpoint_requires_login(client):
             if method.upper() not in {"GET", "POST", "PUT", "PATCH", "DELETE"} or (method.upper(), path) in UNPROTECTED:
                 continue
             r = client.request(method.upper(), path.format_map(_AnyInt()), headers=H)
-            assert r.status_code == 401, f"{method.upper()} {path} answered {r.status_code} without login"
+            if path.startswith("/api/bot/v1/"):  # machine API: its own Bearer auth; 503 while no key is configured
+                assert r.status_code in (401, 503, 405), f"{method.upper()} {path} answered {r.status_code} without a token"
+            else:
+                assert r.status_code == 401, f"{method.upper()} {path} answered {r.status_code} without login"
             checked += 1
     assert checked >= 20
 

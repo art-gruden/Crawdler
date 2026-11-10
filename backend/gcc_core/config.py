@@ -26,6 +26,18 @@ class Settings(BaseSettings):
     session_ttl_hours: int = 12
     cookie_secure: bool = True
 
+    # --- machine-to-machine API for bots (/api/bot/v1) -------------------
+    # Credentials come only from the environment / a secrets file, never from the code or the admin
+    # login. Entries: "name:sha256:<hex digest>" (recommended) or "name:<token of >= 32 chars>",
+    # separated by commas or newlines. Several entries allow rotation. Empty = the bot API is disabled.
+    bot_api_keys: str = ""
+    bot_api_keys_file: str = ""  # e.g. /run/secrets/bot_api_keys; read at every start
+    bot_rate_limit_per_min: int = 120
+    bot_auth_fail_limit_per_min: int = 20  # per client address, before 429 on wrong tokens
+    bot_max_page_size: int = 100
+    bot_max_changes_page: int = 500
+    bot_rank_weights: str = ""  # JSON override of the ranking weights, e.g. {"skills": 30}
+
     # --- outbound HTTP (verification, crawler) --------------------------
     # The one identity every outgoing request uses (HTTP clients, robots.txt, the browser). The
     # robots.txt product token is derived from it (gcc_core.botinfo.robots_token); the public

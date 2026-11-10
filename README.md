@@ -131,6 +131,18 @@ curl -s https://<SITE_ADDRESS>/api/public/bot | jq
 
 After changing `.env`: `docker compose up -d` (containers are recreated and read it again).
 
+## DACH job data platform and bot API
+
+Vacancies are normalized for Germany, Austria and Switzerland (country → region → city with ISO codes, remote
+eligibility, specialization, seniority, employment type, languages with CEFR levels, salary with currency) and served
+through a read-only, versioned **bot API** under `/api/bot/v1` with search, facets and a durable change feed. It uses
+its own Bearer-token authentication (`BOT_API_KEYS`), never the administrator login. Full description:
+[docs/DACH.md](docs/DACH.md); request flow and examples: [docs/API.md](docs/API.md#bot-api-apibotv1).
+
+```bash
+docker compose exec api python -m gcc_core.botauth generate telegram   # token shown once + .env line
+```
+
 ## Configuration
 
 All settings come from environment variables; [.env.example](.env.example) lists them with defaults. The most important ones:
@@ -146,6 +158,8 @@ All settings come from environment variables; [.env.example](.env.example) lists
 | `IMPORT_MAX_MB` / `IMPORT_MAX_ROWS` | 20 / 50 000 | CSV limits |
 | `CRAWLER_USER_AGENT` | GermanyCareerCrawler/0.1 (+…/bot) | The one User-Agent of every outgoing request; robots.txt token derived from it. See [Crawler identity](#crawler-identity-and-the-bot-page). |
 | `BOT_CONTACT_EMAIL` | empty | Contact address shown on the public `/bot` page |
+| `BOT_API_KEYS` / `BOT_API_KEYS_FILE` | empty (API disabled) | Machine-API keys `name:sha256:<hex>`; see [docs/DACH.md](docs/DACH.md#authentication) |
+| `BOT_RATE_LIMIT_PER_MIN` / `BOT_AUTH_FAIL_LIMIT_PER_MIN` | 120 / 20 | Per key / per client address for failed attempts |
 | `CRAWLER_HTTP_CONCURRENCY` / `CRAWLER_COMPANIES_IN_PARALLEL` | 16 / 16 | Upper bounds; the resource controller adapts below them |
 | `CRAWLER_PER_DOMAIN_DELAY_S` | 2 | Minimum spacing of requests to one domain (all workers) |
 | `CRAWLER_MAX_PAGES_PER_COMPANY` / `CRAWLER_MAX_DEPTH` | 50 / 4 | Crawl budget per company |

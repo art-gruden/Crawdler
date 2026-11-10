@@ -120,7 +120,7 @@ def _salary(posting: dict) -> dict | None:
     return {
         "min": lo,
         "max": hi,
-        "currency": str(bs.get("currency") or "EUR")[:3].upper(),
+        "currency": (str(bs.get("currency") or "").strip()[:3].upper() or None),
         "period": period,
         "raw": json.dumps(bs, ensure_ascii=False)[:300],
     }

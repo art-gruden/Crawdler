@@ -88,7 +88,8 @@ def test_skills_and_languages():
     assert {"Kubernetes", "Terraform", "Go", "CI/CD", "AWS"} <= set(skills)
     assert "Go" not in [s for s, _ in find_skills("Wir go-live im Mai und gehen gemeinsam los")]
     langs = {x["language"]: x for x in find_languages("Sehr gute Deutschkenntnisse (C1) und gute Englischkenntnisse.")}
-    assert langs["de"]["level"] == "C1" and langs["en"]["level"] == "B1"
+    # CEFR only when written: "gute Englischkenntnisse" is a descriptor, never a fabricated B1
+    assert langs["de"]["level"] == "C1" and langs["en"]["level"] is None and langs["en"]["descriptor"] == "good"
     assert find_languages("Wir sind ein deutsches Unternehmen") == []
     opt = find_languages("Fluent English; German is a plus")
     assert {x["language"]: x["required"] for x in opt} == {"en": True, "de": False}
