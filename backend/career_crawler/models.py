@@ -167,6 +167,7 @@ class Job(Base):
         Index("ix_jobs_company_status", "company_id", "status"),
         Index("ix_jobs_status_seen", "status", "last_seen_at"),
         Index("ix_jobs_discovered_at", "discovered_at"),
+        Index("ix_jobs_company_discovered", "company_id", "discovered_at"),
         Index("ix_jobs_date_posted", "date_posted"),
         Index("ix_jobs_company_title", "company_id", "title_norm"),
         Index("ix_jobs_canonical_url", "canonical_url"),
@@ -290,6 +291,37 @@ class JobEvent(Base):
     __table_args__ = (
         CheckConstraint(_in("event_type", EVENT_TYPES), name="event_type"),
         Index("ix_job_events_job", "job_id", "id"),
+        Index("ix_job_events_type_time", "event_type", "occurred_at"),
+    )
+
+
+class StatPublication(Base):
+    """History of Telegram statistics posts (Phase 4). One row per period+configuration+channel:
+    ``dedup_key`` is unique, so the same report is never published twice."""
+
+    __tablename__ = "stat_publications"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    dedup_key: Mapped[str] = mapped_column(String(64), unique=True)
+    channel: Mapped[str] = mapped_column(String(64))
+    period_start: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True))
+    period_end: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True))
+    config: Mapped[dict] = mapped_column(JSONB, server_default=text("'{}'::jsonb"))
+    body: Mapped[str] = mapped_column(Text)
+    text_sha256: Mapped[str] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(8), server_default="pending")  # pending | sent | failed
+    attempts: Mapped[int] = mapped_column(Integer, server_default="0")
+    message_id: Mapped[int | None] = mapped_column(BigInteger)
+    response: Mapped[dict | None] = mapped_column(JSONB)
+    error: Mapped[str | None] = mapped_column(Text)
+    created_by: Mapped[str] = mapped_column(String(64))
+    created_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    sent_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))
+
+    __table_args__ = (
+        CheckConstraint(_in("status", ("pending", "sent", "failed")), name="status"),
+        Index("ix_stat_publications_created", "created_at"),
     )
 
 

@@ -15,7 +15,7 @@ from gcc_core.auth import current_user
 from gcc_core.db import get_db
 from gcc_core.models import Company, ScanRequest
 
-from . import export
+from . import export, jobstats
 from .models import CareerSource, CrawlMetric, CrawlPage, CrawlRun, ExtractionError, Job, JobSkill, SiteFingerprint
 
 jobs_router = APIRouter(prefix="/api/jobs", tags=["jobs"], dependencies=[Depends(current_user)])
@@ -114,6 +114,10 @@ class JobFilters:
         seniority: list[str] | None = Query(
             None, description="INTERN | JUNIOR | MID | SENIOR | LEAD | EXECUTIVE | UNKNOWN"
         ),
+        discovered_from: dt.datetime | None = Query(None, description="discovered at or after (ISO, with UTC offset)"),
+        discovered_to: dt.datetime | None = Query(None, description="discovered before (exclusive)"),
+        place_city: list[str] | None = Query(None, description="exact city name of a listed place (statistics drill-down)"),
+        dach_scope: bool = Query(False, description="D/A/CH vacancies plus those without a country (statistics scope)"),
     ):
         self.country_code = [x.upper() for x in country_code or []]
         self.region = [x.upper() for x in region or []]
@@ -123,6 +127,9 @@ class JobFilters:
         self.q, self.status, self.company_id, self.city = q, status_, company_id, city
         self.remote_type, self.employment_type, self.skill, self.method = remote_type, employment_type, skill, method
         self.new_days, self.posted_days, self.min_confidence, self.sort = new_days, posted_days, min_confidence, sort
+        self.discovered_from, self.discovered_to = discovered_from, discovered_to
+        self.place_city = [" ".join(c.split()) for c in place_city or [] if c.strip()][:20]
+        self.dach_scope = dach_scope
 
     def as_dict(self) -> dict:
         """Active filters only (written into the export header)."""
@@ -130,7 +137,8 @@ class JobFilters:
             k: getattr(self, k)
             for k in (
                 "q status company_id city remote_type employment_type skill method new_days posted_days "
-                "min_confidence sort country_code region specialization work_model seniority"
+                "min_confidence sort country_code region specialization work_model seniority "
+                "discovered_from discovered_to place_city dach_scope"
             ).split()
         }
         return {k: v for k, v in d.items() if v not in (None, "", [])}
@@ -159,13 +167,30 @@ class JobFilters:
             conds.append(Job.country_codes.overlap(self.country_code))
         if self.region:
             conds.append(Job.region_codes.overlap(self.region))
+        if self.discovered_from is not None:
+            if self.discovered_from.tzinfo is None:
+                raise HTTPException(422, "discovered_from needs a UTC offset")
+            conds.append(Job.discovered_at >= self.discovered_from)
+        if self.discovered_to is not None:
+            if self.discovered_to.tzinfo is None:
+                raise HTTPException(422, "discovered_to needs a UTC offset")
+            conds.append(Job.discovered_at < self.discovered_to)
+        if self.dach_scope and not self.country_code:
+            conds.append(jobstats.dach_scope_condition())
+        if self.place_city:
+            conds.append(
+                or_(*[jobstats.place_condition(c, self.country_code, self.region) for c in self.place_city])
+            )
         if self.specialization:
             from .search import SearchError, expand_specializations
 
+            wants_unclassified = any(x.lower() == jobstats.UNCLASSIFIED for x in self.specialization)
+            named = [x for x in self.specialization if x.lower() != jobstats.UNCLASSIFIED]
             try:
-                conds.append(Job.specialization_id.in_(expand_specializations(self.specialization)))
+                ids = expand_specializations(named) if named else []
             except SearchError as exc:
                 raise HTTPException(422, str(exc)) from exc
+            conds.append(jobstats.specialization_condition(ids, wants_unclassified))
         if self.work_model:
             conds.append(Job.work_model.in_(self.work_model))
         if self.seniority:

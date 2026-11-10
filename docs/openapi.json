@@ -1367,6 +1367,77 @@
               "title": "Seniority"
             },
             "description": "INTERN | JUNIOR | MID | SENIOR | LEAD | EXECUTIVE | UNKNOWN"
+          },
+          {
+            "name": "discovered_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "discovered at or after (ISO, with UTC offset)",
+              "title": "Discovered From"
+            },
+            "description": "discovered at or after (ISO, with UTC offset)"
+          },
+          {
+            "name": "discovered_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "discovered before (exclusive)",
+              "title": "Discovered To"
+            },
+            "description": "discovered before (exclusive)"
+          },
+          {
+            "name": "place_city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "exact city name of a listed place (statistics drill-down)",
+              "title": "Place City"
+            },
+            "description": "exact city name of a listed place (statistics drill-down)"
+          },
+          {
+            "name": "dach_scope",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "D/A/CH vacancies plus those without a country (statistics scope)",
+              "default": false,
+              "title": "Dach Scope"
+            },
+            "description": "D/A/CH vacancies plus those without a country (statistics scope)"
           }
         ],
         "responses": {
@@ -1782,6 +1853,77 @@
               "title": "Seniority"
             },
             "description": "INTERN | JUNIOR | MID | SENIOR | LEAD | EXECUTIVE | UNKNOWN"
+          },
+          {
+            "name": "discovered_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "discovered at or after (ISO, with UTC offset)",
+              "title": "Discovered From"
+            },
+            "description": "discovered at or after (ISO, with UTC offset)"
+          },
+          {
+            "name": "discovered_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "discovered before (exclusive)",
+              "title": "Discovered To"
+            },
+            "description": "discovered before (exclusive)"
+          },
+          {
+            "name": "place_city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "exact city name of a listed place (statistics drill-down)",
+              "title": "Place City"
+            },
+            "description": "exact city name of a listed place (statistics drill-down)"
+          },
+          {
+            "name": "dach_scope",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "D/A/CH vacancies plus those without a country (statistics scope)",
+              "default": false,
+              "title": "Dach Scope"
+            },
+            "description": "D/A/CH vacancies plus those without a country (statistics scope)"
           }
         ],
         "responses": {
@@ -2139,6 +2281,77 @@
               "title": "Seniority"
             },
             "description": "INTERN | JUNIOR | MID | SENIOR | LEAD | EXECUTIVE | UNKNOWN"
+          },
+          {
+            "name": "discovered_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "discovered at or after (ISO, with UTC offset)",
+              "title": "Discovered From"
+            },
+            "description": "discovered at or after (ISO, with UTC offset)"
+          },
+          {
+            "name": "discovered_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "discovered before (exclusive)",
+              "title": "Discovered To"
+            },
+            "description": "discovered before (exclusive)"
+          },
+          {
+            "name": "place_city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "exact city name of a listed place (statistics drill-down)",
+              "title": "Place City"
+            },
+            "description": "exact city name of a listed place (statistics drill-down)"
+          },
+          {
+            "name": "dach_scope",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "D/A/CH vacancies plus those without a country (statistics scope)",
+              "default": false,
+              "title": "Dach Scope"
+            },
+            "description": "D/A/CH vacancies plus those without a country (statistics scope)"
           }
         ],
         "responses": {
@@ -2623,6 +2836,1592 @@
         },
         "responses": {
           "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/stats/jobs/config": {
+      "get": {
+        "tags": [
+          "job-statistics"
+        ],
+        "summary": "Dashboard options: taxonomy, countries, regions, time zone, Telegram status",
+        "operationId": "stats_config_api_crawler_stats_jobs_config_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/stats/jobs/summary": {
+      "get": {
+        "tags": [
+          "job-statistics"
+        ],
+        "summary": "KPI cards: newly discovered, active, updated/closed/reopened, data quality",
+        "operationId": "stats_summary_api_crawler_stats_jobs_summary_get",
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "today | yesterday | last_24h | 7d | 30d | custom",
+              "default": "today",
+              "title": "Period"
+            },
+            "description": "today | yesterday | last_24h | 7d | 30d | custom"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "custom period: first local date (YYYY-MM-DD)",
+              "title": "From"
+            },
+            "description": "custom period: first local date (YYYY-MM-DD)"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "custom period: last local date, inclusive",
+              "title": "To"
+            },
+            "description": "custom period: last local date, inclusive"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "IANA zone; default Europe/Berlin",
+              "title": "Timezone"
+            },
+            "description": "IANA zone; default Europe/Berlin"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "DE | AT | CH (several = OR); none = all DACH",
+              "title": "Country"
+            },
+            "description": "DE | AT | CH (several = OR); none = all DACH"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-2, e.g. DE-BY, AT-9, CH-ZH",
+              "title": "Region"
+            },
+            "description": "ISO 3166-2, e.g. DE-BY, AT-9, CH-ZH"
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "exact city name (combine with country for same-named cities)",
+              "title": "City"
+            },
+            "description": "exact city name (combine with country for same-named cities)"
+          },
+          {
+            "name": "specialization",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "taxonomy slug/id (group includes members) or 'unclassified'",
+              "title": "Specialization"
+            },
+            "description": "taxonomy slug/id (group includes members) or 'unclassified'"
+          },
+          {
+            "name": "exclude_initial_load",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "leave out vacancies of companies first crawled in the period",
+              "default": false,
+              "title": "Exclude Initial Load"
+            },
+            "description": "leave out vacancies of companies first crawled in the period"
+          },
+          {
+            "name": "as_of",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "snapshot time (ISO with offset); default now",
+              "title": "As Of"
+            },
+            "description": "snapshot time (ISO with offset); default now"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/stats/jobs/trends": {
+      "get": {
+        "tags": [
+          "job-statistics"
+        ],
+        "summary": "Newly discovered vacancies per local day (hourly for periods up to 48 h)",
+        "operationId": "stats_trends_api_crawler_stats_jobs_trends_get",
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "today | yesterday | last_24h | 7d | 30d | custom",
+              "default": "today",
+              "title": "Period"
+            },
+            "description": "today | yesterday | last_24h | 7d | 30d | custom"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "custom period: first local date (YYYY-MM-DD)",
+              "title": "From"
+            },
+            "description": "custom period: first local date (YYYY-MM-DD)"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "custom period: last local date, inclusive",
+              "title": "To"
+            },
+            "description": "custom period: last local date, inclusive"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "IANA zone; default Europe/Berlin",
+              "title": "Timezone"
+            },
+            "description": "IANA zone; default Europe/Berlin"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "DE | AT | CH (several = OR); none = all DACH",
+              "title": "Country"
+            },
+            "description": "DE | AT | CH (several = OR); none = all DACH"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-2, e.g. DE-BY, AT-9, CH-ZH",
+              "title": "Region"
+            },
+            "description": "ISO 3166-2, e.g. DE-BY, AT-9, CH-ZH"
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "exact city name (combine with country for same-named cities)",
+              "title": "City"
+            },
+            "description": "exact city name (combine with country for same-named cities)"
+          },
+          {
+            "name": "specialization",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "taxonomy slug/id (group includes members) or 'unclassified'",
+              "title": "Specialization"
+            },
+            "description": "taxonomy slug/id (group includes members) or 'unclassified'"
+          },
+          {
+            "name": "exclude_initial_load",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "leave out vacancies of companies first crawled in the period",
+              "default": false,
+              "title": "Exclude Initial Load"
+            },
+            "description": "leave out vacancies of companies first crawled in the period"
+          },
+          {
+            "name": "as_of",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "snapshot time (ISO with offset); default now",
+              "title": "As Of"
+            },
+            "description": "snapshot time (ISO with offset); default now"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/stats/jobs/specializations": {
+      "get": {
+        "tags": [
+          "job-statistics"
+        ],
+        "summary": "Specialization table (primary specialization, additive)",
+        "operationId": "stats_specializations_api_crawler_stats_jobs_specializations_get",
+        "parameters": [
+          {
+            "name": "level",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(specialization|group)$",
+              "default": "specialization",
+              "title": "Level"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(sel|prev|change|today|7d|30d|active|name)$",
+              "default": "sel",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(asc|desc)$",
+              "default": "desc",
+              "title": "Order"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 0,
+              "description": "top N rows; 0 = all",
+              "default": 10,
+              "title": "Limit"
+            },
+            "description": "top N rows; 0 = all"
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "today | yesterday | last_24h | 7d | 30d | custom",
+              "default": "today",
+              "title": "Period"
+            },
+            "description": "today | yesterday | last_24h | 7d | 30d | custom"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "custom period: first local date (YYYY-MM-DD)",
+              "title": "From"
+            },
+            "description": "custom period: first local date (YYYY-MM-DD)"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "custom period: last local date, inclusive",
+              "title": "To"
+            },
+            "description": "custom period: last local date, inclusive"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "IANA zone; default Europe/Berlin",
+              "title": "Timezone"
+            },
+            "description": "IANA zone; default Europe/Berlin"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "DE | AT | CH (several = OR); none = all DACH",
+              "title": "Country"
+            },
+            "description": "DE | AT | CH (several = OR); none = all DACH"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-2, e.g. DE-BY, AT-9, CH-ZH",
+              "title": "Region"
+            },
+            "description": "ISO 3166-2, e.g. DE-BY, AT-9, CH-ZH"
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "exact city name (combine with country for same-named cities)",
+              "title": "City"
+            },
+            "description": "exact city name (combine with country for same-named cities)"
+          },
+          {
+            "name": "specialization",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "taxonomy slug/id (group includes members) or 'unclassified'",
+              "title": "Specialization"
+            },
+            "description": "taxonomy slug/id (group includes members) or 'unclassified'"
+          },
+          {
+            "name": "exclude_initial_load",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "leave out vacancies of companies first crawled in the period",
+              "default": false,
+              "title": "Exclude Initial Load"
+            },
+            "description": "leave out vacancies of companies first crawled in the period"
+          },
+          {
+            "name": "as_of",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "snapshot time (ISO with offset); default now",
+              "title": "As Of"
+            },
+            "description": "snapshot time (ISO with offset); default now"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/stats/jobs/cities": {
+      "get": {
+        "tags": [
+          "job-statistics"
+        ],
+        "summary": "City / region / country ranking (unique job breakdown or overlapping coverage)",
+        "operationId": "stats_cities_api_crawler_stats_jobs_cities_get",
+        "parameters": [
+          {
+            "name": "mode",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(unique|coverage)$",
+              "default": "unique",
+              "title": "Mode"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(city|region|country)$",
+              "default": "city",
+              "title": "Level"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(sel|prev|change|today|7d|30d|active|name)$",
+              "default": "sel",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(asc|desc)$",
+              "default": "desc",
+              "title": "Order"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 0,
+              "description": "top N rows; 0 = all",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "top N rows; 0 = all"
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "today | yesterday | last_24h | 7d | 30d | custom",
+              "default": "today",
+              "title": "Period"
+            },
+            "description": "today | yesterday | last_24h | 7d | 30d | custom"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "custom period: first local date (YYYY-MM-DD)",
+              "title": "From"
+            },
+            "description": "custom period: first local date (YYYY-MM-DD)"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "custom period: last local date, inclusive",
+              "title": "To"
+            },
+            "description": "custom period: last local date, inclusive"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "IANA zone; default Europe/Berlin",
+              "title": "Timezone"
+            },
+            "description": "IANA zone; default Europe/Berlin"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "DE | AT | CH (several = OR); none = all DACH",
+              "title": "Country"
+            },
+            "description": "DE | AT | CH (several = OR); none = all DACH"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-2, e.g. DE-BY, AT-9, CH-ZH",
+              "title": "Region"
+            },
+            "description": "ISO 3166-2, e.g. DE-BY, AT-9, CH-ZH"
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "exact city name (combine with country for same-named cities)",
+              "title": "City"
+            },
+            "description": "exact city name (combine with country for same-named cities)"
+          },
+          {
+            "name": "specialization",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "taxonomy slug/id (group includes members) or 'unclassified'",
+              "title": "Specialization"
+            },
+            "description": "taxonomy slug/id (group includes members) or 'unclassified'"
+          },
+          {
+            "name": "exclude_initial_load",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "leave out vacancies of companies first crawled in the period",
+              "default": false,
+              "title": "Exclude Initial Load"
+            },
+            "description": "leave out vacancies of companies first crawled in the period"
+          },
+          {
+            "name": "as_of",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "snapshot time (ISO with offset); default now",
+              "title": "As Of"
+            },
+            "description": "snapshot time (ISO with offset); default now"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/stats/jobs/countries": {
+      "get": {
+        "tags": [
+          "job-statistics"
+        ],
+        "summary": "Newly discovered vacancies per country (DE / AT / CH, several, unknown)",
+        "operationId": "stats_countries_api_crawler_stats_jobs_countries_get",
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "today | yesterday | last_24h | 7d | 30d | custom",
+              "default": "today",
+              "title": "Period"
+            },
+            "description": "today | yesterday | last_24h | 7d | 30d | custom"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "custom period: first local date (YYYY-MM-DD)",
+              "title": "From"
+            },
+            "description": "custom period: first local date (YYYY-MM-DD)"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "custom period: last local date, inclusive",
+              "title": "To"
+            },
+            "description": "custom period: last local date, inclusive"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "IANA zone; default Europe/Berlin",
+              "title": "Timezone"
+            },
+            "description": "IANA zone; default Europe/Berlin"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "DE | AT | CH (several = OR); none = all DACH",
+              "title": "Country"
+            },
+            "description": "DE | AT | CH (several = OR); none = all DACH"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-2, e.g. DE-BY, AT-9, CH-ZH",
+              "title": "Region"
+            },
+            "description": "ISO 3166-2, e.g. DE-BY, AT-9, CH-ZH"
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "exact city name (combine with country for same-named cities)",
+              "title": "City"
+            },
+            "description": "exact city name (combine with country for same-named cities)"
+          },
+          {
+            "name": "specialization",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "taxonomy slug/id (group includes members) or 'unclassified'",
+              "title": "Specialization"
+            },
+            "description": "taxonomy slug/id (group includes members) or 'unclassified'"
+          },
+          {
+            "name": "exclude_initial_load",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "leave out vacancies of companies first crawled in the period",
+              "default": false,
+              "title": "Exclude Initial Load"
+            },
+            "description": "leave out vacancies of companies first crawled in the period"
+          },
+          {
+            "name": "as_of",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "snapshot time (ISO with offset); default now",
+              "title": "As Of"
+            },
+            "description": "snapshot time (ISO with offset); default now"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/stats/jobs/specialization-city": {
+      "get": {
+        "tags": [
+          "job-statistics"
+        ],
+        "summary": "Specialization x city matrix and top combinations",
+        "operationId": "stats_specialization_city_api_crawler_stats_jobs_specialization_city_get",
+        "parameters": [
+          {
+            "name": "level",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(specialization|group)$",
+              "default": "group",
+              "title": "Level"
+            }
+          },
+          {
+            "name": "rows",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 8,
+              "title": "Rows"
+            }
+          },
+          {
+            "name": "cols",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 8,
+              "title": "Cols"
+            }
+          },
+          {
+            "name": "combos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 20,
+              "title": "Combos"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(total|name)$",
+              "default": "total",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^(asc|desc)$",
+              "default": "desc",
+              "title": "Order"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "today | yesterday | last_24h | 7d | 30d | custom",
+              "default": "today",
+              "title": "Period"
+            },
+            "description": "today | yesterday | last_24h | 7d | 30d | custom"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "custom period: first local date (YYYY-MM-DD)",
+              "title": "From"
+            },
+            "description": "custom period: first local date (YYYY-MM-DD)"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "custom period: last local date, inclusive",
+              "title": "To"
+            },
+            "description": "custom period: last local date, inclusive"
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "IANA zone; default Europe/Berlin",
+              "title": "Timezone"
+            },
+            "description": "IANA zone; default Europe/Berlin"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "DE | AT | CH (several = OR); none = all DACH",
+              "title": "Country"
+            },
+            "description": "DE | AT | CH (several = OR); none = all DACH"
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO 3166-2, e.g. DE-BY, AT-9, CH-ZH",
+              "title": "Region"
+            },
+            "description": "ISO 3166-2, e.g. DE-BY, AT-9, CH-ZH"
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "exact city name (combine with country for same-named cities)",
+              "title": "City"
+            },
+            "description": "exact city name (combine with country for same-named cities)"
+          },
+          {
+            "name": "specialization",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "taxonomy slug/id (group includes members) or 'unclassified'",
+              "title": "Specialization"
+            },
+            "description": "taxonomy slug/id (group includes members) or 'unclassified'"
+          },
+          {
+            "name": "exclude_initial_load",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "leave out vacancies of companies first crawled in the period",
+              "default": false,
+              "title": "Exclude Initial Load"
+            },
+            "description": "leave out vacancies of companies first crawled in the period"
+          },
+          {
+            "name": "as_of",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "snapshot time (ISO with offset); default now",
+              "title": "As Of"
+            },
+            "description": "snapshot time (ISO with offset); default now"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/stats/jobs/telegram-preview": {
+      "post": {
+        "tags": [
+          "job-statistics"
+        ],
+        "summary": "Generate the Telegram post from live numbers (never publishes)",
+        "operationId": "telegram_preview_api_crawler_stats_jobs_telegram_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/stats/jobs/telegram-publish": {
+      "post": {
+        "tags": [
+          "job-statistics"
+        ],
+        "summary": "Publish an approved post to the configured channel (Phase 4, off by default)",
+        "operationId": "telegram_publish_api_crawler_stats_jobs_telegram_publish_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/stats/jobs/telegram-publications": {
+      "get": {
+        "tags": [
+          "job-statistics"
+        ],
+        "summary": "Publication history (what was posted, when, with Telegram's answer)",
+        "operationId": "telegram_publications_api_crawler_stats_jobs_telegram_publications_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
@@ -4667,6 +6466,158 @@
         ],
         "title": "Page"
       },
+      "PublishIn": {
+        "properties": {
+          "period": {
+            "type": "string",
+            "title": "Period",
+            "default": "today"
+          },
+          "from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From"
+          },
+          "to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "country": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "title": "Country"
+          },
+          "region": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 60,
+            "title": "Region"
+          },
+          "city": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "City"
+          },
+          "specialization": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 80,
+            "title": "Specialization"
+          },
+          "exclude_initial_load": {
+            "type": "boolean",
+            "title": "Exclude Initial Load",
+            "default": false
+          },
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language",
+            "default": "en"
+          },
+          "top_specializations": {
+            "type": "integer",
+            "title": "Top Specializations",
+            "default": 5
+          },
+          "top_cities": {
+            "type": "integer",
+            "title": "Top Cities",
+            "default": 5
+          },
+          "include_bot_link": {
+            "type": "boolean",
+            "title": "Include Bot Link",
+            "default": true
+          },
+          "include_countries": {
+            "type": "boolean",
+            "title": "Include Countries",
+            "default": true
+          },
+          "format": {
+            "type": "string",
+            "title": "Format",
+            "default": "plain"
+          },
+          "bot_link": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bot Link",
+            "description": "https://t.me/<bot>; default: server setting"
+          },
+          "approved_sha256": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 64,
+            "title": "Approved Sha256",
+            "description": "sha256 of the previewed text"
+          },
+          "confirm": {
+            "type": "boolean",
+            "title": "Confirm",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "approved_sha256"
+        ],
+        "title": "PublishIn"
+      },
       "QualityOut": {
         "properties": {
           "score": {
@@ -4781,6 +6732,144 @@
           "countries"
         ],
         "title": "RemoteEligibility"
+      },
+      "ReportIn": {
+        "properties": {
+          "period": {
+            "type": "string",
+            "title": "Period",
+            "default": "today"
+          },
+          "from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From"
+          },
+          "to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "country": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 3,
+            "title": "Country"
+          },
+          "region": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 60,
+            "title": "Region"
+          },
+          "city": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "City"
+          },
+          "specialization": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 80,
+            "title": "Specialization"
+          },
+          "exclude_initial_load": {
+            "type": "boolean",
+            "title": "Exclude Initial Load",
+            "default": false
+          },
+          "as_of": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language",
+            "default": "en"
+          },
+          "top_specializations": {
+            "type": "integer",
+            "title": "Top Specializations",
+            "default": 5
+          },
+          "top_cities": {
+            "type": "integer",
+            "title": "Top Cities",
+            "default": 5
+          },
+          "include_bot_link": {
+            "type": "boolean",
+            "title": "Include Bot Link",
+            "default": true
+          },
+          "include_countries": {
+            "type": "boolean",
+            "title": "Include Countries",
+            "default": true
+          },
+          "format": {
+            "type": "string",
+            "title": "Format",
+            "default": "plain"
+          },
+          "bot_link": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bot Link",
+            "description": "https://t.me/<bot>; default: server setting"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ReportIn",
+        "description": "Period/filters exactly as the dashboard sends them, plus the post options."
       },
       "RescanIn": {
         "properties": {

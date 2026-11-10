@@ -271,3 +271,188 @@ export interface CompanyCrawl {
   career_pages: { url: string; page_type: string; http_status: number | null; jobs_found: number; strategy: string | null; fetched_at: string }[];
   jobs: Record<string, number>;
 }
+
+// --- vacancy statistics -------------------------------------------------------------------------
+
+export interface StatPeriod {
+  key: string;
+  timezone: string;
+  start: string;
+  end: string;
+  counted_until: string;
+  local_start: string;
+  local_end: string;
+  first: string;
+  last: string;
+  label: string;
+  calendar_days: boolean;
+  in_progress: boolean;
+  previous: { start: string; end: string };
+}
+
+export interface StatKpi {
+  key: string;
+  new: number;
+  previous: number;
+  change_pct: number | null;
+  companies: number;
+  period: StatPeriod;
+}
+
+export interface StatSummary {
+  snapshot_at: string;
+  period: StatPeriod;
+  new: { total: number; previous: number; change_pct: number | null; companies: number };
+  active: number;
+  updated: number;
+  closed: number;
+  reopened: number;
+  kpis: StatKpi[];
+  data_quality: {
+    new_total: number;
+    with_created_event: number;
+    created_event_pct: number | null;
+    initial_load: number;
+    initial_load_pct: number | null;
+    with_source_date: number;
+    with_source_date_pct: number | null;
+    classified: number;
+    classified_pct: number | null;
+    with_location: number;
+    with_location_pct: number | null;
+    events_since: string | null;
+    warnings: { code: string; message: string }[];
+  };
+}
+
+export interface StatTrends {
+  period: StatPeriod;
+  bucket: "day" | "hour";
+  points: { t: string; label: string; count: number }[];
+  total: number;
+  empty: boolean;
+}
+
+export interface StatSpecRow {
+  key: string;
+  id: number | null;
+  slug: string;
+  name: string;
+  name_de: string;
+  group: string | null;
+  is_it: boolean;
+  is_group: boolean;
+  sel: number;
+  prev: number;
+  change_pct: number | null;
+  today: number;
+  "7d": number;
+  "30d": number;
+  active: number;
+  companies: number;
+  sources: number;
+  overlap: number | null;
+}
+
+export type StatTotals = { sel: number; prev: number; today: number; "7d": number; "30d": number; active: number; change_pct?: number | null };
+
+export interface StatSpecs {
+  period: StatPeriod;
+  level: string;
+  rows: StatSpecRow[];
+  rest: (StatTotals & { rows: number }) | null;
+  totals: StatTotals;
+  total_rows: number;
+  completeness: { new_total: number; classified: number; classified_pct: number | null };
+  notes: string[];
+}
+
+export interface StatCityRow {
+  key: string;
+  kind: string;
+  country_code: string | null;
+  country: string | null;
+  region_code: string | null;
+  region: string | null;
+  city: string | null;
+  label: string;
+  clickable: boolean;
+  sel: number;
+  prev: number;
+  change_pct: number | null;
+  today: number;
+  "7d": number;
+  "30d": number;
+  active: number;
+  companies: number;
+}
+
+export interface StatCities {
+  period: StatPeriod;
+  mode: string;
+  level: string;
+  additive: boolean;
+  rows: StatCityRow[];
+  rest: (StatTotals & { rows: number }) | null;
+  totals: StatTotals | null;
+  total_rows: number;
+  notes: string[];
+}
+
+export interface StatCountries {
+  period: StatPeriod;
+  rows: { code: string; name: string; sel: number; prev: number; change_pct: number | null; today: number; "7d": number; "30d": number; active: number }[];
+  totals: StatTotals;
+  empty: boolean;
+}
+
+export interface StatMatrix {
+  period: StatPeriod;
+  level: string;
+  total: number;
+  rows: { id: number | null; slug: string; name: string; total: number }[];
+  columns: StatCityRow[];
+  cells: number[][];
+  other: { outside_shown: number; in_buckets: number };
+  top_combinations: { specialization: { id: number | null; slug: string; name: string }; place: StatCityRow; count: number }[];
+  empty: boolean;
+  notes: string[];
+}
+
+export interface StatConfig {
+  specializations: { id: number; slug: string; name_en: string; name_de: string; parent_id: number | null; is_it: boolean }[];
+  countries: { code: string; name: string; in_dach: boolean }[];
+  regions: { code: string; country_code: string; name: string }[];
+  periods: string[];
+  timezone: string;
+  telegram: { enabled: boolean; configured: boolean; post_empty: boolean; bot_link: string | null };
+  languages: string[];
+  formats: string[];
+}
+
+export interface TelegramPreview {
+  text: string;
+  parse_mode: string | null;
+  sha256: string;
+  length: number;
+  empty: boolean;
+  period: StatPeriod;
+  snapshot_at: string;
+  warnings: string[];
+  data: { new_jobs_total: number; classified_pct: number | null };
+}
+
+export interface StatPublication {
+  id: number;
+  status: string;
+  channel: string;
+  period_start: string;
+  period_end: string;
+  attempts: number;
+  message_id: number | null;
+  error: string | null;
+  text: string;
+  created_by: string;
+  created_at: string | null;
+  sent_at: string | null;
+}

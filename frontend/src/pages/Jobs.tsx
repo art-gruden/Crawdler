@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, qs } from "../api";
+import { api, qsMulti } from "../api";
 import CrawlDrawer from "../components/CrawlDrawer";
 import { Badge, ErrorNote, SafeLink, fmtDate } from "../components/common";
 import type { Vacancy, VacancyDetail } from "../types";
@@ -7,6 +7,17 @@ import type { Vacancy, VacancyDetail } from "../types";
 const EMPLOYMENT = ["full_time", "part_time", "permanent", "contract", "working_student", "internship", "apprenticeship", "thesis"];
 const METHODS = ["ats", "jsonld", "html", "content", "pdf", "browser", "llm"];
 const PAGE = 50;
+// Drill-down filters coming from the Job Statistics tab. Lists are comma separated in the URL.
+const LIST_KEYS = ["country_code", "region", "specialization", "place_city"] as const;
+const STATS_KEYS = ["discovered_from", "discovered_to", "dach_scope", ...LIST_KEYS] as const;
+
+function toQuery(obj: Record<string, string | number>): string {
+  const out: Record<string, string | number | string[]> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    out[k] = (LIST_KEYS as readonly string[]).includes(k) && typeof v === "string" ? v.split(",").filter(Boolean) : v;
+  }
+  return qsMulti(out);
+}
 
 function salary(j: Vacancy) {
   if (j.salary_min === null) return null;
@@ -27,6 +38,13 @@ export default function Jobs({ params }: { params: URLSearchParams }) {
     status: params.get("status") ?? "open",
     company_id: params.get("company_id") ?? "",
     sort: params.get("sort") ?? "discovered",
+    discovered_from: params.get("discovered_from") ?? "",
+    discovered_to: params.get("discovered_to") ?? "",
+    dach_scope: params.get("dach_scope") ?? "",
+    country_code: params.get("country_code") ?? "",
+    region: params.get("region") ?? "",
+    specialization: params.get("specialization") ?? "",
+    place_city: params.get("place_city") ?? "",
   }));
   const [offset, setOffset] = useState(0);
   const [data, setData] = useState<{ total: number; items: Vacancy[] } | null>(null);
@@ -40,7 +58,7 @@ export default function Jobs({ params }: { params: URLSearchParams }) {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      api<{ total: number; items: Vacancy[] }>(`/api/jobs${qs({ ...filterParams, limit: PAGE, offset })}`)
+      api<{ total: number; items: Vacancy[] }>(`/api/jobs${toQuery({ ...filterParams, limit: PAGE, offset })}`)
         .then((d) => {
           setData(d);
           setError(null);
@@ -53,7 +71,13 @@ export default function Jobs({ params }: { params: URLSearchParams }) {
   // Downloads use the very same filters (and sort) as the table, so the file equals what is shown.
   const filterParams = { ...f, sort: f.q && f.sort === "discovered" ? "relevance" : f.sort };
   const exportUrl = (kind: "export.csv" | "export.yaml", extra: Record<string, string> = {}) =>
-    `/api/jobs/${kind}${qs({ ...filterParams, ...extra })}`;
+    `/api/jobs/${kind}${toQuery({ ...filterParams, ...extra })}`;
+
+  const fromStats = STATS_KEYS.some((k) => f[k] !== "");
+  const clearStats = () => {
+    setOffset(0);
+    setF({ ...f, discovered_from: "", discovered_to: "", dach_scope: "", country_code: "", region: "", specialization: "", place_city: "" });
+  };
 
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) => {
     setOffset(0);
@@ -123,6 +147,22 @@ export default function Jobs({ params }: { params: URLSearchParams }) {
           </span>
         )}
       </div>
+      {fromStats && (
+        <div className="note ok stats-banner">
+          Filtered from <a href="#/stats">Job Statistics</a>:{" "}
+          {f.discovered_from && (
+            <>
+              discovered {fmtDate(f.discovered_from, true)} → {f.discovered_to ? fmtDate(f.discovered_to, true) : "now"} ·{" "}
+            </>
+          )}
+          {[f.country_code && `country ${f.country_code}`, f.region && `region ${f.region}`, f.place_city && `city ${f.place_city}`, f.specialization && `specialization ${f.specialization}`]
+            .filter(Boolean)
+            .join(" · ") || "all DACH"}{" "}
+          <button className="link" onClick={clearStats}>
+            Clear
+          </button>
+        </div>
+      )}
       <ErrorNote error={error} />
       <div className="export-bar">
         <span className="hint">

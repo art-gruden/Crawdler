@@ -4,12 +4,13 @@ import Companies from "./pages/Companies";
 import Crawler from "./pages/Crawler";
 import Discovery from "./pages/Discovery";
 import Jobs from "./pages/Jobs";
+import JobStats from "./pages/JobStats";
 import Login from "./pages/Login";
 import { Attribution } from "./components/common";
 
-type Page = "discovery" | "companies" | "jobs" | "crawler";
+type Page = "discovery" | "companies" | "jobs" | "stats" | "crawler";
 type Route = { page: Page; params: URLSearchParams };
-const PAGES: Page[] = ["discovery", "companies", "jobs", "crawler"];
+const PAGES: Page[] = ["discovery", "companies", "jobs", "stats", "crawler"];
 
 function parseHash(): Route {
   const raw = window.location.hash.replace(/^#\/?/, "");
@@ -53,6 +54,9 @@ export default function App() {
         <a className={route.page === "jobs" ? "active" : ""} href="#/jobs">
           Vacancies
         </a>
+        <a className={route.page === "stats" ? "active" : ""} href="#/stats">
+          📊 Job Statistics
+        </a>
         <a className={route.page === "crawler" ? "active" : ""} href="#/crawler">
           Crawler
         </a>
@@ -68,6 +72,7 @@ export default function App() {
       <main>
         {route.page === "companies" && <Companies params={route.params} />}
         {route.page === "jobs" && <Jobs key={route.params.toString()} params={route.params} />}
+        {route.page === "stats" && <JobStats />}
         {route.page === "crawler" && <Crawler />}
         {route.page === "discovery" && <Discovery />}
       </main>

@@ -99,6 +99,25 @@ endpoint is unchanged: `POST /api/companies/{id}/scan` (and `/api/companies/scan
 | GET | `/api/crawler/ats/sources?provider=&only=failing\|incomplete\|disabled\|capped\|search&limit=50` | ATS sources with strategy, `scan_complete`, provider-reported total, job count, search statistics (queries run/failed/saturated, budget skips), last error |
 | POST | `/api/crawler/companies/{id}/rescan` body `{"full": false}` | queue with manual priority; `full: true` also forgets the cached strategy/ATS (next scan runs full discovery). 409 if the website is not verified. |
 
+### Vacancy statistics (admin session only, see [STATS.md](STATS.md))
+
+All GET endpoints share the parameters `period` (`today|yesterday|last_24h|7d|30d|custom`), `from`/`to` (custom, local dates, inclusive), `timezone`, `country`, `region`, `city`, `specialization` (repeatable; `unclassified` is allowed), `exclude_initial_load` and `as_of` (snapshot time). Invalid input answers 422.
+
+| Method | Path | Returns |
+| --- | --- | --- |
+| GET | `/api/crawler/stats/jobs/config` | taxonomy, countries, regions, default time zone, Telegram flags (never the token) |
+| GET | `/api/crawler/stats/jobs/summary` | KPI cards (today, 24 h, 7 d, 30 d, selected period), active, updated/closed/reopened, data quality |
+| GET | `/api/crawler/stats/jobs/trends` | new vacancies per local day (per hour up to 48 h) |
+| GET | `/api/crawler/stats/jobs/specializations?level=&sort=&order=&limit=` | primary-specialization table with previous period, change, today/7 d/30 d/active, overlap |
+| GET | `/api/crawler/stats/jobs/cities?mode=unique\|coverage&level=city\|region\|country&sort=&limit=` | place ranking; `unique` adds up to the total |
+| GET | `/api/crawler/stats/jobs/countries` | DE / AT / CH / several / unknown |
+| GET | `/api/crawler/stats/jobs/specialization-city?level=&rows=&cols=` | matrix and top combinations |
+| POST | `/api/crawler/stats/jobs/telegram-preview` | post text from the same numbers (`language`, `top_*`, `format`, ...) |
+| POST | `/api/crawler/stats/jobs/telegram-publish` | Phase 4, off by default; needs `confirm` and the previewed `approved_sha256` |
+| GET | `/api/crawler/stats/jobs/telegram-publications` | publication history |
+
+`GET /api/jobs` also accepts `discovered_from`, `discovered_to`, `place_city`, `dach_scope` and `specialization=unclassified`, so a statistic can be opened as the exact list behind it.
+
 Example:
 
 ```bash

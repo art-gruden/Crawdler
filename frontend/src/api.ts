@@ -18,6 +18,17 @@ export function qs(params: Query): string {
   return s ? `?${s}` : "";
 }
 
+/** Like qs(), but arrays become repeated parameters (country=DE&country=AT). */
+export function qsMulti(params: Record<string, string | number | boolean | undefined | null | string[]>): string {
+  const sp = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (Array.isArray(v)) v.filter((x) => x !== "").forEach((x) => sp.append(k, x));
+    else if (v !== undefined && v !== null && v !== "" && v !== false) sp.set(k, String(v));
+  }
+  const s = sp.toString();
+  return s ? `?${s}` : "";
+}
+
 let onUnauthorized: () => void = () => {};
 export function setUnauthorizedHandler(fn: () => void) {
   onUnauthorized = fn;
@@ -36,6 +47,7 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
       const body = await res.json();
       if (typeof body.detail === "string") msg = body.detail;
       else if (Array.isArray(body.detail)) msg = body.detail.map((d: { msg: string }) => d.msg).join("; ");
+      else if (body.detail && typeof body.detail.message === "string") msg = body.detail.message;
     } catch {
       /* not JSON */
     }

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -101,6 +102,18 @@ class CrawlerSettings(BaseSettings):
     metrics_retention_days: int = 30
     closed_job_retention_days: int = 365
     description_max_chars: int = 40_000
+
+    # --- vacancy statistics and Telegram reports ----------------------------------------
+    stats_timezone: str = "Europe/Berlin"  # default calendar for "today", day buckets and report periods
+    stats_telegram_bot_link: str | None = None  # https://t.me/<bot>, shown in generated posts
+    # Phase 4 (publishing to a channel). Off by default; the token is read from the environment only
+    # (CRAWLER_STATS_TELEGRAM_BOT_TOKEN) and never returned by any endpoint or written to a log.
+    stats_telegram_enabled: bool = False
+    stats_telegram_bot_token: SecretStr | None = None
+    stats_telegram_chat_id: str | None = None  # @channelname or numeric id
+    stats_telegram_post_empty: bool = False  # allow publishing a report with zero new vacancies
+    stats_telegram_min_interval_s: int = 5  # minimum gap between two publish attempts to one channel
+    stats_telegram_timeout_s: float = 10.0
 
     # --- test mode ---------------------------------------------------------------------
     # Serve every request from local fixtures; never touches live employer websites.

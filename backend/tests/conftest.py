@@ -66,7 +66,7 @@ def clean_db(migrated_db):
             text(
                 "TRUNCATE companies, company_sources, scan_requests, external_api_usage, "
                 "discovery_jobs, discovery_job_items, career_sources, jobs, job_skills, crawl_runs, crawl_pages, "
-                "crawl_metrics, site_fingerprints, extraction_errors, job_events, company_locations "
+                "crawl_metrics, site_fingerprints, extraction_errors, job_events, company_locations, stat_publications "
                 "RESTART IDENTITY CASCADE"
             )
         )

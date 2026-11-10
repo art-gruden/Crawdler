@@ -151,6 +151,13 @@ API (or whose catalogue exceeds a cap) can be read with a bounded, never-complet
 close vacancies. The admin view `GET /api/crawler/ats/providers` shows capabilities, access status, job counts, scan
 completeness and errors per provider. Details, evidence and the live-validation procedure: [docs/ATS.md](docs/ATS.md).
 
+## Vacancy statistics and Telegram reports
+
+The admin tab **📊 Job Statistics** shows how many vacancies the crawler *newly discovered* (each canonical vacancy once,
+by first-discovery time, in the Europe/Berlin calendar by default), split by specialization, city and country, with
+charts, drill-down into the vacancy list, and a generator for a Telegram post that uses exactly the same numbers.
+Definitions and limitations: [docs/STATS.md](docs/STATS.md).
+
 ## Configuration
 
 All settings come from environment variables; [.env.example](.env.example) lists them with defaults. The most important ones:
