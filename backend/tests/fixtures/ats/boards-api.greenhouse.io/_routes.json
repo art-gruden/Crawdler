@@ -1,0 +1,26 @@
+{
+ "/v1/boards/n26like/jobs?content=true": {
+  "file": "n26like.json",
+  "content_type": "application/json"
+ },
+ "/v1/boards/bitpandalike/jobs?content=true": {
+  "file": "bitpandalike.json",
+  "content_type": "application/json"
+ },
+ "/v1/boards/short/jobs?content=true": {
+  "file": "short.json",
+  "content_type": "application/json"
+ },
+ "/v1/boards/dupid/jobs?content=true": {
+  "file": "dupid.json",
+  "content_type": "application/json"
+ },
+ "/v1/boards/bigboard/jobs?content=true": {
+  "file": "bigboard.json",
+  "content_type": "application/json"
+ },
+ "/v1/boards/bigboard/jobs": {
+  "file": "bigboard_nocontent.json",
+  "content_type": "application/json"
+ }
+}

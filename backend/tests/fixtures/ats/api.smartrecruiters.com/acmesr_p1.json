@@ -1,0 +1,163 @@
+{
+ "offset": 0,
+ "limit": 100,
+ "totalFound": 4,
+ "content": [
+  {
+   "id": "744000001",
+   "name": "Site Reliability Engineer",
+   "uuid": "uuid-744000001",
+   "refNumber": "REF744000001",
+   "company": {
+    "identifier": "AcmeSR",
+    "name": "Acme SR"
+   },
+   "releasedDate": "2026-10-30T10:00:00.000Z",
+   "location": {
+    "city": "Munich",
+    "region": "BY",
+    "country": "de",
+    "remote": false,
+    "fullLocation": "Munich, BY, DE"
+   },
+   "department": {
+    "id": "d1",
+    "label": "Engineering"
+   },
+   "function": {
+    "id": "f1",
+    "label": "Engineering"
+   },
+   "typeOfEmployment": {
+    "id": "permanent",
+    "label": "Full-time"
+   },
+   "experienceLevel": {
+    "id": "mid",
+    "label": "Mid-Senior Level"
+   },
+   "language": {
+    "code": "en",
+    "label": "English"
+   },
+   "ref": "https://api.smartrecruiters.com/v1/companies/AcmeSR/postings/744000001"
+  },
+  {
+   "id": "744000002",
+   "name": "Data Scientist",
+   "uuid": "uuid-744000002",
+   "refNumber": "REF744000002",
+   "company": {
+    "identifier": "AcmeSR",
+    "name": "Acme SR"
+   },
+   "releasedDate": "2026-10-30T10:00:00.000Z",
+   "location": {
+    "city": "Wien",
+    "region": "",
+    "country": "at",
+    "remote": false,
+    "fullLocation": "Wien, AT"
+   },
+   "department": {
+    "id": "d1",
+    "label": "Engineering"
+   },
+   "function": {
+    "id": "f1",
+    "label": "Engineering"
+   },
+   "typeOfEmployment": {
+    "id": "permanent",
+    "label": "Full-time"
+   },
+   "experienceLevel": {
+    "id": "mid",
+    "label": "Mid-Senior Level"
+   },
+   "language": {
+    "code": "en",
+    "label": "English"
+   },
+   "ref": "https://api.smartrecruiters.com/v1/companies/AcmeSR/postings/744000002"
+  },
+  {
+   "id": "744000003",
+   "name": "Sales Manager",
+   "uuid": "uuid-744000003",
+   "refNumber": "REF744000003",
+   "company": {
+    "identifier": "AcmeSR",
+    "name": "Acme SR"
+   },
+   "releasedDate": "2026-10-30T10:00:00.000Z",
+   "location": {
+    "city": "Zürich",
+    "region": "ZH",
+    "country": "ch",
+    "remote": false,
+    "fullLocation": "Zürich, ZH, CH"
+   },
+   "department": {
+    "id": "d1",
+    "label": "Sales"
+   },
+   "function": {
+    "id": "f1",
+    "label": "Engineering"
+   },
+   "typeOfEmployment": {
+    "id": "permanent",
+    "label": "Full-time"
+   },
+   "experienceLevel": {
+    "id": "mid",
+    "label": "Mid-Senior Level"
+   },
+   "language": {
+    "code": "en",
+    "label": "English"
+   },
+   "ref": "https://api.smartrecruiters.com/v1/companies/AcmeSR/postings/744000003"
+  },
+  {
+   "id": "744000004",
+   "name": "Platform Engineer (Remote)",
+   "uuid": "uuid-744000004",
+   "refNumber": "REF744000004",
+   "company": {
+    "identifier": "AcmeSR",
+    "name": "Acme SR"
+   },
+   "releasedDate": "2026-10-30T10:00:00.000Z",
+   "location": {
+    "city": "",
+    "region": "",
+    "country": "de",
+    "remote": true,
+    "fullLocation": "DE"
+   },
+   "department": {
+    "id": "d1",
+    "label": "Engineering"
+   },
+   "function": {
+    "id": "f1",
+    "label": "Engineering"
+   },
+   "typeOfEmployment": {
+    "id": "permanent",
+    "label": "Full-time"
+   },
+   "experienceLevel": {
+    "id": "mid",
+    "label": "Mid-Senior Level"
+   },
+   "language": {
+    "code": "en",
+    "label": "English"
+   },
+   "ref": "https://api.smartrecruiters.com/v1/companies/AcmeSR/postings/744000004"
+  }
+ ]
+}

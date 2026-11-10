@@ -61,6 +61,19 @@ class CrawlerSettings(BaseSettings):
     llm_max_chars: int = 12_000
     llm_max_calls_per_hour: int = 30
 
+    # --- ATS providers and search-aware crawling ------------------------------------------
+    # Only providers listed here are fetched. smartrecruiters/ashby are implemented from documented
+    # structures and offline fixtures only; their robots.txt blocked the v3 diagnostics (docs/ATS.md).
+    ats_enabled_providers: str = "personio,greenhouse,lever"
+    ats_catalog_max_jobs: int = 2000  # catalogue larger than this is "capped" (never complete)
+    ats_search_enabled: bool = False  # bounded keyword/location search for search-capable providers
+    ats_search_keywords: str = "engineer,developer,data,product,devops,security,design,analyst,manager,sales,marketing"
+    ats_search_countries: str = "DE,AT,CH"
+    ats_search_max_queries: int = 40  # per account and scan
+    ats_search_max_pages: int = 5  # per query
+    ats_search_page_size: int = 100
+    ats_search_max_jobs: int = 5000  # per account and scan
+
     # --- job lifecycle --------------------------------------------------------------
     close_after_misses: int = 3  # complete scans in a row without the posting …
     close_min_days: int = 3  # … and not seen for at least this many days

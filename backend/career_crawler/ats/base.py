@@ -38,6 +38,9 @@ class FeedResult:
     jobs: list[RawJob] = field(default_factory=list)
     complete: bool = True  # a feed lists every open posting: missing ones may be counted as misses
     feed_url: str = ""
+    reported_total: int | None = None  # the provider's own "total" counter, when it gives one
+    pages: int = 1
+    detail: dict = field(default_factory=dict)  # strategy-specific diagnostics (queries run, caps hit, ...)
 
 
 class FeedAdapter(Protocol):

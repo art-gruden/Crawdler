@@ -95,6 +95,8 @@ endpoint is unchanged: `POST /api/companies/{id}/scan` (and `/api/companies/scan
 | GET | `/api/crawler/runs?status=running\|done\|partial\|failed\|abandoned&limit=50` | company scans |
 | GET | `/api/crawler/problem-domains` | slow or failing sites (error streak, latency, rate limit, last error) |
 | GET | `/api/crawler/companies/{id}` | diagnosis in plain words, site fingerprint (strategy, success rates, ATS, career URLs, schedule), career sources with evidence, last runs, errors, career pages |
+| GET | `/api/crawler/ats/providers` | per ATS provider: capabilities (catalogue, search parameters, unverified parameters), `access_status` and evidence, `live_ready`, whether it is enabled, observed access (`ok`, `failing`, `robots_blocked`, `not_fetched`, `no_data`), source/open-job counts, strategies, scan completeness, last (complete) scan, top errors; plus the active ATS settings |
+| GET | `/api/crawler/ats/sources?provider=&only=failing\|incomplete\|disabled\|capped\|search&limit=50` | ATS sources with strategy, `scan_complete`, provider-reported total, job count, search statistics (queries run/failed/saturated, budget skips), last error |
 | POST | `/api/crawler/companies/{id}/rescan` body `{"full": false}` | queue with manual priority; `full: true` also forgets the cached strategy/ATS (next scan runs full discovery). 409 if the website is not verified. |
 
 Example:

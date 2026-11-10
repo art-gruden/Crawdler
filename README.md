@@ -143,6 +143,14 @@ its own Bearer-token authentication (`BOT_API_KEYS`), never the administrator lo
 docker compose exec api python -m gcc_core.botauth generate telegram   # token shown once + .env line
 ```
 
+## ATS adapters and search-aware crawling
+
+Personio, Greenhouse and Lever are read through their public APIs; SmartRecruiters and Ashby adapters exist but are
+**off by default** (their robots.txt blocked the diagnostics - see the evidence table). Providers that offer a search
+API (or whose catalogue exceeds a cap) can be read with a bounded, never-complete keyword × location search that cannot
+close vacancies. The admin view `GET /api/crawler/ats/providers` shows capabilities, access status, job counts, scan
+completeness and errors per provider. Details, evidence and the live-validation procedure: [docs/ATS.md](docs/ATS.md).
+
 ## Configuration
 
 All settings come from environment variables; [.env.example](.env.example) lists them with defaults. The most important ones:

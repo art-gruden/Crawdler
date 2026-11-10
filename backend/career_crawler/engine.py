@@ -30,6 +30,8 @@ from gcc_core.netsafe import FetchError
 from gcc_core.urls import domain_key
 
 from . import ats
+from .ats import capabilities as caps_mod
+from .ats import searchcrawl
 from .config import CrawlerSettings
 from .discovery import Frontier, career_urls_from_sitemap, parse_sitemap, rank_sitemap_children
 from .extract import html as h
@@ -95,6 +97,10 @@ class SourceFound:
     ok: bool = True
     complete: bool = False
     error: str | None = None
+    # ATS scan diagnostics (persisted on career_sources)
+    strategy: str | None = None  # catalog | search | catalog+search | disabled
+    reported_total: int | None = None
+    detail: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -193,6 +199,7 @@ class SiteScan:
         self.r = ScanResult()
         self.frontier = Frontier(settings.frontier_max)
         self.ats_done: set[tuple[str, str]] = set()
+        self.ats_skipped: set[tuple[str, str]] = set()  # detected but not fetched (provider disabled / no strategy)
         self.external_hosts: set[str] = set()
         self.list_entries: dict[str, tuple[RawJob, str]] = {}  # job url -> (raw, list page)
         self.detail_done: set[str] = set()
@@ -263,11 +270,7 @@ class SiteScan:
         await self._crawl()
 
     def _remembered_match(self):
-        board = {
-            "personio": f"https://{self.fp.ats_account}.jobs.personio.de/",
-            "greenhouse": f"https://boards.greenhouse.io/{self.fp.ats_account}",
-            "lever": f"https://jobs.lever.co/{self.fp.ats_account}",
-        }.get(self.fp.ats_type or "")
+        board = ats.board_url(self.fp.ats_type, self.fp.ats_account)
         if not board:
             return None
         for u in self.fp.career_urls:  # keep the original host variant (.com, EU region)
@@ -533,42 +536,134 @@ class SiteScan:
 
     async def _run_feed(self, match, *, evidence: dict) -> bool:
         key = (match.ats_type, match.account.lower())
-        if key in self.ats_done:
+        if key in self.ats_done or key in self.ats_skipped:
+            return False
+        adapter = ats.adapter(match.ats_type)
+        caps = caps_mod.capabilities(match.ats_type)
+        if adapter is None or caps is None:
+            return False
+        src_evidence = {
+            **evidence,
+            "evidence_url": match.evidence,
+            "board": match.board_url,
+            "access_status": caps.access_status,
+        }
+        # Provider gate: detected accounts of a disabled provider are recorded, never fetched.
+        if match.ats_type not in caps_mod.enabled_providers(self.s.ats_enabled_providers):
+            self.ats_skipped.add(key)
+            self.r.sources.setdefault(
+                match.feed_url,
+                SourceFound(
+                    match.feed_url,
+                    "ats_feed",
+                    match.ats_type,
+                    match.account,
+                    evidence=src_evidence,
+                    ok=False,
+                    complete=False,
+                    error="provider_disabled",
+                    strategy="disabled",
+                ),
+            )
+            return False
+        strategy = caps_mod.select_strategy(caps, search_enabled=self.s.ats_search_enabled)
+        if strategy.name == "none":
+            self.ats_skipped.add(key)
+            self.r.sources.setdefault(
+                match.feed_url,
+                SourceFound(
+                    match.feed_url,
+                    "ats_feed",
+                    match.ats_type,
+                    match.account,
+                    evidence=src_evidence,
+                    ok=False,
+                    complete=False,
+                    error="search_disabled",
+                    strategy="disabled",
+                    detail={"reason": strategy.reason},
+                ),
+            )
             return False
         if len(self.ats_done) >= self.s.max_external_ats_hops + 1:
             return False
         self.ats_done.add(key)
-        adapter = ats.adapter(match.ats_type)
         src = self.r.sources.setdefault(
             match.feed_url,
-            SourceFound(
-                match.feed_url,
-                "ats_feed",
-                match.ats_type,
-                match.account,
-                evidence={**evidence, "evidence_url": match.evidence, "board": match.board_url},
-            ),
+            SourceFound(match.feed_url, "ats_feed", match.ats_type, match.account, evidence=src_evidence),
         )
+        configure = getattr(adapter, "configure", None)
+        if configure:
+            configure(self.s)
+        stop: CrawlStop | None = None
         try:
-            res = await adapter.fetch(self.f, match)
+            if strategy.name == "catalog":
+                res = await adapter.fetch(self.f, match)
+                res.detail.setdefault("strategy", "catalog")
+                if caps_mod.needs_search_supplement(
+                    caps, catalog_capped=bool(res.detail.get("capped")), search_enabled=self.s.ats_search_enabled
+                ) and hasattr(adapter, "search_url"):
+                    outcome = await self._search(adapter, match, {str(j.ats_job_id) for j in res.jobs})
+                    res.jobs = [*res.jobs, *outcome.jobs]
+                    res.complete = False  # a capped catalogue plus a partial search is never complete
+                    res.detail = {**res.detail, "strategy": "catalog+search", "search": outcome.detail()}
+                    stop = outcome.stop
+            else:
+                outcome = await self._search(adapter, match, set())
+                res = searchcrawl.to_feed_result(outcome, match)
+                stop = outcome.stop
+                if not any(not q.error for q in outcome.queries):  # nothing answered at all
+                    first = next((q.error for q in outcome.queries if q.error), None) or "no_queries"
+                    src.ok, src.error, src.strategy, src.detail = False, first, "search", res.detail
+                    self.r.errors.append(
+                        ErrorRecord("ats", first, match.feed_url, "search returned no usable answer", strategy="ats")
+                    )
+                    self.r.note("ats", ok=False)
+                    if stop:
+                        raise stop
+                    return False
         except RobotsDisallowed as exc:
             src.ok, src.error = False, "robots_disallowed"
+            src.strategy = strategy.name
             self.r.errors.append(ErrorRecord("ats", "robots_disallowed", match.feed_url, str(exc), strategy="ats"))
             self.r.note("ats", ok=False)
             return False
         except (ats.AtsFeedError, FetchError) as exc:
             src.ok, src.error = False, getattr(exc, "kind", "ats_feed_error")
+            src.strategy = strategy.name
             self.r.errors.append(ErrorRecord("ats", src.error, match.feed_url, str(exc)[:300], strategy="ats"))
             self.r.note("ats", ok=False)
             return False
         n = 0
-        self.r.pages_fetched += 1
+        self.r.pages_fetched += max(1, res.pages)
         for raw in res.jobs:
             n += self._add(raw, match.feed_url, "ats_feed")
         src.job_count, src.complete = n, res.complete
+        src.strategy = str(res.detail.get("strategy") or strategy.name)
+        src.reported_total, src.detail = res.reported_total, res.detail
+        if res.detail.get("aborted"):
+            src.error = f"search_{res.detail['aborted']}"  # partial but usable: ok stays True
         self.r.career_found = True
         self.r.note("ats", ok=True, jobs=n)
+        if stop:
+            raise stop  # rate limit / access restriction after a partial search: keep what was found
         return True
+
+    async def _search(self, adapter, match, already_have: set[str]):
+        return await searchcrawl.run_search(
+            self.f,
+            adapter,
+            match,
+            keywords=[k.strip() for k in self.s.ats_search_keywords.split(",") if k.strip()],
+            countries=[c.strip().upper() for c in self.s.ats_search_countries.split(",") if c.strip()],
+            limits=searchcrawl.SearchLimits(
+                max_queries=self.s.ats_search_max_queries,
+                max_pages_per_query=self.s.ats_search_max_pages,
+                page_size=self.s.ats_search_page_size,
+                max_jobs=self.s.ats_search_max_jobs,
+            ),
+            already_have=already_have,
+        )
 
     def _add(self, raw: RawJob, source_url: str, source_kind: str) -> int:
         job = normalize(raw, max_chars=self.s.description_max_chars)

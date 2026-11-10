@@ -1,0 +1,143 @@
+{
+ "jobs": [
+  {
+   "id": 8101,
+   "internal_job_id": 508101,
+   "title": "AML Operations Associate",
+   "updated_at": "2026-11-08T09:12:44-05:00",
+   "first_published": "2026-10-01T08:00:00-04:00",
+   "requisition_id": "R-8101",
+   "language": "en",
+   "location": {
+    "name": "Vienna, Austria"
+   },
+   "absolute_url": "https://job-boards.greenhouse.io/bitpandalike/jobs/8101",
+   "company_name": "N26Like",
+   "data_compliance": [],
+   "metadata": null,
+   "content": "&lt;p&gt;Review alerts.&lt;/p&gt;",
+   "departments": [
+    {
+     "id": 10,
+     "name": "Operations",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ],
+   "offices": [
+    {
+     "id": 1,
+     "name": "Vienna",
+     "location": "Vienna, Austria",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ]
+  },
+  {
+   "id": 8102,
+   "internal_job_id": 508102,
+   "title": "AML Operations Associate",
+   "updated_at": "2026-11-08T09:12:44-05:00",
+   "first_published": "2026-10-02T08:00:00-04:00",
+   "requisition_id": "R-8102",
+   "language": "en",
+   "location": {
+    "name": "Berlin"
+   },
+   "absolute_url": "https://job-boards.greenhouse.io/bitpandalike/jobs/8102",
+   "company_name": "N26Like",
+   "data_compliance": [],
+   "metadata": null,
+   "content": "&lt;p&gt;Review alerts.&lt;/p&gt;",
+   "departments": [
+    {
+     "id": 10,
+     "name": "Operations",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ],
+   "offices": [
+    {
+     "id": 1,
+     "name": "Berlin",
+     "location": "Berlin, Germany",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ]
+  },
+  {
+   "id": 8103,
+   "internal_job_id": 508103,
+   "title": "Frontend Engineer",
+   "updated_at": "2026-11-08T09:12:44-05:00",
+   "first_published": "2026-10-03T08:00:00-04:00",
+   "requisition_id": "R-8103",
+   "language": "en",
+   "location": {
+    "name": "Vienna, Austria"
+   },
+   "absolute_url": "https://job-boards.greenhouse.io/bitpandalike/jobs/8103",
+   "company_name": "N26Like",
+   "data_compliance": [],
+   "metadata": null,
+   "content": "&lt;p&gt;React and TypeScript.&lt;/p&gt;",
+   "departments": [
+    {
+     "id": 10,
+     "name": "Engineering",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ],
+   "offices": [
+    {
+     "id": 1,
+     "name": "Vienna",
+     "location": "Vienna, Austria",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ]
+  },
+  {
+   "id": 8104,
+   "internal_job_id": 508104,
+   "title": "Frontend Engineer",
+   "updated_at": "2026-11-08T09:12:44-05:00",
+   "first_published": "2026-10-04T08:00:00-04:00",
+   "requisition_id": "R-8104",
+   "language": "en",
+   "location": {
+    "name": "Vienna, Austria"
+   },
+   "absolute_url": "https://job-boards.greenhouse.io/bitpandalike/jobs/8104",
+   "company_name": "N26Like",
+   "data_compliance": [],
+   "metadata": null,
+   "content": "&lt;p&gt;React and TypeScript.&lt;/p&gt;",
+   "departments": [
+    {
+     "id": 10,
+     "name": "Engineering",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ],
+   "offices": [
+    {
+     "id": 1,
+     "name": "Vienna",
+     "location": "Vienna, Austria",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ]
+  }
+ ],
+ "meta": {
+  "total": 4
+ }
+}

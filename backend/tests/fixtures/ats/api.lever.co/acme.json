@@ -1,0 +1,90 @@
+[
+ {
+  "id": "a1111111-0000-0000-0000-000000000001",
+  "text": "Backend Engineer",
+  "categories": {
+   "commitment": "Full-time",
+   "department": "R&D",
+   "location": "Munich",
+   "team": "Engineering",
+   "allLocations": [
+    "Munich"
+   ]
+  },
+  "country": "DE",
+  "workplaceType": "hybrid",
+  "description": "<div>Great role.</div>",
+  "descriptionPlain": "Great role.",
+  "lists": [
+   {
+    "text": "Requirements",
+    "content": "<li>Python</li><li>German B2</li>"
+   }
+  ],
+  "additional": "<div>We value diversity.</div>",
+  "hostedUrl": "https://jobs.lever.co/acme/a1111111-0000-0000-0000-000000000001",
+  "applyUrl": "https://jobs.lever.co/acme/a1111111-0000-0000-0000-000000000001/apply",
+  "createdAt": 1760000000000,
+  "salaryRange": {
+   "currency": "EUR",
+   "interval": "per-year-salary",
+   "min": 70000,
+   "max": 90000
+  }
+ },
+ {
+  "id": "a1111111-0000-0000-0000-000000000002",
+  "text": "Account Executive DACH",
+  "categories": {
+   "commitment": "Full-time",
+   "department": "R&D",
+   "location": "Zurich",
+   "team": "Sales",
+   "allLocations": [
+    "Zurich",
+    "Vienna"
+   ]
+  },
+  "country": "CH",
+  "workplaceType": "onsite",
+  "description": "<div>Great role.</div>",
+  "descriptionPlain": "Great role.",
+  "lists": [
+   {
+    "text": "Requirements",
+    "content": "<li>Python</li><li>German B2</li>"
+   }
+  ],
+  "additional": "<div>We value diversity.</div>",
+  "hostedUrl": "https://jobs.lever.co/acme/a1111111-0000-0000-0000-000000000002",
+  "applyUrl": "https://jobs.lever.co/acme/a1111111-0000-0000-0000-000000000002/apply",
+  "createdAt": 1760000000000
+ },
+ {
+  "id": "a1111111-0000-0000-0000-000000000003",
+  "text": "QA Engineer",
+  "categories": {
+   "commitment": "Full-time",
+   "department": "R&D",
+   "location": "Remote",
+   "team": "Engineering",
+   "allLocations": [
+    "Remote"
+   ]
+  },
+  "country": "DE",
+  "workplaceType": "remote",
+  "description": "<div>Great role.</div>",
+  "descriptionPlain": "Great role.",
+  "lists": [
+   {
+    "text": "Requirements",
+    "content": "<li>Python</li><li>German B2</li>"
+   }
+  ],
+  "additional": "<div>We value diversity.</div>",
+  "hostedUrl": "https://jobs.lever.co/acme/a1111111-0000-0000-0000-000000000003",
+  "applyUrl": "https://jobs.lever.co/acme/a1111111-0000-0000-0000-000000000003/apply",
+  "createdAt": 1760000000000
+ }
+]

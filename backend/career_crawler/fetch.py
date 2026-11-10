@@ -261,8 +261,20 @@ class AdjustableLimiter:
 # --- robots ----------------------------------------------------------------------------
 
 
+# ATS API hosts whose robots.txt must be *readable*: the v3 ATS diagnostics treated an authorisation
+# error (401/403) there as "no permission". RFC 9309 would allow crawling after a 4xx robots.txt, so
+# this is deliberately stricter - and limited to providers that are not yet cleared for live use.
+STRICT_ROBOTS_HOSTS = frozenset({"api.smartrecruiters.com", "api.ashbyhq.com"})
+
+
 class Robots:
-    def __init__(self, fetch_raw: Callable[[str], Awaitable[Page]], user_agent: str):
+    def __init__(
+        self,
+        fetch_raw: Callable[[str], Awaitable[Page]],
+        user_agent: str,
+        strict_hosts: frozenset[str] = STRICT_ROBOTS_HOSTS,
+    ):
+        self._strict_hosts = strict_hosts
         self._fetch_raw = fetch_raw
         self._ua = robots_token(user_agent)  # robots.txt groups match the product token
         self._cache: dict[str, Protego | None] = {}
@@ -282,6 +294,8 @@ class Robots:
         if page.status in (429,) or page.status >= 500:
             # RFC 9309 §2.3.1.3: unreachable robots.txt means complete disallow.
             raise RobotsUnavailable(f"robots.txt answered {page.status}", origin, status=page.status)
+        if page.status in (401, 403) and (urlsplit(origin).hostname or "").lower() in self._strict_hosts:
+            return Protego.parse("User-agent: *\nDisallow: /\n")  # not cleared: treat as disallow-all
         if page.status >= 400:
             return None
         return Protego.parse(page.text()[:500_000])

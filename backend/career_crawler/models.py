@@ -61,6 +61,13 @@ class CareerSource(Base):
     last_error: Mapped[str | None] = mapped_column(Text)
     consecutive_failures: Mapped[int] = mapped_column(Integer, server_default="0")
     last_job_count: Mapped[int | None] = mapped_column(Integer)
+    # --- ATS scan diagnostics (v3): how the account was read and how complete that read was ---
+    scan_strategy: Mapped[str | None] = mapped_column(String(32))  # catalog | search | catalog+search | disabled
+    scan_complete: Mapped[bool | None] = mapped_column(Boolean)  # last scan listed every public posting
+    reported_total: Mapped[int | None] = mapped_column(Integer)  # the provider's own total, when it gives one
+    scan_detail: Mapped[dict | None] = mapped_column(JSONB)  # queries run/failed/saturated, caps hit, ...
+    last_scan_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))
+    last_complete_scan_at: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True))
 
     __table_args__ = (
         UniqueConstraint("company_id", "url", name="uq_career_sources_company_url"),

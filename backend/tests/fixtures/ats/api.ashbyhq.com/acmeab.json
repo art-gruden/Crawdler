@@ -1,0 +1,114 @@
+{
+ "apiVersion": "1",
+ "jobs": [
+  {
+   "id": "f1a2b3c4-0001",
+   "title": "Staff Software Engineer",
+   "department": "Engineering",
+   "team": "Platform",
+   "employmentType": "FullTime",
+   "location": "Berlin",
+   "secondaryLocations": [
+    {
+     "location": "Hamburg",
+     "address": {
+      "postalAddress": {
+       "addressLocality": "Hamburg",
+       "addressCountry": "Germany"
+      }
+     }
+    }
+   ],
+   "publishedAt": "2026-10-28T09:00:00.000+00:00",
+   "isListed": true,
+   "isRemote": false,
+   "workplaceType": "Hybrid",
+   "address": {
+    "postalAddress": {
+     "addressLocality": "Berlin",
+     "addressRegion": "Berlin",
+     "addressCountry": "Germany"
+    }
+   },
+   "jobUrl": "https://jobs.ashbyhq.com/acmeab/f1a2b3c4-0001",
+   "applyUrl": "https://jobs.ashbyhq.com/acmeab/f1a2b3c4-0001/application",
+   "descriptionHtml": "<p>Join our <b>platform</b> team.</p>",
+   "descriptionPlain": "Join our platform team.",
+   "compensation": {
+    "compensationTierSummary": "€90K – €120K",
+    "summaryComponents": [
+     {
+      "compensationType": "Salary",
+      "interval": "1 YEAR",
+      "currencyCode": "EUR",
+      "minValue": 90000,
+      "maxValue": 120000
+     },
+     {
+      "compensationType": "EquityPercentage",
+      "interval": "NONE"
+     }
+    ]
+   }
+  },
+  {
+   "id": "f1a2b3c4-0002",
+   "title": "Backend Engineer",
+   "department": "Engineering",
+   "team": "Platform",
+   "employmentType": "FullTime",
+   "location": "Remote (Europe)",
+   "secondaryLocations": [],
+   "publishedAt": "2026-10-28T09:00:00.000+00:00",
+   "isListed": true,
+   "isRemote": true,
+   "workplaceType": "Remote",
+   "address": null,
+   "jobUrl": "https://jobs.ashbyhq.com/acmeab/f1a2b3c4-0002",
+   "applyUrl": "https://jobs.ashbyhq.com/acmeab/f1a2b3c4-0002/application",
+   "descriptionHtml": "<p>Join our <b>platform</b> team.</p>",
+   "descriptionPlain": "Join our platform team."
+  },
+  {
+   "id": "f1a2b3c4-0003",
+   "title": "Internal Draft Role",
+   "department": "Engineering",
+   "team": "Platform",
+   "employmentType": "FullTime",
+   "location": "Berlin",
+   "secondaryLocations": [],
+   "publishedAt": "2026-10-28T09:00:00.000+00:00",
+   "isListed": false,
+   "isRemote": false,
+   "workplaceType": "Hybrid",
+   "address": null,
+   "jobUrl": "https://jobs.ashbyhq.com/acmeab/f1a2b3c4-0003",
+   "applyUrl": "https://jobs.ashbyhq.com/acmeab/f1a2b3c4-0003/application",
+   "descriptionHtml": "<p>Join our <b>platform</b> team.</p>",
+   "descriptionPlain": "Join our platform team."
+  },
+  {
+   "id": "f1a2b3c4-0004",
+   "title": "Working Student Data",
+   "department": "Engineering",
+   "team": "Platform",
+   "employmentType": "Intern",
+   "location": "Munich",
+   "secondaryLocations": [],
+   "publishedAt": "2026-10-28T09:00:00.000+00:00",
+   "isListed": true,
+   "isRemote": false,
+   "workplaceType": "OnSite",
+   "address": {
+    "postalAddress": {
+     "addressLocality": "Munich",
+     "addressCountry": "Germany"
+    }
+   },
+   "jobUrl": "https://jobs.ashbyhq.com/acmeab/f1a2b3c4-0004",
+   "applyUrl": "https://jobs.ashbyhq.com/acmeab/f1a2b3c4-0004/application",
+   "descriptionHtml": "<p>Join our <b>platform</b> team.</p>",
+   "descriptionPlain": "Join our platform team."
+  }
+ ]
+}

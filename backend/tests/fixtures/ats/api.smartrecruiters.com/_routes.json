@@ -1,0 +1,18 @@
+{
+ "/v1/companies/AcmeSR/postings?destination=PUBLIC&limit=100&offset=0": {
+  "file": "acmesr_p1.json",
+  "content_type": "application/json"
+ },
+ "/v1/companies/AcmeSR/postings?destination=PUBLIC&limit=2&offset=0": {
+  "file": "acmesr_p0.json",
+  "content_type": "application/json"
+ },
+ "/v1/companies/AcmeSR/postings?destination=PUBLIC&limit=2&offset=2": {
+  "file": "acmesr_p2.json",
+  "content_type": "application/json"
+ },
+ "/v1/companies/ShortSR/postings?destination=PUBLIC&limit=100&offset=0": {
+  "file": "acmesr_short.json",
+  "content_type": "application/json"
+ }
+}

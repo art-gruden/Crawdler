@@ -128,7 +128,8 @@ def _source_ids(s: Session, company_id: int, result: ScanResult) -> dict[str, in
     ids = {}
     t = now()
     for src in result.sources.values():
-        stmt = insert(CareerSource).values(
+        is_feed = src.kind == "ats_feed"
+        values = dict(
             company_id=company_id,
             url=src.url,
             kind=src.kind,
@@ -141,19 +142,40 @@ def _source_ids(s: Session, company_id: int, result: ScanResult) -> dict[str, in
             consecutive_failures=0 if src.ok else 1,
             last_job_count=src.job_count if src.ok else None,
         )
-        stmt = stmt.on_conflict_do_update(
-            constraint="uq_career_sources_company_url",
-            set_={
-                "kind": stmt.excluded.kind,
-                "active": True,
-                "last_seen_at": t,
-                "last_success_at": func.coalesce(stmt.excluded.last_success_at, CareerSource.last_success_at),
-                "last_error": stmt.excluded.last_error,
-                "consecutive_failures": (CareerSource.consecutive_failures + 1) if not src.ok else 0,
-                "last_job_count": func.coalesce(stmt.excluded.last_job_count, CareerSource.last_job_count),
-                "evidence": stmt.excluded.evidence,
-            },
-        ).returning(CareerSource.id)
+        if is_feed:
+            values.update(
+                scan_strategy=src.strategy,
+                scan_complete=bool(src.ok and src.complete),
+                reported_total=src.reported_total,
+                scan_detail=src.detail or None,
+                last_scan_at=t,
+                last_complete_scan_at=t if (src.ok and src.complete) else None,
+            )
+        stmt = insert(CareerSource).values(**values)
+        update = {
+            "kind": stmt.excluded.kind,
+            "active": True,
+            "last_seen_at": t,
+            "last_success_at": func.coalesce(stmt.excluded.last_success_at, CareerSource.last_success_at),
+            "last_error": stmt.excluded.last_error,
+            "consecutive_failures": (CareerSource.consecutive_failures + 1) if not src.ok else 0,
+            "last_job_count": func.coalesce(stmt.excluded.last_job_count, CareerSource.last_job_count),
+            "evidence": stmt.excluded.evidence,
+        }
+        if is_feed:
+            update.update(
+                scan_strategy=stmt.excluded.scan_strategy,
+                scan_complete=stmt.excluded.scan_complete,
+                reported_total=stmt.excluded.reported_total,
+                scan_detail=stmt.excluded.scan_detail,
+                last_scan_at=t,
+                last_complete_scan_at=func.coalesce(
+                    stmt.excluded.last_complete_scan_at, CareerSource.last_complete_scan_at
+                ),
+            )
+        stmt = stmt.on_conflict_do_update(constraint="uq_career_sources_company_url", set_=update).returning(
+            CareerSource.id
+        )
         ids[src.url] = s.execute(stmt).scalar_one()
     return ids
 

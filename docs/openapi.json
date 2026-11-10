@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Germany Career Crawler API",
-    "description": "Company discovery and career crawling for German employers. Company data from OpenStreetMap is \u00a9 OpenStreetMap contributors, ODbL 1.0.",
+    "description": "Company discovery and career crawling for German employers. Company data from OpenStreetMap is © OpenStreetMap contributors, ODbL 1.0.",
     "version": "0.1.0"
   },
   "paths": {
@@ -565,10 +565,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Kreisschl\u00fcssel (e.g. 14612) or ISO 3166-2 state code",
+              "description": "Kreisschlüssel (e.g. 14612) or ISO 3166-2 state code",
               "title": "Region"
             },
-            "description": "Kreisschl\u00fcssel (e.g. 14612) or ISO 3166-2 state code"
+            "description": "Kreisschlüssel (e.g. 14612) or ISO 3166-2 state code"
           },
           {
             "name": "industry",
@@ -633,10 +633,10 @@
                   "type": "null"
                 }
               ],
-              "description": "osm, csv:standort_sachsen, \u2026; prefix match",
+              "description": "osm, csv:standort_sachsen, …; prefix match",
               "title": "Source"
             },
-            "description": "osm, csv:standort_sachsen, \u2026; prefix match"
+            "description": "osm, csv:standort_sachsen, …; prefix match"
           },
           {
             "name": "job_id",
@@ -734,10 +734,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Kreisschl\u00fcssel (e.g. 14612) or ISO 3166-2 state code",
+              "description": "Kreisschlüssel (e.g. 14612) or ISO 3166-2 state code",
               "title": "Region"
             },
-            "description": "Kreisschl\u00fcssel (e.g. 14612) or ISO 3166-2 state code"
+            "description": "Kreisschlüssel (e.g. 14612) or ISO 3166-2 state code"
           },
           {
             "name": "industry",
@@ -802,10 +802,10 @@
                   "type": "null"
                 }
               ],
-              "description": "osm, csv:standort_sachsen, \u2026; prefix match",
+              "description": "osm, csv:standort_sachsen, …; prefix match",
               "title": "Source"
             },
-            "description": "osm, csv:standort_sachsen, \u2026; prefix match"
+            "description": "osm, csv:standort_sachsen, …; prefix match"
           },
           {
             "name": "job_id",
@@ -2447,6 +2447,104 @@
         }
       }
     },
+    "/api/crawler/ats/providers": {
+      "get": {
+        "tags": [
+          "crawler"
+        ],
+        "summary": "Ats Providers",
+        "description": "Per ATS provider: capabilities, verification status, access outcome, counts and completeness.",
+        "operationId": "ats_providers_api_crawler_ats_providers_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/crawler/ats/sources": {
+      "get": {
+        "tags": [
+          "crawler"
+        ],
+        "summary": "Ats Sources",
+        "description": "ATS sources with their strategy, completeness and last error (filter: failing/incomplete/disabled/...).",
+        "operationId": "ats_sources_api_crawler_ats_sources_get",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 32
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Provider"
+            }
+          },
+          {
+            "name": "only",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(failing|incomplete|disabled|capped|search)$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Only"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/crawler/companies/{company_id}": {
       "get": {
         "tags": [
@@ -2881,11 +2979,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "year | month | hour \u2026; salaries are never converted",
+              "description": "year | month | hour …; salaries are never converted",
               "default": "year",
               "title": "Salary Period"
             },
-            "description": "year | month | hour \u2026; salaries are never converted"
+            "description": "year | month | hour …; salaries are never converted"
           },
           {
             "name": "new_since",
@@ -3115,7 +3213,7 @@
         "tags": [
           "bot-api"
         ],
-        "summary": "Regions (L\u00e4nder / cantons) of a country",
+        "summary": "Regions (Länder / cantons) of a country",
         "operationId": "facet_regions_api_bot_v1_facets_regions_get",
         "parameters": [
           {
@@ -4741,7 +4839,7 @@
               }
             ],
             "title": "Period",
-            "description": "year | month | hour \u2026 exactly as stated, never converted"
+            "description": "year | month | hour … exactly as stated, never converted"
           },
           "basis": {
             "type": "string",

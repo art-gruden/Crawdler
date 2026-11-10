@@ -1,0 +1,6 @@
+{
+ "/posting-api/job-board/acmeab?includeCompensation=true": {
+  "file": "acmeab.json",
+  "content_type": "application/json"
+ }
+}

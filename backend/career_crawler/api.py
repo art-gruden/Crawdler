@@ -111,7 +111,9 @@ class JobFilters:
         region: list[str] | None = Query(None, description="ISO 3166-2 (DE-SN, AT-9, CH-ZH); several = OR"),
         specialization: list[str] | None = Query(None, description="taxonomy slug or id; a group includes its members"),
         work_model: list[str] | None = Query(None, description="REMOTE | HYBRID | ONSITE | UNKNOWN"),
-        seniority: list[str] | None = Query(None, description="INTERN | JUNIOR | MID | SENIOR | LEAD | EXECUTIVE | UNKNOWN"),
+        seniority: list[str] | None = Query(
+            None, description="INTERN | JUNIOR | MID | SENIOR | LEAD | EXECUTIVE | UNKNOWN"
+        ),
     ):
         self.country_code = [x.upper() for x in country_code or []]
         self.region = [x.upper() for x in region or []]
@@ -532,6 +534,174 @@ def problem_domains(limit: int = Query(30, ge=1, le=200), db: Session = Depends(
             }
         )
     return out
+
+
+# --- ATS providers (admin diagnostics) -------------------------------------------------------------
+
+
+def _source_row(x: CareerSource, company: str | None) -> dict:
+    d = x.scan_detail or {}
+    return {
+        "source_id": x.id,
+        "company_id": x.company_id,
+        "company": company,
+        "provider": x.ats_type,
+        "account": x.ats_account,
+        "url": x.url,
+        "strategy": x.scan_strategy,
+        "scan_complete": x.scan_complete,
+        "reported_total": x.reported_total,
+        "job_count": x.last_job_count,
+        "last_scan_at": x.last_scan_at,
+        "last_complete_scan_at": x.last_complete_scan_at,
+        "last_success_at": x.last_success_at,
+        "last_error": x.last_error,
+        "consecutive_failures": x.consecutive_failures,
+        "search": {
+            k: d.get(k)
+            for k in (
+                "queries_planned",
+                "queries_run",
+                "queries_failed",
+                "queries_saturated",
+                "skipped_by_budget",
+                "aborted",
+            )
+        }
+        if d.get("strategy") in ("search", "catalog+search")
+        else None,
+        "capped": bool(d.get("capped")) or None,
+    }
+
+
+def _observed_access(total: int, ok: int, errors: dict[str, int]) -> str:
+    """What the crawler actually saw (not what the adapter claims)."""
+    if total == 0:
+        return "no_data"
+    if errors.get("robots_disallowed", 0) >= max(1, total - errors.get("provider_disabled", 0)):
+        return "robots_blocked"
+    if errors.get("provider_disabled", 0) == total:
+        return "not_fetched"
+    return "ok" if ok else "failing"
+
+
+@crawler_router.get("/ats/providers")
+def ats_providers(db: Session = Depends(get_db)):
+    """Per ATS provider: capabilities, verification status, access outcome, counts and completeness."""
+    from .ats import capabilities as caps_mod
+    from .config import get_crawler_settings
+
+    cfg = get_crawler_settings()
+    enabled = caps_mod.enabled_providers(cfg.ats_enabled_providers)
+    open_by_provider = dict(
+        db.execute(
+            select(Job.ats_type, func.count())
+            .where(Job.status == "open", Job.ats_type.is_not(None))
+            .group_by(Job.ats_type)
+        ).all()
+    )
+    src_rows = db.execute(
+        select(
+            CareerSource.ats_type,
+            func.count().label("total"),
+            func.count().filter(CareerSource.consecutive_failures == 0).label("ok"),
+            func.count().filter(CareerSource.scan_complete.is_(True)).label("complete"),
+            func.count()
+            .filter(CareerSource.scan_complete.is_(False), CareerSource.consecutive_failures == 0)
+            .label("partial"),
+            func.max(CareerSource.last_scan_at).label("last_scan_at"),
+            func.max(CareerSource.last_complete_scan_at).label("last_complete_scan_at"),
+            func.coalesce(func.sum(CareerSource.last_job_count), 0).label("jobs_last_scan"),
+        )
+        .where(CareerSource.kind == "ats_feed", CareerSource.active.is_(True))
+        .group_by(CareerSource.ats_type)
+    ).all()
+    stats = {r.ats_type: r for r in src_rows}
+    strat = {}
+    for t, st, n in db.execute(
+        select(CareerSource.ats_type, CareerSource.scan_strategy, func.count())
+        .where(CareerSource.kind == "ats_feed", CareerSource.active.is_(True))
+        .group_by(CareerSource.ats_type, CareerSource.scan_strategy)
+    ).all():
+        strat.setdefault(t, {})[st or "unknown"] = n
+    errs = {}
+    for t, e, n, last in db.execute(
+        select(CareerSource.ats_type, CareerSource.last_error, func.count(), func.max(CareerSource.last_seen_at))
+        .where(CareerSource.kind == "ats_feed", CareerSource.active.is_(True), CareerSource.last_error.is_not(None))
+        .group_by(CareerSource.ats_type, CareerSource.last_error)
+        .order_by(desc(func.count()))
+    ).all():
+        errs.setdefault(t, []).append({"error": e, "sources": n, "last_seen_at": last})
+    providers = []
+    names = list(dict.fromkeys([*caps_mod.CAPABILITIES, *stats]))
+    for name in names:
+        cap = caps_mod.CAPABILITIES.get(name)
+        st = stats.get(name)
+        e = errs.get(name, [])
+        total = st.total if st else 0
+        providers.append(
+            {
+                "provider": name,
+                "enabled": name in enabled,
+                "capabilities": cap.as_dict() if cap else None,
+                "observed_access": _observed_access(total, st.ok if st else 0, {x["error"]: x["sources"] for x in e}),
+                "sources": {
+                    "total": total,
+                    "ok": st.ok if st else 0,
+                    "scan_complete": st.complete if st else 0,
+                    "scan_partial": st.partial if st else 0,
+                },
+                "strategies": strat.get(name, {}),
+                "open_jobs": open_by_provider.get(name, 0),
+                "jobs_in_last_scans": int(st.jobs_last_scan) if st else 0,
+                "last_scan_at": st.last_scan_at if st else None,
+                "last_complete_scan_at": st.last_complete_scan_at if st else None,
+                "errors": e[:8],
+            }
+        )
+    return {
+        "generated_at": _now(),
+        "settings": {
+            "enabled_providers": sorted(enabled),
+            "search_enabled": cfg.ats_search_enabled,
+            "catalog_max_jobs": cfg.ats_catalog_max_jobs,
+            "search_max_queries": cfg.ats_search_max_queries,
+            "search_max_pages": cfg.ats_search_max_pages,
+            "search_max_jobs": cfg.ats_search_max_jobs,
+            "search_keywords": [k.strip() for k in cfg.ats_search_keywords.split(",") if k.strip()],
+            "search_countries": [c.strip() for c in cfg.ats_search_countries.split(",") if c.strip()],
+        },
+        "providers": providers,
+    }
+
+
+@crawler_router.get("/ats/sources")
+def ats_sources(
+    provider: str | None = Query(None, max_length=32),
+    only: str | None = Query(None, pattern="^(failing|incomplete|disabled|capped|search)$"),
+    limit: int = Query(50, ge=1, le=500),
+    db: Session = Depends(get_db),
+):
+    """ATS sources with their strategy, completeness and last error (filter: failing/incomplete/disabled/...)."""
+    q = (
+        select(CareerSource, Company.name)
+        .join(Company, Company.id == CareerSource.company_id)
+        .where(CareerSource.kind == "ats_feed", CareerSource.active.is_(True))
+    )
+    if provider:
+        q = q.where(CareerSource.ats_type == provider)
+    if only == "failing":
+        q = q.where(CareerSource.consecutive_failures > 0, CareerSource.last_error != "provider_disabled")
+    elif only == "incomplete":
+        q = q.where(CareerSource.scan_complete.is_(False), CareerSource.consecutive_failures == 0)
+    elif only == "disabled":
+        q = q.where(CareerSource.last_error.in_(["provider_disabled", "search_disabled"]))
+    elif only == "capped":
+        q = q.where(CareerSource.scan_detail["capped"].astext == "true")
+    elif only == "search":
+        q = q.where(CareerSource.scan_strategy.in_(["search", "catalog+search"]))
+    rows = db.execute(q.order_by(desc(CareerSource.last_scan_at).nulls_last(), CareerSource.id).limit(limit)).all()
+    return [_source_row(x, name) for x, name in rows]
 
 
 @crawler_router.get("/companies/{company_id}")

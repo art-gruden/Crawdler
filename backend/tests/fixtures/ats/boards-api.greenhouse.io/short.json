@@ -1,0 +1,138 @@
+{
+ "jobs": [
+  {
+   "id": 7001,
+   "internal_job_id": 507001,
+   "title": "Senior Backend Engineer (Payments)",
+   "updated_at": "2026-11-08T09:12:44-05:00",
+   "first_published": "2026-10-12T08:00:00-04:00",
+   "requisition_id": "R-7001",
+   "language": "en",
+   "location": {
+    "name": "Berlin"
+   },
+   "absolute_url": "https://job-boards.greenhouse.io/n26like/jobs/7001",
+   "company_name": "N26Like",
+   "data_compliance": [],
+   "metadata": [
+    {
+     "id": 1,
+     "name": "Employment Type",
+     "value": "Full-time",
+     "value_type": "single_select"
+    },
+    {
+     "id": 2,
+     "name": "Remote policy",
+     "value": "Hybrid",
+     "value_type": "single_select"
+    }
+   ],
+   "content": "&lt;p&gt;Build payment services with Kotlin and Kubernetes.&lt;/p&gt;&lt;h3&gt;Requirements&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;5+ years backend experience&lt;/li&gt;&lt;li&gt;Fluent English&lt;/li&gt;&lt;/ul&gt;",
+   "departments": [
+    {
+     "id": 10,
+     "name": "Engineering",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ],
+   "offices": [
+    {
+     "id": 1,
+     "name": "Berlin",
+     "location": "Berlin, Germany",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ],
+   "pay_input_ranges": [
+    {
+     "min_cents": 8500000,
+     "max_cents": 10500000,
+     "currency_type": "EUR",
+     "title": "Berlin",
+     "blurb": "<p>Annual gross</p>"
+    }
+   ]
+  },
+  {
+   "id": 7002,
+   "internal_job_id": 507002,
+   "title": "Data Analyst",
+   "updated_at": "2026-11-08T09:12:44-05:00",
+   "first_published": "2026-10-20T08:00:00-04:00",
+   "requisition_id": "R-7002",
+   "language": "en",
+   "location": {
+    "name": "Barcelona, Spain"
+   },
+   "absolute_url": "https://job-boards.greenhouse.io/n26like/jobs/7002",
+   "company_name": "N26Like",
+   "data_compliance": [],
+   "metadata": [
+    {
+     "id": 1,
+     "name": "Employment Type",
+     "value": "Full-time",
+     "value_type": "single_select"
+    }
+   ],
+   "content": "&lt;p&gt;SQL, dbt and Looker.&lt;/p&gt;",
+   "departments": [
+    {
+     "id": 10,
+     "name": "Data",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ],
+   "offices": [
+    {
+     "id": 1,
+     "name": "Barcelona",
+     "location": "Barcelona, Spain",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ]
+  },
+  {
+   "id": 7003,
+   "internal_job_id": 507003,
+   "title": "Customer Support Specialist (German)",
+   "updated_at": "2026-11-08T09:12:44-05:00",
+   "first_published": "2026-10-25T08:00:00-04:00",
+   "requisition_id": "R-7003",
+   "language": "en",
+   "location": {
+    "name": "Vienna, Austria"
+   },
+   "absolute_url": "https://job-boards.greenhouse.io/n26like/jobs/7003",
+   "company_name": "N26Like",
+   "data_compliance": [],
+   "metadata": null,
+   "content": "&lt;p&gt;Support customers in German.&lt;/p&gt;",
+   "departments": [
+    {
+     "id": 10,
+     "name": "Support",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ],
+   "offices": [
+    {
+     "id": 1,
+     "name": "Vienna",
+     "location": "Vienna, Austria",
+     "child_ids": [],
+     "parent_id": null
+    }
+   ]
+  }
+ ],
+ "meta": {
+  "total": 5
+ }
+}

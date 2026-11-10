@@ -145,44 +145,109 @@ class GreenhouseAdapter:
         return None
 
     async def fetch(self, fetcher, match: AtsMatch) -> FeedResult:
+        no_content = False
         page = await fetcher.get(match.feed_url, kind="feed")
+        if page.status == 200 and page.truncated:
+            # The list with descriptions is bigger than the byte limit: the *list* is still the
+            # complete catalogue, so fall back to it without bodies instead of dropping the board.
+            page = await fetcher.get(match.feed_url.replace("?content=true", ""), kind="feed")
+            no_content = True
         data = _json(page)
         if not isinstance(data, dict) or not isinstance(data.get("jobs"), list):
             raise AtsFeedError("unexpected Greenhouse response")
         jobs = []
+        seen: set[str] = set()
         for j in data["jobs"]:
             if not isinstance(j, dict) or not j.get("id") or not j.get("title"):
                 continue
+            jid = str(j["id"])
+            if jid in seen:  # two postings with the same *title* are fine; the same *id* twice is not
+                continue
+            seen.add(jid)
             loc = (j.get("location") or {}).get("name") if isinstance(j.get("location"), dict) else None
+            offices = [o for o in j.get("offices") or [] if isinstance(o, dict)]
+            office_names = [str(o.get("name")).strip() for o in offices if o.get("name")]
+            office_locs = [
+                str(o.get("location") or o.get("name")).strip() for o in offices if o.get("location") or o.get("name")
+            ]
             content = html_lib.unescape(j.get("content") or "")
-            url = j.get("absolute_url") or f"{match.board_url}/jobs/{j['id']}"
-            meta = {m.get("name"): m.get("value") for m in j.get("metadata") or [] if isinstance(m, dict)}
+            url = j.get("absolute_url") or f"{match.board_url}/jobs/{jid}"
+            meta = {m.get("name"): _meta_value(m.get("value")) for m in j.get("metadata") or [] if isinstance(m, dict)}
             emp = [str(v) for k, v in meta.items() if k and re.search(r"employment|type|schedule", k, re.I) and v]
+            remote = next(
+                (str(v) for k, v in meta.items() if k and re.search(r"remote|workplace|work model", k, re.I) and v),
+                None,
+            )
             jobs.append(
                 RawJob(
-                    title=j["title"],
+                    title=j["title"].strip(),
                     source_url=url,
                     method="ats",
                     application_url=url,
                     career_page_url=match.board_url,
-                    location_raw=loc,
+                    location_raw=loc or ("; ".join(office_names) or None),
+                    locations=[{"city": x} for x in dict.fromkeys(office_locs)][:10],
+                    remote_raw=remote,
                     employment_raw=emp,
                     # updated_at is *not* a publication date; only first_published is used.
                     date_posted_raw=j.get("first_published"),
                     description_html=content,
+                    salary=_greenhouse_pay(j.get("pay_input_ranges")),
                     ats_type="greenhouse",
                     ats_account=match.account,
-                    ats_job_id=str(j["id"]),
+                    ats_job_id=jid,
                     confidence=0.95,
                     source_values={
                         "updated_at": j.get("updated_at"),
                         "first_published": j.get("first_published"),
                         "requisition_id": j.get("requisition_id"),
+                        "internal_job_id": j.get("internal_job_id"),
+                        "language": j.get("language"),
                         "departments": [d.get("name") for d in j.get("departments") or [] if isinstance(d, dict)],
+                        "offices": office_names,
+                        "no_content": no_content or None,
                     },
                 )
             )
-        return FeedResult(jobs=jobs, complete=True, feed_url=match.feed_url)
+        complete = True
+        total = (data.get("meta") or {}).get("total") if isinstance(data.get("meta"), dict) else None
+        if isinstance(total, int) and total != len(data["jobs"]):
+            complete = False  # the board says it has more/fewer postings than the list returned
+        return FeedResult(
+            jobs=jobs,
+            complete=complete,
+            feed_url=match.feed_url,
+            reported_total=total if isinstance(total, int) else None,
+        )
+
+
+def _meta_value(v) -> str | None:
+    if v is None:
+        return None
+    if isinstance(v, (list, tuple)):
+        return ", ".join(str(x) for x in v if x) or None
+    if isinstance(v, dict):
+        return None
+    return str(v)
+
+
+def _greenhouse_pay(ranges) -> dict | None:
+    """``pay_input_ranges`` (only present when the employer enabled pay transparency)."""
+    if not isinstance(ranges, list):
+        return None
+    for r in ranges:
+        if not isinstance(r, dict):
+            continue
+        lo, hi = r.get("min_cents"), r.get("max_cents")
+        if isinstance(lo, (int, float)) and isinstance(hi, (int, float)) and hi >= lo > 0:
+            return {
+                "min": lo / 100.0,
+                "max": hi / 100.0,
+                "currency": r.get("currency_type") or None,
+                "period": None,
+                "raw": json.dumps({k: r.get(k) for k in ("min_cents", "max_cents", "currency_type", "title")})[:200],
+            }
+    return None
 
 
 # --- Lever -----------------------------------------------------------------------------------
@@ -219,16 +284,23 @@ class LeverAdapter:
     async def fetch(self, fetcher, match: AtsMatch) -> FeedResult:
         jobs = []
         complete = True
+        seen: set[str] = set()
+        pages = 0
         for page_no in range(self.MAX_PAGES):
             url = f"{match.feed_url}&skip={page_no * self.PAGE}&limit={self.PAGE}"
             data = _json(await fetcher.get(url, kind="feed"))
+            pages += 1
             if not isinstance(data, list):
                 raise AtsFeedError("unexpected Lever response")
             for p in data:
                 if not isinstance(p, dict) or not p.get("id") or not p.get("text"):
                     continue
+                if p["id"] in seen:  # pages can overlap when postings change while we page
+                    continue
+                seen.add(p["id"])
                 cats = p.get("categories") or {}
                 locs = cats.get("allLocations") or ([cats.get("location")] if cats.get("location") else [])
+                country = (p.get("country") or "").strip().upper() or None
                 parts = [p.get("description") or ""]
                 for lst in p.get("lists") or []:
                     if isinstance(lst, dict):
@@ -236,6 +308,12 @@ class LeverAdapter:
                             f"<h3>{html_lib.escape(lst.get('text') or '')}</h3><ul>{lst.get('content') or ''}</ul>"
                         )
                 parts.append(p.get("additional") or "")
+                if p.get("salaryDescription"):  # free text; the normaliser parses salaries out of the body
+                    parts.append(
+                        f"<p>{p['salaryDescription']}</p>"
+                        if "<" not in p["salaryDescription"]
+                        else p["salaryDescription"]
+                    )
                 sal = p.get("salaryRange") if isinstance(p.get("salaryRange"), dict) else None
                 salary = None
                 if sal and sal.get("min") and sal.get("max"):
@@ -257,7 +335,11 @@ class LeverAdapter:
                         application_url=p.get("applyUrl"),
                         career_page_url=match.board_url,
                         location_raw="; ".join(str(x) for x in locs if x) or None,
-                        locations=[{"city": str(x)} for x in locs if x],
+                        locations=[
+                            ({"city": str(x), "country": country} if country and len(locs) == 1 else {"city": str(x)})
+                            for x in locs
+                            if x
+                        ],
                         remote_raw=p.get("workplaceType"),
                         employment_raw=[cats["commitment"]] if cats.get("commitment") else [],
                         date_posted_raw=p.get("createdAt"),
@@ -272,6 +354,7 @@ class LeverAdapter:
                             "department": cats.get("department"),
                             "workplaceType": p.get("workplaceType"),
                             "createdAt": p.get("createdAt"),
+                            "country": country,
                         },
                     )
                 )
@@ -279,4 +362,4 @@ class LeverAdapter:
                 break
         else:
             complete = False  # more postings than we are willing to page through
-        return FeedResult(jobs=jobs, complete=complete, feed_url=match.feed_url)
+        return FeedResult(jobs=jobs, complete=complete, feed_url=match.feed_url, pages=pages)

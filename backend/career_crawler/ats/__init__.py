@@ -5,17 +5,55 @@ from __future__ import annotations
 import re
 
 from .adapters import AtsFeedError, GreenhouseAdapter, LeverAdapter, PersonioAdapter
+from .ashby import AshbyAdapter
 from .base import AtsMatch, FeedAdapter, FeedResult
+from .smartrecruiters import SmartRecruitersAdapter
 
-FEED_ADAPTERS: list[FeedAdapter] = [PersonioAdapter(), GreenhouseAdapter(), LeverAdapter()]
+# Order matters only for detection. Which providers are *fetched* is CRAWLER_ATS_ENABLED_PROVIDERS.
+FEED_ADAPTERS: list[FeedAdapter] = [
+    PersonioAdapter(),
+    GreenhouseAdapter(),
+    LeverAdapter(),
+    SmartRecruitersAdapter(),
+    AshbyAdapter(),
+]
 # Page adapters (schema.org JobPosting, generic HTML) live in career_crawler.extract and are
 # applied by the engine to every fetched page; listed here so the plugin set is in one place.
 PAGE_ADAPTERS = ("jsonld", "html")
 
 _URL_IN_TEXT = re.compile(
-    r"https?://[A-Za-z0-9.-]+\.(?:personio\.(?:de|com)|greenhouse\.io|lever\.co)/[^\s\"'<>)\\]*", re.I
+    r"https?://[A-Za-z0-9.-]+\.(?:personio\.(?:de|com)|greenhouse\.io|lever\.co|smartrecruiters\.com|ashbyhq\.com)"
+    r"/[^\s\"'<>)\\]*",
+    re.I,
 )
-ATS_HOSTS = re.compile(r"(\.jobs\.personio\.(de|com)|greenhouse\.io|\.lever\.co)$", re.I)
+ATS_HOSTS = re.compile(
+    r"(\.jobs\.personio\.(de|com)|greenhouse\.io|\.lever\.co|\.smartrecruiters\.com|\.ashbyhq\.com)$", re.I
+)
+
+_BOARDS = {
+    "personio": "https://{a}.jobs.personio.de/",
+    "greenhouse": "https://boards.greenhouse.io/{a}",
+    "lever": "https://jobs.lever.co/{a}",
+    "smartrecruiters": "https://jobs.smartrecruiters.com/{a}",
+    "ashby": "https://jobs.ashbyhq.com/{a}",
+}
+
+
+def register(adapter: FeedAdapter, board_template: str | None = None) -> None:
+    """Add (or replace) an adapter - used by tests for the mock search provider."""
+    unregister(adapter.name)
+    FEED_ADAPTERS.append(adapter)
+    if board_template:
+        _BOARDS[adapter.name] = board_template
+
+
+def unregister(name: str) -> None:
+    FEED_ADAPTERS[:] = [a for a in FEED_ADAPTERS if a.name != name]
+
+
+def board_url(ats_type: str | None, account: str | None) -> str | None:
+    tpl = _BOARDS.get(ats_type or "")
+    return tpl.format(a=account) if tpl and account else None
 
 
 def adapter(name: str) -> FeedAdapter | None:
@@ -49,6 +87,9 @@ __all__ = [
     "AtsMatch",
     "FeedResult",
     "adapter",
+    "board_url",
     "detect",
     "detect_url",
+    "register",
+    "unregister",
 ]
